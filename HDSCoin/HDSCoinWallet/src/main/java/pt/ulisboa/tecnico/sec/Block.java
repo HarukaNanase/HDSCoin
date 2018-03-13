@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.sec;
 
+import java.security.MessageDigest;
 import java.util.Date;
 import pt.ulisboa.tecnico.meic.sirs.*;
 public class Block
@@ -14,10 +15,12 @@ public class Block
         this.data = data;
         this.previousBlockHash = previousHash;
         this.time = new Date().getTime();
+        this.hash = calculateHash();
     }
 
-    public calculateHash(){
-        
+    public String calculateHash(){
+        return "a";
     }
+
 
 }
