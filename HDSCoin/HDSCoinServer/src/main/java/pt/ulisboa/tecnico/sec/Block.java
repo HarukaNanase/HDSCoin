@@ -26,9 +26,7 @@ public class Block
         String objective = new String(new char[dificulty]).replace('\0','0');
         while(!this.hash.substring(0, dificulty).equals(objective)){
             this.nonce++;
-            System.out.println("Nonce: " + this.nonce);
             this.hash = calculateHash();
-            System.out.println("Hash calculated for this nonce: " + this.hash);
         }
 
         System.out.println("Block mined! Block hash: " + this.hash);

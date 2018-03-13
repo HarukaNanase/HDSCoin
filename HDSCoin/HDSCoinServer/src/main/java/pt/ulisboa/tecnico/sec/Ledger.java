@@ -18,15 +18,15 @@ public class Ledger {
 
     public static void main(String[] args){
         Block genesis = new Block("First block", "0");
-        System.out.println("Genesis Block Hash: " + genesis.hash);
+
+        AddToBlockChain(genesis);
         Block block2 = new Block("Second block", genesis.hash);
-        System.out.println("Second Block Hash: " + block2.hash);
+        AddToBlockChain(block2);
         Block block3 = new Block("Third block", block2.hash);
-        System.out.println("Third Block Hash: " + block3.hash);
-        System.out.println("Trying to block third block...");
-        block3.mine(difficulty);
+        AddToBlockChain(block3);
 
         System.out.println("Chain is valid? " + verifyChain());
+
 
 
 
@@ -51,11 +51,21 @@ public class Ledger {
 
     }
 
+
+    public static boolean AddToBlockChain(Block block){
+        block.mine(difficulty);
+        blockchain.add(block);
+        verifyChain();
+        return true;
+    }
+
     public static boolean verifyChain(){
         Block current;
         Block previous;
         String objective = new String(new char[difficulty]).replace('\0', '0');
-        for(int i = 0; i< blockchain.size(); i++){
+        System.out.println("Blocks in chain: " + blockchain.size());
+
+        for(int i = 1; i< blockchain.size(); i++){
             current = blockchain.get(i);
             previous = blockchain.get(i-1);
             if(!current.hash.equals(current.calculateHash())){
@@ -66,7 +76,7 @@ public class Ledger {
                 System.out.println("Previous block hash does not match current block previous hash.");
                 return false;
             }
-            if(!current.hash.substring( 0, difficulty).equals(objective)) {
+            if(!current.hash.substring(0, difficulty).equals(objective)) {
                 System.out.println("This block hasn't been mined");
                 return false;
             }
