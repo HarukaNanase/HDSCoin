@@ -7,13 +7,14 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.security.PublicKey;
 import java.util.ArrayList;
 
 public class Ledger {
     public static ServerSocket mainSocket;
 
     public static ArrayList<Block> blockchain = new ArrayList<Block>();
-    public static int difficulty = 5;
+    public static int difficulty = 2;
 
 
     public static void main(String[] args){
@@ -26,8 +27,17 @@ public class Ledger {
         AddToBlockChain(block3);
 
         System.out.println("Chain is valid? " + verifyChain());
-
-
+        Account acc1 = new Account();
+        Account acc2 = new Account();
+        Transaction t = new Transaction(acc1, acc2, 5);
+        System.out.println(t.getTransactionInfo());
+        Block block4 = new Block("4th block", block3.hash);
+        block4.addTransaction(t);
+        AddToBlockChain(block4);
+        System.out.println("Account 1 info:");
+        System.out.println(acc1.getAccountInfo());
+        System.out.println("Account 2 info:");
+        System.out.println(acc2.getAccountInfo());
 
 
         try{
@@ -58,6 +68,9 @@ public class Ledger {
         verifyChain();
         return true;
     }
+
+
+
 
     public static boolean verifyChain(){
         Block current;
