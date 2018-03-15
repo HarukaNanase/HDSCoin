@@ -11,8 +11,8 @@ public class Block
     private String data;
     private long time;
     private ArrayList<Transaction> blockTransactions;
-    private int nonce;
-    private int MAX_TRANSACTIONS_PER_BLOCK = 10;
+    private transient int nonce;
+    private transient int MAX_TRANSACTIONS_PER_BLOCK = 10;
     public Block(String data, String previousHash){
         this.data = data;
         this.previousBlockHash = previousHash;
@@ -48,6 +48,10 @@ public class Block
     public String getTransactionsAsJSon(){
         Gson gson = new Gson();
         return gson.toJson(this.blockTransactions);
+    }
+    public String getBlockAsJSon(){
+        Gson gson = new Gson();
+        return gson.toJson(this);
     }
 
 

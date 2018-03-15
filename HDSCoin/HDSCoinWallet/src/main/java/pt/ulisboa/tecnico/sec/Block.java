@@ -2,7 +2,6 @@ package pt.ulisboa.tecnico.sec;
 
 import java.security.MessageDigest;
 import java.util.Date;
-import pt.ulisboa.tecnico.meic.sirs.*;
 public class Block
 {
     public String hash;
