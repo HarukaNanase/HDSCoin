@@ -26,6 +26,14 @@ public class Account {
             this.generateAccountKeys();
         }
 
+        public String getPublicKeyString(){
+            return this.publicKeyString;
+        }
+
+        public int getBalance(){
+            return this.balance;
+        }
+
         public void generateAccountKeys(){
             try {
                 KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");

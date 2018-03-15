@@ -40,6 +40,14 @@ public class Request {
         return gson.toJson(this);
     }
 
+    public ArrayList<String> getParameters(){
+        return this.parameters;
+    }
+
+    public String getParameter(int idx){
+        return this.parameters.get(idx);
+    }
+
     public void readRequest(String incoming){
         Gson gson = new Gson();
         Request incomingRequest = gson.fromJson(incoming, Request.class);

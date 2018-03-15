@@ -31,9 +31,21 @@ public class Request {
         this.opcode = opcode;
     }
 
-    public String getRequest(){
+    public String getOpcode(){
+        return this.opcode;
+    }
+
+    public String requestAsJson(){
         Gson gson = new Gson();
         return gson.toJson(this);
+    }
+
+    public ArrayList<String> getParameters(){
+        return this.parameters;
+    }
+
+    public String getParameter(int idx){
+        return this.parameters.get(idx);
     }
 
     public void readRequest(String incoming){
@@ -46,6 +58,5 @@ public class Request {
     public static Request requestFromJson(String incomingJson){
         Gson gson = new Gson();
         return gson.fromJson(incomingJson, Request.class);
-
     }
 }
