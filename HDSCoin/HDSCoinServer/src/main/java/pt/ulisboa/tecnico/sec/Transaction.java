@@ -21,9 +21,11 @@ public class Transaction {
 
     public void process(){
         if(shouldProcess) {
-            this.sourceAcc.makePayment(value);
-            this.destinationAcc.receivePayment(value);
-            this.isProcessed = true;
+            if(sourceAcc != null && destinationAcc != null){
+                this.sourceAcc.makePayment(value);
+                this.destinationAcc.receivePayment(value);
+                this.isProcessed = true;
+            }
         }
     }
 
@@ -34,6 +36,14 @@ public class Transaction {
     public String getTransactionInfo(){
         Gson gson = new Gson();
         return gson.toJson(this);
+    }
+
+    public String getSourceAddress(){
+        return sourceAddress;
+    }
+
+    public String getDestinationAddress(){
+        return destinationAddress;
     }
 }
 

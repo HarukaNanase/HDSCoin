@@ -21,6 +21,18 @@ public class Account {
             this.publicKey = pkey;
             balance = 50;
         }
+
+        public Account(String publicKeyString){
+            this.publicKeyString = publicKeyString;
+            this.balance = 50;
+        }
+
+        public Account(PublicKey pkey, String publicKeyString){
+            this.publicKey = pkey;
+            this.publicKeyString = publicKeyString;
+            this.balance = 50;
+        }
+
         public Account(){
             balance = 50;
             this.generateAccountKeys();
