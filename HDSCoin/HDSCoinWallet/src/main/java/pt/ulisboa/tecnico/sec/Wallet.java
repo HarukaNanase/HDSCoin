@@ -4,20 +4,24 @@ import com.sun.org.apache.xml.internal.security.utils.Base64;
 
 import java.io.*;
 import java.net.Socket;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
+import java.security.spec.EncodedKeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Scanner;
 
 public class Wallet {
     public static Socket mainSocket;
     private static PublicKey pKey;
     private static PrivateKey privKey;
-    private static String publicKeyString = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAL4+Qm4IeaIuoV5SATb2BEyuL6tCuqJoblxypcY325sa\\nTKiurtYzWYsQv2HtZ3nuBKul09lX8GI+pJU2uBKOajkCAwEAAQ\\u003d\\u003d";
+    private static String publicKeyString;
     private static String privateKeyString;
     private static DataOutputStream out;
     private static DataInputStream in;
+
+    private static String serverPublicKeyString;
+    private static PublicKey serverPublicKey;
+
     public static void main(String[] args){
         System.out.println("Wallet v0.01");
         Scanner scanner = new Scanner(System.in);
@@ -38,6 +42,7 @@ public class Wallet {
             mainSocket = new Socket("127.0.0.1", 1381);
             out = new DataOutputStream(mainSocket.getOutputStream());
             in = new DataInputStream(mainSocket.getInputStream());
+            handleUserInput("RequestServerKey");
             while(true){
                 System.out.println("What you wanna do?");
                 String opcode = scanner.next();
@@ -94,6 +99,22 @@ public class Wallet {
             try{
                 out.writeUTF(ureq.requestAsJson());
                 System.out.println(in.readUTF());
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+        }else if(opcode.equals("RequestServerKey")){
+            try{
+                out.writeUTF(ureq.requestAsJson());
+                serverPublicKeyString = in.readUTF();
+                byte[] publicKeyBytes = Base64.decode(serverPublicKeyString);
+                // The bytes can be converted back to public and private key objects
+                KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+
+                EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
+                serverPublicKey = keyFactory.generatePublic(publicKeySpec);
+                System.out.println("Server Key: " + serverPublicKeyString);
+
             }catch(Exception e){
                 e.printStackTrace();
             }

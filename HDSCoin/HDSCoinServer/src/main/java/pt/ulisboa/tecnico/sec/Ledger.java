@@ -2,43 +2,39 @@ package pt.ulisboa.tecnico.sec;
 
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 
-import javax.xml.ws.Endpoint;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
-import java.security.KeyFactory;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 
-public class Ledger {
+public class Ledger implements Serializable{
     public static ServerSocket mainSocket;
 
     public static ArrayList<Block> blockchain = new ArrayList<Block>();
     public static ArrayList<Account> accounts = new ArrayList<Account>();
     public static ArrayList<Transaction> backlog = new ArrayList<Transaction>();
-    public static int difficulty = 5;
+    public static int difficulty = 2;
+    private static String publicKeyString;
+    private static String PrivateKeyString;
+    private static PublicKey publicKey;
+    private static PrivateKey privKey;
+    private static int KEY_SIZE = 512;
 
+    public Ledger() {
+    }
 
     public static void main(String[] args){
         Block genesis = new Block("First block", "0");
-
+        generateServerKeys();
         AddToBlockChain(genesis);
         Block block2 = new Block("Second block", genesis.hash);
         AddToBlockChain(block2);
         Block block3 = new Block("Third block", block2.hash);
         AddToBlockChain(block3);
-        Account acc1 = new Account();
-        Account acc2 = new Account();
-        Transaction t = new Transaction(acc1, acc2, 5);
-        //Transaction t2 = new Transaction(acc2, acc1, 10);
         Block block4 = new Block("4th block", block3.hash);
-        t.signalToProcess();
-        //t2.signalToProcess();
-        block4.addTransaction(t);
-        //block4.addTransaction(t2);
         AddToBlockChain(block4);
 
         for(Block b : blockchain){
@@ -78,6 +74,8 @@ public class Ledger {
 
     }
 
+
+
     public static void handleClientRequest(Socket client){
         try {
             DataInputStream in = new DataInputStream(client.getInputStream());
@@ -93,10 +91,20 @@ public class Ledger {
                     KeyFactory keyFactory = KeyFactory.getInstance("RSA");
                     EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
                     PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
+                    for(Account a : accounts){
+                        if(a.getAccountAddress().equals(publicKeyBase64)){
+                            System.out.println("Account already exists");
+                            out.writeUTF("Account already exists with that address");
+                            return;
+                        }
+                    }
                     Account newUser = new Account(publicKey, publicKeyBase64);
                     accounts.add(newUser);
                     System.out.println("Account added. Account Size: " + accounts.size());
                     out.writeUTF("Success! Your account balance: " + newUser.getBalance());
+                    System.out.println("Accounts array:");
+                    for(Account a : accounts)
+                        System.out.println(a.getAccountInfo());
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -130,9 +138,12 @@ public class Ledger {
             } else if (req.getOpcode().equals("CreateTransaction")) {
                 String src = req.getParameter(0);
                 String dst = req.getParameter(1);
+                System.out.println("Destination: " + dst);
                 Account acc1 = getAccount(src);
                 Account acc2 = getAccount(dst);
                 Transaction t;
+                System.out.println("Acc1: " + acc1.getAccountAddress());
+                System.out.println("Acc2: " + acc2.getAccountAddress());
                 int value = Integer.valueOf(req.getParameter(2));
                 if(acc1 != null && acc2 != null) {
                     t = new Transaction(acc1, acc2, value);
@@ -157,19 +168,26 @@ public class Ledger {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             }
-        }catch(Exception e){
+            else if(req.getOpcode().equals("RequestServerKey")){
+                try{
+                    out.writeUTF(publicKeyString);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }catch(Exception e) {
             e.printStackTrace();
 
         }
 
 
-
     }
+
 
     public static Account getAccount(String publicKey){
         for(Account a : accounts){
+            System.out.println("Account address:" + a.getAccountAddress());
             if (a.getAccountAddress().equals(publicKey)) {
                 System.out.println("Account found!");
                 return a;
@@ -212,7 +230,25 @@ public class Ledger {
     }
 
 
+    public static void generateServerKeys(){
+        try {
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+            keyGen.initialize(KEY_SIZE);
+            KeyPair keyPair = keyGen.generateKeyPair();
+            privKey = keyPair.getPrivate();
+            publicKey = keyPair.getPublic();
 
+            byte[] pubKeyBytes = publicKey.getEncoded();
+            byte[] privKeyBytes = privKey.getEncoded();
+
+            publicKeyString = Base64.encode(pubKeyBytes);
+            PrivateKeyString = Base64.encode(privKeyBytes); // PKCS#8
+            System.out.println("Server Key: " + publicKeyString);
+
+        }catch(Exception e){
+
+        }
+    }
 
 
 

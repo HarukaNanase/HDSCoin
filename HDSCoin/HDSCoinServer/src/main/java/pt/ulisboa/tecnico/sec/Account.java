@@ -61,17 +61,6 @@ public class Account {
                 this.privateKeyString = Base64.encode(privKeyBytes); // PKCS#8
 
 
-                //get the key from the string:
-                /*
-               // The bytes can be converted back to public and private key objects
-               KeyFactory keyFactory = KeyFactory.getInstance(keyAlgorithm);
-               EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
-               PrivateKey privateKey2 = keyFactory.generatePrivate(privateKeySpec);
-
-               EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
-               PublicKey publicKey2 = keyFactory.generatePublic(publicKeySpec);
-                 */
-
             }catch(Exception e){
 
             }
