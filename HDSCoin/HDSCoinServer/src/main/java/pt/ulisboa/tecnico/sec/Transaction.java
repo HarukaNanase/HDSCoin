@@ -18,6 +18,9 @@ public class Transaction {
         this.destinationAddress = dest.getAccountAddress();
         this.value = value;
     }
+    public boolean isProcessed(){
+        return this.isProcessed;
+    }
 
     public void process(){
         if(shouldProcess) {

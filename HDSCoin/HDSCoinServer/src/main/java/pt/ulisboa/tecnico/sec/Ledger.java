@@ -169,6 +169,26 @@ public class Ledger implements Serializable{
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }else if(req.getOpcode().equals("ReceiveTransaction")){
+                String destinationKey = req.getParameter(0);
+                String sourceKey = req.getParameter(1);
+                for(Transaction t: backlog){
+                    if(t.getSourceAddress().equals(sourceKey) && t.getDestinationAddress().equals(destinationKey)){
+                        if(!t.isProcessed()){
+                            t.signalToProcess();
+                            //test, 1 trasaction per block!
+                            Block b = new Block("Transaction Completed", blockchain.get((blockchain.size() - 1)).hash);
+                            b.addTransaction(t);
+                            AddToBlockChain(b);
+                            try{
+                                out.writeUTF("Transaction has been accepted! Check your new balance!");
+                            }catch(Exception e){
+                                out.writeUTF("A problem occured.");
+                            }
+                        }
+                    }
+                }
+
             }
             else if(req.getOpcode().equals("RequestServerKey")){
                 try{
@@ -205,7 +225,10 @@ public class Ledger implements Serializable{
     public static boolean AddToBlockChain(Block block){
         block.mine(difficulty);
         blockchain.add(block);
-        verifyChain();
+        if(verifyChain())
+            System.out.println("Everything's fine with the chain");
+        else
+            System.out.println("Chain's corrupted, altered and not viable");
         return true;
     }
 

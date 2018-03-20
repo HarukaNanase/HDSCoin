@@ -23,7 +23,7 @@ public class Request {
         this.parameters = new ArrayList<String>();
     }
 
-    public void addParamemter(String param){
+    public void addParameter(String param){
         this.parameters.add(param);
     }
 

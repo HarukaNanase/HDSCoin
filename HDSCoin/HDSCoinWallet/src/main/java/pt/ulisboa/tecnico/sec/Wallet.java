@@ -6,7 +6,6 @@ import java.io.*;
 import java.net.Socket;
 import java.security.*;
 import java.security.spec.EncodedKeySpec;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Scanner;
 
@@ -63,7 +62,7 @@ public class Wallet {
             Scanner scanner = new Scanner(System.in);
             System.out.println("Your key address: " + publicKeyString);
 
-            ureq.addParamemter(publicKeyString);
+            ureq.addParameter(publicKeyString);
             try {
                 out.writeUTF(ureq.requestAsJson());
                 System.out.println(in.readUTF());
@@ -72,10 +71,7 @@ public class Wallet {
             }
         }
         else if(opcode.equals("CheckAccount")) {
-            Scanner scanner = new Scanner(System.in);
-            ureq.addParamemter(scanner.next());
-
-            //ureq.addParamemter(publicKeyString);
+            ureq.addParameter(publicKeyString);
             try {
                 out.writeUTF(ureq.requestAsJson());
                 System.out.println(in.readUTF());
@@ -89,9 +85,9 @@ public class Wallet {
             String destination = scanner.next();
             System.out.println("How many coins do you want to send : " );
             int value = scanner.nextInt();
-            ureq.addParamemter(publicKeyString);
-            ureq.addParamemter(destination);
-            ureq.addParamemter(Integer.toString(value));
+            ureq.addParameter(publicKeyString);
+            ureq.addParameter(destination);
+            ureq.addParameter(Integer.toString(value));
             try {
                 out.writeUTF(ureq.requestAsJson());
                 System.out.println(in.readUTF());
@@ -120,6 +116,19 @@ public class Wallet {
                 serverPublicKey = keyFactory.generatePublic(publicKeySpec);
                 System.out.println("Server Key: " + serverPublicKeyString);
 
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
+        }else if(opcode.equals("ReceiveTransaction")){
+            try{
+                System.out.println("Enter the payer's address:");
+                Scanner scanner = new Scanner(System.in);
+                String payerAddress = scanner.next();
+                ureq.addParameter(publicKeyString);
+                ureq.addParameter(payerAddress);
+                out.writeUTF(ureq.requestAsJson());
+                System.out.println(in.readUTF());
             }catch(Exception e){
                 e.printStackTrace();
             }
