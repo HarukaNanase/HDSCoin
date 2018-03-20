@@ -112,10 +112,11 @@ public class Ledger implements Serializable{
             } else if (req.getOpcode().equals("CheckAccount")) {
                 String key = null;
                 key = req.getParameter(0);
+
                 StringBuilder sb = new StringBuilder();
                 Account acc = getAccount(key);
                     if (acc != null) {
-                        sb.append("Account : " + acc.getAccountAddress() + "\n");
+                        sb.append("Account : " + StringUtil.unEscapeString(acc.getAccountAddress()) + "\n");
                         sb.append("Balance : " + acc.getBalance() + "\n");
                     }
 
@@ -184,10 +185,9 @@ public class Ledger implements Serializable{
 
     }
 
-
     public static Account getAccount(String publicKey){
         for(Account a : accounts){
-            System.out.println("Account address:" + a.getAccountAddress());
+
             if (a.getAccountAddress().equals(publicKey)) {
                 System.out.println("Account found!");
                 return a;
