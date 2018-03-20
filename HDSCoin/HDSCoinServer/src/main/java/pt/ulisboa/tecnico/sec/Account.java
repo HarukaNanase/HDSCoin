@@ -42,6 +42,8 @@ public class Account {
             return this.publicKeyString;
         }
 
+        public PublicKey getPublicKey(){ return this.publicKey;}
+
         public int getBalance(){
             return this.balance;
         }

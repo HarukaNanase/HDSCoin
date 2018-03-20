@@ -19,6 +19,8 @@ public class Wallet {
     private static DataOutputStream out;
     private static DataInputStream in;
 
+    private static int KEY_SIZE = 512;
+
     private static String serverPublicKeyString;
     private static PublicKey serverPublicKey;
 
@@ -27,7 +29,7 @@ public class Wallet {
         Scanner scanner = new Scanner(System.in);
         try {
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-            keyGen.initialize(512);
+            keyGen.initialize(KEY_SIZE);
             KeyPair keyPair = keyGen.generateKeyPair();
             privKey = keyPair.getPrivate();
             pKey = keyPair.getPublic();
@@ -35,8 +37,8 @@ public class Wallet {
             byte[] pubKeyBytes = pKey.getEncoded();
             byte[] privKeyBytes = privKey.getEncoded();
 
-            publicKeyString = Base64.encode(pubKeyBytes);
-            privateKeyString = Base64.encode(privKeyBytes);
+            publicKeyString = Base64.encode(pubKeyBytes, 512);
+            privateKeyString = Base64.encode(privKeyBytes, 512);
             System.out.println("Your key: " + publicKeyString);
 
             mainSocket = new Socket("127.0.0.1", 1381);
@@ -70,7 +72,10 @@ public class Wallet {
             }
         }
         else if(opcode.equals("CheckAccount")) {
-            ureq.addParamemter(publicKeyString);
+            Scanner scanner = new Scanner(System.in);
+            ureq.addParamemter(scanner.next());
+
+            //ureq.addParamemter(publicKeyString);
             try {
                 out.writeUTF(ureq.requestAsJson());
                 System.out.println(in.readUTF());

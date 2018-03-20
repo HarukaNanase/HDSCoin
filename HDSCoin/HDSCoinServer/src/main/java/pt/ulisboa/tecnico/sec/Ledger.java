@@ -121,7 +121,8 @@ public class Ledger implements Serializable{
                     }
 
                 for (Transaction t : backlog) {
-                    if (t.getDestinationAddress().equals(key)) {
+                        System.out.println("\n"+t.getTransactionInfo()+"\n");
+                    if (t.getDestinationAddress().equals(key) || t.getSourceAddress().equals(key)) {
                         sb.append(t.getTransactionInfo());
                         sb.append("\n");
                     }
@@ -143,12 +144,11 @@ public class Ledger implements Serializable{
                 Account acc1 = getAccount(src);
                 Account acc2 = getAccount(dst);
                 Transaction t;
-                System.out.println("Acc1: " + acc1.getAccountAddress());
-                System.out.println("Acc2: " + acc2.getAccountAddress());
                 int value = Integer.valueOf(req.getParameter(2));
                 if(acc1 != null && acc2 != null) {
                     t = new Transaction(acc1, acc2, value);
                     backlog.add(t);
+                    out.writeUTF("Transaction has been sent.");
                 }
                 else
                     out.writeUTF("Destination address is unknown.");
@@ -186,12 +186,19 @@ public class Ledger implements Serializable{
     }
 
     public static Account getAccount(String publicKey){
-        for(Account a : accounts){
-
-            if (a.getAccountAddress().equals(publicKey)) {
-                System.out.println("Account found!");
-                return a;
+        try {
+            byte[] publicKeyBytes = Base64.decode(publicKey);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
+            PublicKey pubK = keyFactory.generatePublic(publicKeySpec);
+            for (Account a : accounts) {
+                if (a.getPublicKey().equals(pubK)) {
+                    System.out.println("Account found!");
+                    return a;
+                }
             }
+        }catch(Exception e){
+            return null;
         }
         return null;
     }
@@ -241,7 +248,7 @@ public class Ledger implements Serializable{
             byte[] pubKeyBytes = publicKey.getEncoded();
             byte[] privKeyBytes = privKey.getEncoded();
 
-            publicKeyString = Base64.encode(pubKeyBytes);
+            publicKeyString = Base64.encode(pubKeyBytes, 512);
             PrivateKeyString = Base64.encode(privKeyBytes); // PKCS#8
             System.out.println("Server Key: " + publicKeyString);
 
