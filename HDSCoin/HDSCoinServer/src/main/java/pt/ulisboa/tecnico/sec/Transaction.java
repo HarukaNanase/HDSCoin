@@ -25,7 +25,7 @@ public class Transaction {
     public void process(){
         if(shouldProcess) {
             if(sourceAcc != null && destinationAcc != null){
-                this.sourceAcc.makePayment(value);
+                //this.sourceAcc.makePayment(value);
                 this.destinationAcc.receivePayment(value);
                 this.isProcessed = true;
             }

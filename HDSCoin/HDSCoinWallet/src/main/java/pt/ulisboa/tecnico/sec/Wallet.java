@@ -56,6 +56,12 @@ public class Wallet {
 
     }
 
+
+    public static void createAccount(String pkey){
+
+    }
+
+
     public static void handleUserInput(String opcode){
         Request ureq = new Request(opcode);
         if(opcode.equals("CreateAccount")){

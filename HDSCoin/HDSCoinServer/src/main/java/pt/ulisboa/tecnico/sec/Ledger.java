@@ -74,7 +74,82 @@ public class Ledger implements Serializable{
 
     }
 
+    private static String createAccount(String publicKeyBase64) {
+        try {
+            byte[] publicKeyBytes = Base64.decode(publicKeyBase64);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
+            PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
+            for (Account a : accounts) {
+                if (a.getAccountAddress().equals(publicKeyBase64)) {
+                    System.out.println("Account already exists");
+                    return "Account already exists with that address";
 
+                }
+            }
+            Account newUser = new Account(publicKey, publicKeyBase64);
+            accounts.add(newUser);
+            return "Success! Your account balance: ";
+        }catch(Exception e){
+            e.printStackTrace();
+            return "An error has occured";
+        }
+    }
+
+    private static String checkAccount(String key){
+        StringBuilder sb = new StringBuilder();
+        Account acc = getAccount(key);
+        if (acc != null) {
+            sb.append("Account : " + acc.getAccountAddress() + "\n");
+            sb.append("Balance : " + acc.getBalance() + "\n");
+        }
+
+        for (Transaction t : backlog) {
+            System.out.println("\n" + t.getTransactionInfo() + "\n");
+            if (t.getDestinationAddress().equals(key)) {
+                sb.append(t.getTransactionInfo());
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
+    }
+
+
+    private static String createTransaction(String src, String dst, int value){
+        Account acc1 = getAccount(src);
+        Account acc2 = getAccount(dst);
+        Transaction t;
+        if (value <= 0) {
+            return "Cannot do a transaction with negative or 0 value.";
+        }
+        if (acc1 != null && acc2 != null) {
+            acc1.setBalance(acc1.getBalance() - value);
+            t = new Transaction(acc1, acc2, value);
+            backlog.add(t);
+            return "Transaction has been sent.";
+
+        } else {
+            return "Destination address is unknown.";
+        }
+
+    }
+
+    public static String getChain(){
+        try {
+            StringBuilder sb = new StringBuilder();
+            int i = 1;
+            for (Block b : blockchain) {
+                sb.append("Block " + i + ": " + "\n");
+                sb.append(b.getBlockAsJSon());
+                sb.append("\n");
+                i++;
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error fetching chain.";
+        }
+    }
 
     public static void handleClientRequest(Socket client){
         try {
@@ -84,92 +159,25 @@ public class Ledger implements Serializable{
             Request req = Request.requestFromJson(treq);
             System.out.println("Request Received!");
             System.out.println(req.requestAsJson());
+
             if (req.getOpcode().equals("CreateAccount")) {
                 String publicKeyBase64 = req.getParameter(0);
-                try {
-                    byte[] publicKeyBytes = Base64.decode(publicKeyBase64);
-                    KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-                    EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
-                    PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
-                    for(Account a : accounts){
-                        if(a.getAccountAddress().equals(publicKeyBase64)){
-                            System.out.println("Account already exists");
-                            out.writeUTF("Account already exists with that address");
-                            return;
-                        }
-                    }
-                    Account newUser = new Account(publicKey, publicKeyBase64);
-                    accounts.add(newUser);
-                    System.out.println("Account added. Account Size: " + accounts.size());
-                    out.writeUTF("Success! Your account balance: " + newUser.getBalance());
-                    System.out.println("Accounts array:");
-                    for(Account a : accounts)
-                        System.out.println(a.getAccountInfo());
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else if (req.getOpcode().equals("CheckAccount")) {
-                String key = null;
-                key = req.getParameter(0);
-
-                StringBuilder sb = new StringBuilder();
-                Account acc = getAccount(key);
-                    if (acc != null) {
-                        sb.append("Account : " + StringUtil.unEscapeString(acc.getAccountAddress()) + "\n");
-                        sb.append("Balance : " + acc.getBalance() + "\n");
-                    }
-
-                for (Transaction t : backlog) {
-                        System.out.println("\n"+t.getTransactionInfo()+"\n");
-                    if (t.getDestinationAddress().equals(key) || t.getSourceAddress().equals(key)) {
-                        sb.append(t.getTransactionInfo());
-                        sb.append("\n");
-                    }
-                }
-                try {
-                    out.writeUTF(sb.toString());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            } else if (req.getOpcode().equals("sendAmount")) {
-
-            } else if (req.getOpcode().equals("receiveAmount")) {
-
-            } else if (req.getOpcode().equals("CreateTransaction")) {
+                out.writeUTF(createAccount(publicKeyBase64));
+            }
+            else if (req.getOpcode().equals("CheckAccount")) {
+                out.writeUTF(checkAccount(req.getParameter(0)));
+            }
+            else if (req.getOpcode().equals("CreateTransaction")) {
                 String src = req.getParameter(0);
                 String dst = req.getParameter(1);
-                System.out.println("Destination: " + dst);
-                Account acc1 = getAccount(src);
-                Account acc2 = getAccount(dst);
-                Transaction t;
                 int value = Integer.valueOf(req.getParameter(2));
-                if(acc1 != null && acc2 != null) {
-                    t = new Transaction(acc1, acc2, value);
-                    backlog.add(t);
-                    out.writeUTF("Transaction has been sent.");
-                }
-                else
-                    out.writeUTF("Destination address is unknown.");
+                out.writeUTF(createTransaction(src,dst,value));
+            }
+            else if (req.getOpcode().equals("RequestChain")) {
+                out.writeUTF(getChain());
 
-
-            } else if (req.getOpcode().equals("RequestChain")) {
-                try {
-                    StringBuilder sb = new StringBuilder();
-                    int i = 1;
-                    for (Block b : blockchain) {
-                        sb.append("Block " + i + ": " + "\n");
-                        sb.append(b.getBlockAsJSon());
-                        sb.append("\n");
-                        i++;
-                    }
-                    out.writeUTF(sb.toString());
-                    out.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }else if(req.getOpcode().equals("ReceiveTransaction")){
+            }
+            else if(req.getOpcode().equals("ReceiveTransaction")){
                 String destinationKey = req.getParameter(0);
                 String sourceKey = req.getParameter(1);
                 for(Transaction t: backlog){
@@ -180,8 +188,10 @@ public class Ledger implements Serializable{
                             Block b = new Block("Transaction Completed", blockchain.get((blockchain.size() - 1)).hash);
                             b.addTransaction(t);
                             AddToBlockChain(b);
+                            backlog.remove(t);
                             try{
                                 out.writeUTF("Transaction has been accepted! Check your new balance!");
+                                return;
                             }catch(Exception e){
                                 out.writeUTF("A problem occured.");
                             }
