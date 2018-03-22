@@ -7,6 +7,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.*;
 import java.security.spec.EncodedKeySpec;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 
@@ -22,13 +24,28 @@ public class Ledger implements Serializable{
     private static PublicKey publicKey;
     private static PrivateKey privKey;
     private static int KEY_SIZE = 512;
+    private static String ALGORITHM = "RSA";
 
     public Ledger() {
     }
 
     public static void main(String[] args){
+        try {
+            loadKeys(System.getProperty("user.dir")+"/resources/");
+        }catch(IOException ioe){
+            System.out.println("Could not load key files. Generating new ones.");
+            ioe.printStackTrace();
+            generateServerKeys();
+        }catch(NoSuchAlgorithmException nsae){
+            System.out.println("Incompatible algorithm");
+            return;
+        }catch(InvalidKeySpecException ikse){
+            System.out.println("Invalid or corrupt keys. Generating new ones");
+            generateServerKeys();
+        }
+
+
         Block genesis = new Block("First block", "0");
-        generateServerKeys();
         AddToBlockChain(genesis);
         Block block2 = new Block("Second block", genesis.hash);
         AddToBlockChain(block2);
@@ -50,9 +67,6 @@ public class Ledger implements Serializable{
         while(true){
             try {
                 final Socket client = mainSocket.accept();
-                int count = 0;
-                //System.out.println("Message: " + in.readUTF());
-
                 Thread th = new Thread(new Runnable() {
 
                     Socket tClient = client;
@@ -223,7 +237,6 @@ public class Ledger implements Serializable{
             PublicKey pubK = keyFactory.generatePublic(publicKeySpec);
             for (Account a : accounts) {
                 if (a.getPublicKey().equals(pubK)) {
-                    System.out.println("Account found!");
                     return a;
                 }
             }
@@ -235,11 +248,14 @@ public class Ledger implements Serializable{
     public static boolean AddToBlockChain(Block block){
         block.mine(difficulty);
         blockchain.add(block);
-        if(verifyChain())
+        if(verifyChain()) {
             System.out.println("Everything's fine with the chain");
-        else
+            return true;
+        }
+        else {
             System.out.println("Chain's corrupted, altered and not viable");
-        return true;
+            return false;
+        }
     }
 
 
@@ -270,7 +286,7 @@ public class Ledger implements Serializable{
     }
 
 
-    public static void generateServerKeys(){
+    private static void generateServerKeys(){
         try {
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
             keyGen.initialize(KEY_SIZE);
@@ -284,11 +300,61 @@ public class Ledger implements Serializable{
             publicKeyString = Base64.encode(pubKeyBytes, 512);
             PrivateKeyString = Base64.encode(privKeyBytes); // PKCS#8
             System.out.println("Server Key: " + publicKeyString);
-
+            saveKeys(System.getProperty("user.dir")+"/resources/", publicKey, privKey);
         }catch(Exception e){
 
         }
     }
+
+
+    private static void loadKeys(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException{
+            File filePublicKey = new File(path + "server.pub");
+            FileInputStream fis = new FileInputStream(path + "server.pub");
+            byte[] encodedPublicKey = new byte[(int) filePublicKey.length()];
+            fis.read(encodedPublicKey);
+            fis.close();
+
+            // Read Private Key.
+            File filePrivateKey = new File(path + "server.priv");
+            fis = new FileInputStream(path + "server.priv");
+            byte[] encodedPrivateKey = new byte[(int) filePrivateKey.length()];
+            fis.read(encodedPrivateKey);
+            fis.close();
+
+            // Generate KeyPair.
+            KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
+            X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(
+                    encodedPublicKey);
+            publicKey = keyFactory.generatePublic(publicKeySpec);
+
+            PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(
+                    encodedPrivateKey);
+            privKey = keyFactory.generatePrivate(privateKeySpec);
+
+    }
+
+    private static void saveKeys(String path, PublicKey publicKey, PrivateKey privateKey){
+        X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(
+                publicKey.getEncoded());
+        try {
+            FileOutputStream fos = new FileOutputStream(path + "server.pub");
+            fos.write(x509EncodedKeySpec.getEncoded());
+            fos.close();
+            // Store Private Key.
+            PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(
+                    privateKey.getEncoded());
+            fos = new FileOutputStream(path + "server.priv");
+            fos.write(pkcs8EncodedKeySpec.getEncoded());
+            fos.close();
+        }catch(IOException e){
+            System.out.println("Failed to save key pair to file.");
+            e.printStackTrace();
+        }
+
+    }
+
+
+
 
 
 
