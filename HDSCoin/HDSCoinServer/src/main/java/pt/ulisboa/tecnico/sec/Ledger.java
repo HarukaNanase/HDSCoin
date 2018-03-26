@@ -31,7 +31,7 @@ public class Ledger implements Serializable{
 
     public static void main(String[] args){
         try {
-            loadKeys(System.getProperty("user.dir")+"/resources/");
+            loadKeys(System.getProperty("user.dir")+"/HDSCoinServer/resources/");
         }catch(IOException ioe){
             System.out.println("Could not load key files. Generating new ones.");
             ioe.printStackTrace();
@@ -57,6 +57,21 @@ public class Ledger implements Serializable{
         for(Block b : blockchain){
             System.out.println(b.getTransactionsAsJSon());
         }
+
+        Request request = new Request();
+        request.setOpcode("CreateTransaction");
+        request.addParameter("ASDASDASD");
+        System.out.println(request.requestAsJson());
+        SecurityManager.SignMessage(request, privKey);
+        System.out.println(request.requestAsJson());
+        if(SecurityManager.VerifyMessage(request, publicKeyString)){
+            System.out.println("Success");
+        }else
+            System.out.println("Invalid");
+
+
+
+
 
         try{
             mainSocket = new ServerSocket(1381);
@@ -300,7 +315,7 @@ public class Ledger implements Serializable{
             publicKeyString = Base64.encode(pubKeyBytes, 512);
             PrivateKeyString = Base64.encode(privKeyBytes); // PKCS#8
             System.out.println("Server Key: " + publicKeyString);
-            saveKeys(System.getProperty("user.dir")+"/resources/", publicKey, privKey);
+            saveKeys(System.getProperty("user.dir")+"/HDSCoinServer/resources/", publicKey, privKey);
         }catch(Exception e){
 
         }
@@ -330,6 +345,12 @@ public class Ledger implements Serializable{
             PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(
                     encodedPrivateKey);
             privKey = keyFactory.generatePrivate(privateKeySpec);
+
+            byte[] pubKeyBytes = publicKey.getEncoded();
+            byte[] privKeyBytes = privKey.getEncoded();
+
+            publicKeyString = Base64.encode(pubKeyBytes, 512);
+            PrivateKeyString = Base64.encode(privKeyBytes); // PKCS#8
 
     }
 

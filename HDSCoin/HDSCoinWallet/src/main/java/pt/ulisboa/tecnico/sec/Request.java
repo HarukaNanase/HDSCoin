@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Request {
     private String opcode;
     private ArrayList<String> parameters;
-
+    private String dSig;
     public Request(String opcode, ArrayList<String> param){
         this.opcode = opcode;
         this.parameters = param;
@@ -59,4 +59,14 @@ public class Request {
         Gson gson = new Gson();
         return gson.fromJson(incomingJson, Request.class);
     }
+
+    public void setdSig(String dSig){
+        this.dSig = dSig;
+    }
+
+    public String getdSig(){
+        return this.dSig;
+    }
+
+
 }
