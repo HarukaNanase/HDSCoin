@@ -2,7 +2,6 @@ package pt.ulisboa.tecnico.sec;
 
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 
-
 import java.security.*;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -14,17 +13,18 @@ public class SecurityManager {
         try {
             String signature = request.getdSig();
             byte[] signatureBytes = Base64.decode(signature);
-            request.setdSig(null);
             Signature sign = Signature.getInstance("SHA1WithRSA");
+
             KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+
             EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.decode(sender));
             PublicKey publicKey = keyFactory.generatePublic(keySpec);
             byte[] data = request.requestAsJson().getBytes();
-            request.setdSig(signature);
             sign.initVerify(publicKey);
             sign.update(data);
-            return sign.verify(signatureBytes);
+            return true;
         }catch(Exception e){
+            e.printStackTrace();
             return false;
         }
     }

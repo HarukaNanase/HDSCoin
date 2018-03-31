@@ -26,6 +26,9 @@ public class Block
         return StringUtil.sha256(this.previousBlockHash + Long.toString(this.time) + this.data + Integer.toString(nonce) + gson.toJson(this.blockTransactions));
     }
 
+    public ArrayList<Transaction> getBlockTransactions(){
+        return this.blockTransactions;
+    }
     public void mine(int dificulty){
         String objective = new String(new char[dificulty]).replace('\0','0');
         for(Transaction t : this.blockTransactions){

@@ -18,7 +18,7 @@ public class Wallet {
     private static DataOutputStream out;
     private static DataInputStream in;
 
-    private static int KEY_SIZE = 512;
+    private static int KEY_SIZE = 2048;
 
     private static String serverPublicKeyString;
     private static PublicKey serverPublicKey;
@@ -36,14 +36,14 @@ public class Wallet {
             byte[] pubKeyBytes = pKey.getEncoded();
             byte[] privKeyBytes = privKey.getEncoded();
 
-            publicKeyString = Base64.encode(pubKeyBytes, 512);
-            privateKeyString = Base64.encode(privKeyBytes, 512);
+            publicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
+            privateKeyString = Base64.encode(privKeyBytes, KEY_SIZE);
             System.out.println("Your key: " + publicKeyString);
 
             mainSocket = new Socket("127.0.0.1", 1381);
             out = new DataOutputStream(mainSocket.getOutputStream());
             in = new DataInputStream(mainSocket.getInputStream());
-            handleUserInput("RequestServerKey");
+            //handleUserInput("RequestServerKey");
             while(true){
                 System.out.println("What you wanna do?");
                 String opcode = scanner.next();
@@ -56,89 +56,58 @@ public class Wallet {
 
     }
 
-
-    public static void createAccount(String pkey){
-
-    }
-
-
     public static void handleUserInput(String opcode){
         Request ureq = new Request(opcode);
+        ureq.addParameter(publicKeyString);
         if(opcode.equals("CreateAccount")){
             Scanner scanner = new Scanner(System.in);
             System.out.println("Your key address: " + publicKeyString);
+           // ureq.addParameter(publicKeyString);
 
-            ureq.addParameter(publicKeyString);
-            try {
-                out.writeUTF(ureq.requestAsJson());
-                System.out.println(in.readUTF());
-            }catch(Exception e){
-                e.printStackTrace();
-            }
         }
         else if(opcode.equals("CheckAccount")) {
-            ureq.addParameter(publicKeyString);
-            try {
-                out.writeUTF(ureq.requestAsJson());
-                System.out.println(in.readUTF());
+           // ureq.addParameter(publicKeyString);
 
-            }catch(Exception e){
-                e.printStackTrace();
-            }
         }else if(opcode.equals("CreateTransaction")){
             System.out.println("Enter destination address: ");
             Scanner scanner = new Scanner(System.in);
             String destination = scanner.next();
             System.out.println("How many coins do you want to send : " );
             int value = scanner.nextInt();
-            ureq.addParameter(publicKeyString);
+            //ureq.addParameter(publicKeyString);
             ureq.addParameter(destination);
             ureq.addParameter(Integer.toString(value));
-            try {
-                out.writeUTF(ureq.requestAsJson());
-                System.out.println(in.readUTF());
-            }catch(Exception e){
-                e.printStackTrace();
-
-            }
 
         }else if(opcode.equals("RequestChain")){
-            try{
-                out.writeUTF(ureq.requestAsJson());
-                System.out.println(in.readUTF());
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-
-        }else if(opcode.equals("RequestServerKey")){
-            try{
-                out.writeUTF(ureq.requestAsJson());
-                serverPublicKeyString = in.readUTF();
-                byte[] publicKeyBytes = Base64.decode(serverPublicKeyString);
-                // The bytes can be converted back to public and private key objects
-                KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-
-                EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
-                serverPublicKey = keyFactory.generatePublic(publicKeySpec);
-                System.out.println("Server Key: " + serverPublicKeyString);
-
-            }catch(Exception e){
-                e.printStackTrace();
-            }
+                SendMessage(ureq);
+                return;
 
         }else if(opcode.equals("ReceiveTransaction")){
-            try{
                 System.out.println("Enter the payer's address:");
                 Scanner scanner = new Scanner(System.in);
                 String payerAddress = scanner.next();
-                ureq.addParameter(publicKeyString);
+               // ureq.addParameter(publicKeyString);
                 ureq.addParameter(payerAddress);
-                out.writeUTF(ureq.requestAsJson());
-                System.out.println(in.readUTF());
-            }catch(Exception e){
-                e.printStackTrace();
-            }
+        }
+        signAndSendMessage(ureq);
+    }
 
+    private static void signAndSendMessage(Request ureq){
+        SecurityManager.SignMessage(ureq, privKey);
+        try {
+            out.writeUTF(ureq.requestAsJson());
+            System.out.println(in.readUTF());
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private static void SendMessage(Request ureq){
+        try {
+            out.writeUTF(ureq.requestAsJson());
+            System.out.println(in.readUTF());
+        }catch(Exception e){
+            e.printStackTrace();
         }
     }
 }

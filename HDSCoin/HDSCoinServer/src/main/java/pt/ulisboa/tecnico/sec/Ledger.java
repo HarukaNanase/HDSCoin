@@ -5,6 +5,7 @@ import com.sun.org.apache.xml.internal.security.utils.Base64;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.security.*;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
@@ -23,7 +24,7 @@ public class Ledger implements Serializable{
     private static String PrivateKeyString;
     private static PublicKey publicKey;
     private static PrivateKey privKey;
-    private static int KEY_SIZE = 512;
+    private static int KEY_SIZE = 2048;
     private static String ALGORITHM = "RSA";
 
     public Ledger() {
@@ -58,21 +59,6 @@ public class Ledger implements Serializable{
             System.out.println(b.getTransactionsAsJSon());
         }
 
-        Request request = new Request();
-        request.setOpcode("CreateTransaction");
-        request.addParameter("ASDASDASD");
-        System.out.println(request.requestAsJson());
-        SecurityManager.SignMessage(request, privKey);
-        System.out.println(request.requestAsJson());
-        if(SecurityManager.VerifyMessage(request, publicKeyString)){
-            System.out.println("Success");
-        }else
-            System.out.println("Invalid");
-
-
-
-
-
         try{
             mainSocket = new ServerSocket(1381);
         }catch(IOException ioe){
@@ -89,7 +75,15 @@ public class Ledger implements Serializable{
                     public void run() {
                         while(shouldRun) {
                                 System.out.println("New thread responding to client.");
-                                handleClientRequest(tClient);
+                                try {
+                                    handleClientRequest(tClient);
+                                }catch(Exception e){
+                                    handleClientDisconnect(tClient);
+                                    shouldRun = false;
+                                }
+
+
+
                         }
                     }
                 });
@@ -98,9 +92,20 @@ public class Ledger implements Serializable{
 
             }catch(IOException ioe){
                 ioe.printStackTrace();
+                return;
             }
         }
 
+    }
+
+    private static void handleClientDisconnect(Socket client){
+        try{
+            client.close();
+        }catch(SocketException se){
+            se.printStackTrace();
+        }catch(IOException ioe){
+            ioe.printStackTrace();
+        }
     }
 
     private static String createAccount(String publicKeyBase64) {
@@ -143,17 +148,38 @@ public class Ledger implements Serializable{
         return sb.toString();
     }
 
+    private static String auditAccount(String key){
+        StringBuilder sb = new StringBuilder();
+        sb.append("Audit for account: " + key + "\n");
+        Account acc = getAccount(key);
+        sb.append("Pending Transactions: \n");
+        for(Transaction t : backlog){
+            sb.append(t.getTransactionInfo() + "\n");
+        }
+        sb.append("Completed Transactions: \n");
+        for(Block b: blockchain){
+            for(Transaction t: b.getBlockTransactions()){
+                if(t.getDestinationAddress().equals(key) || t.getSourceAddress().equals(key)){
+                    sb.append(t.getTransactionInfo()+"\n");
+                }
+            }
+        }
+        return sb.toString();
+    }
 
     private static String createTransaction(String src, String dst, int value){
         Account acc1 = getAccount(src);
         Account acc2 = getAccount(dst);
-        Transaction t;
+
         if (value <= 0) {
             return "Cannot do a transaction with negative or 0 value.";
         }
         if (acc1 != null && acc2 != null) {
+            if( value > acc1.getBalance()){
+                return "Not enough balance.";
+            }
             acc1.setBalance(acc1.getBalance() - value);
-            t = new Transaction(acc1, acc2, value);
+            Transaction t = new Transaction(acc1, acc2, value);
             backlog.add(t);
             return "Transaction has been sent.";
 
@@ -180,21 +206,28 @@ public class Ledger implements Serializable{
         }
     }
 
-    public static void handleClientRequest(Socket client){
-        try {
+    public static void handleClientRequest(Socket client) throws SocketException, IOException{
             DataInputStream in = new DataInputStream(client.getInputStream());
             DataOutputStream out = new DataOutputStream(client.getOutputStream());
             String treq = in.readUTF();
             Request req = Request.requestFromJson(treq);
             System.out.println("Request Received!");
             System.out.println(req.requestAsJson());
-
+            if(!req.getOpcode().equals("RequestChain") && !SecurityManager.VerifyMessage(req, req.getParameter(0))){
+                System.out.println("Invalid message b o i");
+                out.writeUTF("Nice try loser");
+            }else{
+                System.out.println("Valid message!");
+            }
             if (req.getOpcode().equals("CreateAccount")) {
                 String publicKeyBase64 = req.getParameter(0);
                 out.writeUTF(createAccount(publicKeyBase64));
             }
             else if (req.getOpcode().equals("CheckAccount")) {
                 out.writeUTF(checkAccount(req.getParameter(0)));
+            }
+            else if(req.getOpcode().equals("AuditAccount")){
+                out.writeUTF(auditAccount(req.getParameter(0)));
             }
             else if (req.getOpcode().equals("CreateTransaction")) {
                 String src = req.getParameter(0);
@@ -204,11 +237,10 @@ public class Ledger implements Serializable{
             }
             else if (req.getOpcode().equals("RequestChain")) {
                 out.writeUTF(getChain());
-
             }
             else if(req.getOpcode().equals("ReceiveTransaction")){
-                String destinationKey = req.getParameter(0);
                 String sourceKey = req.getParameter(1);
+                String destinationKey = req.getParameter(0);
                 for(Transaction t: backlog){
                     if(t.getSourceAddress().equals(sourceKey) && t.getDestinationAddress().equals(destinationKey)){
                         if(!t.isProcessed()){
@@ -228,18 +260,22 @@ public class Ledger implements Serializable{
                     }
                 }
 
+            }else{
+                try{
+                    out.writeUTF("Invalid request.");
+                    return;
+                }catch(Exception e){
+                    out.writeUTF("A problem occured.");
+                }
             }
-            else if(req.getOpcode().equals("RequestServerKey")){
+           /* else if(req.getOpcode().equals("RequestServerKey")){
                 try{
                     out.writeUTF(publicKeyString);
                 }catch(Exception e){
                     e.printStackTrace();
                 }
-            }
-        }catch(Exception e) {
-            e.printStackTrace();
+            }*/
 
-        }
 
 
     }
@@ -312,8 +348,8 @@ public class Ledger implements Serializable{
             byte[] pubKeyBytes = publicKey.getEncoded();
             byte[] privKeyBytes = privKey.getEncoded();
 
-            publicKeyString = Base64.encode(pubKeyBytes, 512);
-            PrivateKeyString = Base64.encode(privKeyBytes); // PKCS#8
+            publicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
+            PrivateKeyString = Base64.encode(privKeyBytes, KEY_SIZE); // PKCS#8
             System.out.println("Server Key: " + publicKeyString);
             saveKeys(System.getProperty("user.dir")+"/HDSCoinServer/resources/", publicKey, privKey);
         }catch(Exception e){
