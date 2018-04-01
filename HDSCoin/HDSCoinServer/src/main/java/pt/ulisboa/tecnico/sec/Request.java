@@ -8,6 +8,9 @@ public class Request {
     private String opcode;
     private ArrayList<String> parameters;
     private String dSig;
+    private long createdOn;
+    private long expiresOn;
+
     public Request(String opcode, ArrayList<String> param){
         this.opcode = opcode;
         this.parameters = param;
@@ -34,6 +37,23 @@ public class Request {
     public String getOpcode(){
         return this.opcode;
     }
+
+    public long getCreatedOn(){
+        return this.createdOn;
+    }
+
+    public void setCreatedOn(long time){
+        this.createdOn = time;
+    }
+
+    public long getExpiresOn(){
+        return this.expiresOn;
+    }
+
+    public void setExpiresOn(long time){
+        this.expiresOn = time;
+    }
+
 
     public String requestAsJson(){
         Gson gson = new Gson();

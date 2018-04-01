@@ -11,7 +11,9 @@ import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Ledger implements Serializable{
     public static ServerSocket mainSocket;
@@ -65,35 +67,33 @@ public class Ledger implements Serializable{
             ioe.printStackTrace();
         }
 
-        while(true){
-            try {
-                final Socket client = mainSocket.accept();
-                Thread th = new Thread(new Runnable() {
+        while(true) try {
+            final Socket client = mainSocket.accept();
+            Thread th = new Thread(new Runnable() {
 
-                    Socket tClient = client;
-                    Boolean shouldRun = true;
-                    public void run() {
-                        while(shouldRun) {
-                                System.out.println("New thread responding to client.");
-                                try {
-                                    handleClientRequest(tClient);
-                                }catch(Exception e){
-                                    handleClientDisconnect(tClient);
-                                    shouldRun = false;
-                                }
+                Socket tClient = client;
+                Boolean shouldRun = true;
 
-
-
+                public void run() {
+                    while (shouldRun) {
+                        System.out.println("New thread responding to client.");
+                        try {
+                            handleClientRequest(tClient);
+                        } catch (Exception e) {
+                            handleClientDisconnect(tClient);
+                            shouldRun = false;
                         }
+
+
                     }
-                });
-                th.start();
+                }
+            });
+            th.start();
 
 
-            }catch(IOException ioe){
-                ioe.printStackTrace();
-                return;
-            }
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+            return;
         }
 
     }
@@ -268,16 +268,6 @@ public class Ledger implements Serializable{
                     out.writeUTF("A problem occured.");
                 }
             }
-           /* else if(req.getOpcode().equals("RequestServerKey")){
-                try{
-                    out.writeUTF(publicKeyString);
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-            }*/
-
-
-
     }
 
     public static Account getAccount(String publicKey){
@@ -389,6 +379,14 @@ public class Ledger implements Serializable{
             PrivateKeyString = Base64.encode(privKeyBytes); // PKCS#8
 
     }
+
+    private static Request createResponseRequest(){
+        Request request = new Request("SERVER_ANSWER");
+
+        return request;
+    }
+
+
 
     private static void saveKeys(String path, PublicKey publicKey, PrivateKey privateKey){
         X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(

@@ -6,6 +6,8 @@ import java.io.*;
 import java.net.Socket;
 import java.security.*;
 import java.security.spec.EncodedKeySpec;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Scanner;
 
@@ -19,6 +21,7 @@ public class Wallet {
     private static DataInputStream in;
 
     private static int KEY_SIZE = 2048;
+    private static String ALGORITHM = "RSA";
 
     private static String serverPublicKeyString;
     private static PublicKey serverPublicKey;
@@ -26,6 +29,12 @@ public class Wallet {
     public static void main(String[] args){
         System.out.println("Wallet v0.01");
         Scanner scanner = new Scanner(System.in);
+        try{
+            loadServerKey(System.getProperty("user.dir") + "/HDSCoinWallet/resources/");
+        }catch(Exception e){
+            System.out.println("Failed to load server keys");
+            return;
+        }
         try {
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
             keyGen.initialize(KEY_SIZE);
@@ -109,5 +118,22 @@ public class Wallet {
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+
+    private static void loadServerKey(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+        File filePublicKey = new File(path + "server.pub");
+        FileInputStream fis = new FileInputStream(path + "server.pub");
+        byte[] encodedPublicKey = new byte[(int) filePublicKey.length()];
+        fis.read(encodedPublicKey);
+        fis.close();
+        // Generate KeyPair.
+        KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
+        X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(
+                encodedPublicKey);
+        serverPublicKey = keyFactory.generatePublic(publicKeySpec);
+        byte[] pubKeyBytes = serverPublicKey.getEncoded();
+        serverPublicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
+
     }
 }
