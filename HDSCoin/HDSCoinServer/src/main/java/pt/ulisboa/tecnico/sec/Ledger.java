@@ -23,7 +23,7 @@ public class Ledger implements Serializable{
     public static ArrayList<Transaction> backlog = new ArrayList<Transaction>();
     public static int difficulty = 2;
     private static String publicKeyString;
-    private static String PrivateKeyString;
+    private static String privateKeyString;
     private static PublicKey publicKey;
     private static PrivateKey privKey;
     private static int KEY_SIZE = 2048;
@@ -56,6 +56,7 @@ public class Ledger implements Serializable{
         AddToBlockChain(block3);
         Block block4 = new Block("4th block", block3.hash);
         AddToBlockChain(block4);
+
 
         for(Block b : blockchain){
             System.out.println(b.getTransactionsAsJSon());
@@ -123,7 +124,7 @@ public class Ledger implements Serializable{
             }
             Account newUser = new Account(publicKey, publicKeyBase64);
             accounts.add(newUser);
-            return "Success! Your account balance: ";
+            return "Success! Your account balance: " + newUser.getBalance();
         }catch(Exception e){
             e.printStackTrace();
             return "An error has occured";
@@ -137,9 +138,9 @@ public class Ledger implements Serializable{
             sb.append("Account : " + acc.getAccountAddress() + "\n");
             sb.append("Balance : " + acc.getBalance() + "\n");
         }
-
+        sb.append("Incoming transactions pending confirmation:\n");
         for (Transaction t : backlog) {
-            System.out.println("\n" + t.getTransactionInfo() + "\n");
+            //System.out.println(t.getTransactionInfo() + "\n");
             if (t.getDestinationAddress().equals(key)) {
                 sb.append(t.getTransactionInfo());
                 sb.append("\n");
@@ -150,8 +151,11 @@ public class Ledger implements Serializable{
 
     private static String auditAccount(String key){
         StringBuilder sb = new StringBuilder();
-        sb.append("Audit for account: " + key + "\n");
+
         Account acc = getAccount(key);
+        if(acc == null)
+            return "Account not found.";
+        sb.append("Audit for account: " + key + "\n");
         sb.append("Pending Transactions: \n");
         for(Transaction t : backlog){
             sb.append(t.getTransactionInfo() + "\n");
@@ -206,6 +210,23 @@ public class Ledger implements Serializable{
         }
     }
 
+    public static Request createResponse(String message){
+        Request req = new Request(Opcode.SERVER_ANSWER);
+        req.addParameter(message);
+        return req;
+    }
+
+    public static void sendResponseToClient(Request request, DataOutputStream out){
+        try{
+            SecurityManager.SignMessage(request, privKey);
+            out.writeUTF(request.requestAsJson());
+            System.out.println("Response sent!");
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
     public static void handleClientRequest(Socket client) throws SocketException, IOException{
             DataInputStream in = new DataInputStream(client.getInputStream());
             DataOutputStream out = new DataOutputStream(client.getOutputStream());
@@ -213,62 +234,60 @@ public class Ledger implements Serializable{
             Request req = Request.requestFromJson(treq);
             System.out.println("Request Received!");
             System.out.println(req.requestAsJson());
-            if(!req.getOpcode().equals("RequestChain") && !SecurityManager.VerifyMessage(req, req.getParameter(0))){
-                System.out.println("Invalid message b o i");
-                out.writeUTF("Nice try loser");
+            String publicKeyBase64 = req.getParameter(0);
+            if((req.getOpcode() != Opcode.REQUEST_CHAIN || req.getOpcode() != Opcode.AUDIT) && !SecurityManager.VerifyMessage(req, publicKeyBase64)){
+                sendResponseToClient(createResponse("Invalid message"), out);
             }else{
                 System.out.println("Valid message!");
             }
-            if (req.getOpcode().equals("CreateAccount")) {
-                String publicKeyBase64 = req.getParameter(0);
-                out.writeUTF(createAccount(publicKeyBase64));
-            }
-            else if (req.getOpcode().equals("CheckAccount")) {
-                out.writeUTF(checkAccount(req.getParameter(0)));
-            }
-            else if(req.getOpcode().equals("AuditAccount")){
-                out.writeUTF(auditAccount(req.getParameter(0)));
-            }
-            else if (req.getOpcode().equals("CreateTransaction")) {
-                String src = req.getParameter(0);
-                String dst = req.getParameter(1);
-                int value = Integer.valueOf(req.getParameter(2));
-                out.writeUTF(createTransaction(src,dst,value));
-            }
-            else if (req.getOpcode().equals("RequestChain")) {
-                out.writeUTF(getChain());
-            }
-            else if(req.getOpcode().equals("ReceiveTransaction")){
-                String sourceKey = req.getParameter(1);
-                String destinationKey = req.getParameter(0);
-                for(Transaction t: backlog){
-                    if(t.getSourceAddress().equals(sourceKey) && t.getDestinationAddress().equals(destinationKey)){
-                        if(!t.isProcessed()){
-                            t.signalToProcess();
-                            //test, 1 trasaction per block!
-                            Block b = new Block("Transaction Completed", blockchain.get((blockchain.size() - 1)).hash);
-                            b.addTransaction(t);
-                            AddToBlockChain(b);
-                            backlog.remove(t);
-                            try{
-                                out.writeUTF("Transaction has been accepted! Check your new balance!");
-                                return;
-                            }catch(Exception e){
-                                out.writeUTF("A problem occured.");
-                            }
-                        }
-                    }
-                }
 
-            }else{
-                try{
-                    out.writeUTF("Invalid request.");
-                    return;
-                }catch(Exception e){
-                    out.writeUTF("A problem occured.");
-                }
+            switch(req.getOpcode()){
+                case CREATE_ACCOUNT:
+                    sendResponseToClient(createResponse(createAccount(publicKeyBase64)), out);
+                    break;
+                case CHECK_ACCOUNT:
+                    sendResponseToClient(createResponse(checkAccount(publicKeyBase64)), out);
+                    break;
+                case CREATE_TRANSACTION:
+                    String src = req.getParameter(0);
+                    String dst = req.getParameter(1);
+                    int value = Integer.valueOf(req.getParameter(2));
+                    String result = createTransaction(src, dst, value);
+                    sendResponseToClient(createResponse(result), out);
+                    break;
+                case RECEIVE_TRANSACTION:
+                    sendResponseToClient(createResponse(ReceiveTransaction(req)), out);
+                    break;
+                case REQUEST_CHAIN:
+                    sendResponseToClient(createResponse(getChain()),out);
+                    break;
+                case AUDIT:
+                    sendResponseToClient(createResponse(auditAccount(publicKeyBase64)), out);
+                default:
+                    sendResponseToClient(createResponse("Unrecognized command."), out);
             }
     }
+
+    public static String ReceiveTransaction(Request req){
+        String sourceKey = req.getParameter(1);
+        String destinationKey = req.getParameter(0);
+        for(Transaction t: backlog){
+            if(t.getSourceAddress().equals(sourceKey) && t.getDestinationAddress().equals(destinationKey)){
+                if(!t.isProcessed()){
+                    t.signalToProcess();
+                    //test, 1 trasaction per block!
+                    Block b = new Block("Transaction Completed", blockchain.get((blockchain.size() - 1)).hash);
+                    b.addTransaction(t);
+                    AddToBlockChain(b);
+                    backlog.remove(t);
+                    return "Transaction has been accepted! Check your new balance!";
+                }
+                return "No transaction to be processed with for the addresses.";
+            }
+        }
+        return "Transaction not found. Re-check your payer's address.";
+    }
+
 
     public static Account getAccount(String publicKey){
         try {
@@ -339,7 +358,7 @@ public class Ledger implements Serializable{
             byte[] privKeyBytes = privKey.getEncoded();
 
             publicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
-            PrivateKeyString = Base64.encode(privKeyBytes, KEY_SIZE); // PKCS#8
+            privateKeyString = Base64.encode(privKeyBytes, KEY_SIZE); // PKCS#8
             System.out.println("Server Key: " + publicKeyString);
             saveKeys(System.getProperty("user.dir")+"/HDSCoinServer/resources/", publicKey, privKey);
         }catch(Exception e){
@@ -376,17 +395,9 @@ public class Ledger implements Serializable{
             byte[] privKeyBytes = privKey.getEncoded();
 
             publicKeyString = Base64.encode(pubKeyBytes, 512);
-            PrivateKeyString = Base64.encode(privKeyBytes); // PKCS#8
+            privateKeyString = Base64.encode(privKeyBytes); // PKCS#8
 
     }
-
-    private static Request createResponseRequest(){
-        Request request = new Request("SERVER_ANSWER");
-
-        return request;
-    }
-
-
 
     private static void saveKeys(String path, PublicKey publicKey, PrivateKey privateKey){
         X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(

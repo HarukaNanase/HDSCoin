@@ -11,6 +11,7 @@ import java.util.Date;
 public class SecurityManager {
     private static String algorithm = "RSA";
     private static long MAX_MESSAGE_DELAY = 5000;
+
     public static boolean VerifyMessage(Request request, String sender){
         try {
             long currentTime = System.currentTimeMillis();
@@ -26,10 +27,16 @@ public class SecurityManager {
             request.setdSig(signature);
             sign.initVerify(publicKey);
             sign.update(data);
-            if(currentTime > request.getExpiresOn() || currentTime < request.getCreatedOn()){
-                validTimer = false;
+            boolean validSign = sign.verify(signatureBytes);
+            if(validSign) {
+                if (currentTime > request.getExpiresOn() || currentTime < request.getCreatedOn()) {
+                    validTimer = false;
+                }
+                return (validSign && validTimer);
             }
-            return (sign.verify(signatureBytes) && validTimer);
+
+            return false;
+
         }catch(Exception e){
             return false;
         }

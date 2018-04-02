@@ -5,24 +5,23 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 
 public class Request {
-    private String opcode;
+    private Opcode opcode;
     private ArrayList<String> parameters;
     private String dSig;
     private long createdOn;
     private long expiresOn;
 
-    public Request(String opcode, ArrayList<String> param){
+    public Request(Opcode opcode, ArrayList<String> param){
         this.opcode = opcode;
         this.parameters = param;
     }
 
-    public Request(String opcode){
+    public Request(Opcode opcode){
         this.opcode = opcode;
         this.parameters = new ArrayList<String>();
     }
 
     public Request(){
-        this.opcode = "";
         this.parameters = new ArrayList<String>();
     }
 
@@ -30,11 +29,14 @@ public class Request {
         this.parameters.add(param);
     }
 
-    public void setOpcode(String opc){
+    public void setParameter(int idx, String newParam){
+        this.parameters.set(idx, newParam);
+    }
+    public void setOpcode(Opcode opc){
         this.opcode = opcode;
     }
 
-    public String getOpcode(){
+    public Opcode getOpcode(){
         return this.opcode;
     }
 
