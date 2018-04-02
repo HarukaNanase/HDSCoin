@@ -14,6 +14,8 @@ public class SecurityManager {
 
     public static boolean VerifyMessage(Request request, String sender){
         try {
+            if(request.getOpcode() == Opcode.AUDIT)
+                return true;
             long currentTime = System.currentTimeMillis();
             boolean validTimer = true;
             String signature = request.getdSig();
@@ -60,6 +62,16 @@ public class SecurityManager {
             se.printStackTrace();
         }
     }
+
+    public static boolean VerifySequenceNumber(Request request, Account user){
+        System.out.println("\n\n This Account Sequence Number: " + user.getSequenceNumber() + "\n\n");
+        if(request.getSequenceNumber() == (user.getSequenceNumber()+1)){
+            user.setSequenceNumber(request.getSequenceNumber());
+            return true;
+        }
+        return false;
+    }
+
 
 
 

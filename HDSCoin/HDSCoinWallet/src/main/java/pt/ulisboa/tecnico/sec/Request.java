@@ -10,6 +10,7 @@ public class Request {
     private String dSig;
     private long createdOn;
     private long expiresOn;
+    private long sequenceNumber = 0;
 
     public Request(Opcode opcode, ArrayList<String> param){
         this.opcode = opcode;
@@ -54,6 +55,14 @@ public class Request {
 
     public void setExpiresOn(long time){
         this.expiresOn = time;
+    }
+
+    public long getSequenceNumber(){
+        return this.sequenceNumber;
+    }
+
+    public void setSequenceNumber(long new_sequence){
+        this.sequenceNumber = new_sequence;
     }
 
 

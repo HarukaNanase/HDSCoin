@@ -13,7 +13,6 @@ public class Account {
         private transient PublicKey publicKey;
         private transient PrivateKey privateKey;
         private String publicKeyString;
-        private transient String privateKeyString;
         private int balance;
         private Transaction[] backlog;
         private long sequenceNumber;
@@ -38,7 +37,6 @@ public class Account {
 
         public Account(){
             balance = 50;
-            this.generateAccountKeys();
             this.sequenceNumber = 0;
         }
 
@@ -60,25 +58,6 @@ public class Account {
             return this.balance;
         }
 
-        public void generateAccountKeys(){
-            try {
-                KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-                keyGen.initialize(KEY_SIZE);
-                KeyPair keyPair = keyGen.generateKeyPair();
-                this.privateKey = keyPair.getPrivate();
-                this.publicKey = keyPair.getPublic();
-
-                byte[] pubKeyBytes = publicKey.getEncoded();
-                byte[] privKeyBytes = privateKey.getEncoded();
-
-                this.publicKeyString = Base64.encode(pubKeyBytes);
-                this.privateKeyString = Base64.encode(privKeyBytes); // PKCS#8
-
-
-            }catch(Exception e){
-
-            }
-        }
 
         public void makePayment(int value){
             if((this.balance - value) < 0){

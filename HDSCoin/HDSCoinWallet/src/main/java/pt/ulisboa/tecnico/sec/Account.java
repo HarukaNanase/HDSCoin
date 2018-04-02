@@ -16,14 +16,49 @@ public class Account {
         private transient String privateKeyString;
         private int balance;
         private Transaction[] backlog;
+        private long sequenceNumber;
 
         public Account(PublicKey pkey){
             this.publicKey = pkey;
             balance = 50;
+            this.sequenceNumber = 0;
         }
+
+        public Account(String publicKeyString){
+            this.publicKeyString = publicKeyString;
+            this.balance = 50;
+            this.sequenceNumber = 0;
+        }
+
+        public Account(PublicKey pkey, String publicKeyString){
+            this.publicKey = pkey;
+            this.publicKeyString = publicKeyString;
+            this.balance = 50;
+            this.sequenceNumber = 0;
+        }
+
         public Account(){
             balance = 50;
             this.generateAccountKeys();
+            this.sequenceNumber = 0;
+        }
+
+        public long getSequenceNumber(){
+            return this.sequenceNumber;
+        }
+
+        public void setSequenceNumber(long new_number){
+            this.sequenceNumber = new_number;
+        }
+
+        public String getPublicKeyString(){
+            return this.publicKeyString;
+        }
+
+        public PublicKey getPublicKey(){ return this.publicKey;}
+
+        public int getBalance(){
+            return this.balance;
         }
 
         public void generateAccountKeys(){
@@ -40,17 +75,6 @@ public class Account {
                 this.publicKeyString = Base64.encode(pubKeyBytes);
                 this.privateKeyString = Base64.encode(privKeyBytes); // PKCS#8
 
-
-                //get the key from the string:
-                /*
-               // The bytes can be converted back to public and private key objects
-               KeyFactory keyFactory = KeyFactory.getInstance(keyAlgorithm);
-               EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
-               PrivateKey privateKey2 = keyFactory.generatePrivate(privateKeySpec);
-
-               EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
-               PublicKey publicKey2 = keyFactory.generatePublic(publicKeySpec);
-                 */
 
             }catch(Exception e){
 
@@ -77,5 +101,7 @@ public class Account {
         }
 
 
-
+    public void setBalance(int balance) {
+        this.balance = balance;
+    }
 }

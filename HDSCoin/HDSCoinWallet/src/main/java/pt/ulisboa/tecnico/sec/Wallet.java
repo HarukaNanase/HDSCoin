@@ -19,10 +19,10 @@ public class Wallet {
     private static String privateKeyString;
     private static DataOutputStream out;
     private static DataInputStream in;
-
+    private static boolean isRegistered = false;
     private static int KEY_SIZE = 512;
     private static String ALGORITHM = "RSA";
-
+    private static long sequenceNumber = 0;
     private static String serverPublicKeyString;
     private static PublicKey serverPublicKey;
 
@@ -30,7 +30,7 @@ public class Wallet {
         System.out.println("Wallet v0.01");
         Scanner scanner = new Scanner(System.in);
         try{
-            loadServerKey(System.getProperty("user.dir") + "/HDSCoinWallet/resources/");
+            loadServerKey(System.getProperty("user.dir") + "/src/main/resources/");
         }catch(Exception e){
             System.out.println("Failed to load server keys");
             return;
@@ -103,11 +103,15 @@ public class Wallet {
             System.out.println("Unknown command.");
             return;
         }
+        if(ureq.getOpcode() != Opcode.CREATE_ACCOUNT && ureq.getOpcode() != Opcode.REQUEST_CHAIN && ureq.getOpcode() != Opcode.AUDIT)
+            ureq.setSequenceNumber(++sequenceNumber);
+
         ureq.addParameter(publicKeyString);
         Scanner scanner = new Scanner(System.in);
         switch(ureq.getOpcode()) {
             case CREATE_ACCOUNT:
                 signAndSendMessage(ureq);
+                isRegistered = true;
                 break;
             case CHECK_ACCOUNT:
                 signAndSendMessage(ureq);

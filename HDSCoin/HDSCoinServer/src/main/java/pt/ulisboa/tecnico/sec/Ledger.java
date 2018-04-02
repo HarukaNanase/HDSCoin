@@ -15,7 +15,7 @@ import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Ledger implements Serializable{
+public class Ledger{
     public static ServerSocket mainSocket;
 
     public static ArrayList<Block> blockchain = new ArrayList<Block>();
@@ -34,7 +34,7 @@ public class Ledger implements Serializable{
 
     public static void main(String[] args){
         try {
-            loadKeys(System.getProperty("user.dir")+"/HDSCoinServer/resources/");
+            loadKeys(System.getProperty("user.dir")+"/src/main/resources/");
         }catch(IOException ioe){
             System.out.println("Could not load key files. Generating new ones.");
             ioe.printStackTrace();
@@ -235,11 +235,26 @@ public class Ledger implements Serializable{
             System.out.println("Request Received!");
             System.out.println(req.requestAsJson());
             String publicKeyBase64 = req.getParameter(0);
-            if((req.getOpcode() != Opcode.REQUEST_CHAIN || req.getOpcode() != Opcode.AUDIT) && !SecurityManager.VerifyMessage(req, publicKeyBase64)){
-                sendResponseToClient(createResponse("Invalid message"), out);
+            if((req.getOpcode() != Opcode.REQUEST_CHAIN && req.getOpcode() != Opcode.AUDIT)){
+                if(!SecurityManager.VerifyMessage(req, publicKeyBase64)){
+                    sendResponseToClient(createResponse("Invalid Message"), out);
+                    return;
+                }
+                if(req.getOpcode() != Opcode.CREATE_ACCOUNT){
+                    Account acc = getAccount(publicKeyBase64);
+                    if(acc == null){
+                        sendResponseToClient(createResponse("Account not found in our records"), out);
+                        return;
+                    }
+                    if(!SecurityManager.VerifySequenceNumber(req, acc)){
+                        sendResponseToClient(createResponse("Incorrect Sequence Number."), out);
+                        return;
+                    }
+                }
             }else{
                 System.out.println("Valid message!");
             }
+
 
             /*
             /TODO: sequenceNumber in account to verify replay attacks
@@ -371,7 +386,7 @@ public class Ledger implements Serializable{
             publicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
             privateKeyString = Base64.encode(privKeyBytes, KEY_SIZE); // PKCS#8
             System.out.println("Server Key: " + publicKeyString);
-            saveKeys(System.getProperty("user.dir")+"/HDSCoinServer/resources/", publicKey, privKey);
+            saveKeys(System.getProperty("user.dir")+"/src/main/resources/", publicKey, privKey);
         }catch(Exception e){
 
         }
@@ -429,6 +444,8 @@ public class Ledger implements Serializable{
         }
 
     }
+
+    
 
 
 

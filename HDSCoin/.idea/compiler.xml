@@ -6,12 +6,14 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="1" />
+        <module name="HDSCoinServer" />
+        <module name="HDSCoinWallet" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="1" target="1.5" />
+      <module name="HDSCoin" target="1.5" />
       <module name="HDSCoinServer" target="1.5" />
+      <module name="HDSCoinWallet" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>
