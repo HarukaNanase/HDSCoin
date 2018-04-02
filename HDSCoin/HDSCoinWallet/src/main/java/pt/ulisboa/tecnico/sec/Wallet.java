@@ -85,6 +85,7 @@ public class Wallet {
         try {
             String incoming = in.readUTF();
             Request inReq = Request.requestFromJson(incoming);
+            System.out.println(incoming);
             if (inReq.getOpcode() == Opcode.SERVER_ANSWER && SecurityManager.VerifyMessage(inReq, serverPublicKeyString)) {
                 System.out.println(inReq.getParameter(0));
             } else {

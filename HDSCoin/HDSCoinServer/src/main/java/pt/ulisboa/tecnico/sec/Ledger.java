@@ -241,6 +241,15 @@ public class Ledger implements Serializable{
                 System.out.println("Valid message!");
             }
 
+            /*
+            /TODO: sequenceNumber in account to verify replay attacks
+            /TODO: transaction signature -> signed by source, signed by destination, signed by server
+            /TODO: Serializable but doesn't need to be secure, just ATOMIC.
+            /TODO: Unit Tests
+            /TODO: Demos and readme
+            /TODO: Wallet key creation or loads
+             */
+
             switch(req.getOpcode()){
                 case CREATE_ACCOUNT:
                     sendResponseToClient(createResponse(createAccount(publicKeyBase64)), out);
@@ -263,8 +272,10 @@ public class Ledger implements Serializable{
                     break;
                 case AUDIT:
                     sendResponseToClient(createResponse(auditAccount(publicKeyBase64)), out);
+                    break;
                 default:
                     sendResponseToClient(createResponse("Unrecognized command."), out);
+                    break;
             }
     }
 

@@ -16,6 +16,7 @@ public class Account {
         private transient String privateKeyString;
         private int balance;
         private Transaction[] backlog;
+        private long sequenceNumber;
 
         public Account(PublicKey pkey){
             this.publicKey = pkey;
@@ -25,17 +26,28 @@ public class Account {
         public Account(String publicKeyString){
             this.publicKeyString = publicKeyString;
             this.balance = 50;
+            this.sequenceNumber = 0;
         }
 
         public Account(PublicKey pkey, String publicKeyString){
             this.publicKey = pkey;
             this.publicKeyString = publicKeyString;
             this.balance = 50;
+            this.sequenceNumber = 0;
         }
 
         public Account(){
             balance = 50;
             this.generateAccountKeys();
+            this.sequenceNumber = 0;
+        }
+
+        public long getSequenceNumber(){
+            return this.sequenceNumber;
+        }
+
+        public void setSequenceNumber(long new_number){
+            this.sequenceNumber = new_number;
         }
 
         public String getPublicKeyString(){
