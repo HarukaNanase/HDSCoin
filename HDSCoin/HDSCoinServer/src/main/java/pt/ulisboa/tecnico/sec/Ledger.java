@@ -1,11 +1,15 @@
 package pt.ulisboa.tecnico.sec;
 
+import com.google.gson.Gson;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
@@ -15,61 +19,73 @@ import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
+
 public class Ledger{
-    public static ServerSocket mainSocket;
+    public transient ServerSocket mainSocket;
 
-    public static ArrayList<Block> blockchain = new ArrayList<Block>();
-    public static ArrayList<Account> accounts = new ArrayList<Account>();
-    public static ArrayList<Transaction> backlog = new ArrayList<Transaction>();
-    public static int difficulty = 2;
-    private static String publicKeyString;
-    private static String privateKeyString;
-    private static PublicKey publicKey;
-    private static PrivateKey privKey;
-    private static int KEY_SIZE = 2048;
-    private static String ALGORITHM = "RSA";
+    public ArrayList<Block> blockchain = new ArrayList<Block>();
+    public ArrayList<Account> accounts = new ArrayList<Account>();
+    public ArrayList<Transaction> backlog = new ArrayList<Transaction>();
+    public transient int difficulty = 2;
+    private transient String publicKeyString;
+    private transient String privateKeyString;
+    private transient PublicKey publicKey;
+    private transient PrivateKey privKey;
+    private transient int KEY_SIZE = 2048;
+    private transient String ALGORITHM = "RSA";
+    private transient static Ledger ledger = null;
 
-    public Ledger() {
+    private Ledger() {
+
+    }
+
+    public static Ledger getInstance(){
+        if(ledger == null)
+            ledger = new Ledger();
+        return ledger;
     }
 
     public static void main(String[] args){
+        ledger = getInstance();
+
         try {
-            loadKeys(System.getProperty("user.dir")+"/src/main/resources/");
+            ledger.loadKeys(System.getProperty("user.dir")+"/src/main/resources/");
         }catch(IOException ioe){
             System.out.println("Could not load key files. Generating new ones.");
             ioe.printStackTrace();
-            generateServerKeys();
+            ledger.generateServerKeys();
         }catch(NoSuchAlgorithmException nsae){
             System.out.println("Incompatible algorithm");
             return;
         }catch(InvalidKeySpecException ikse){
             System.out.println("Invalid or corrupt keys. Generating new ones");
-            generateServerKeys();
+            ledger.generateServerKeys();
         }
 
 
         Block genesis = new Block("First block", "0");
-        AddToBlockChain(genesis);
+        ledger.AddToBlockChain(genesis);
         Block block2 = new Block("Second block", genesis.hash);
-        AddToBlockChain(block2);
+        ledger.AddToBlockChain(block2);
         Block block3 = new Block("Third block", block2.hash);
-        AddToBlockChain(block3);
+        ledger.AddToBlockChain(block3);
         Block block4 = new Block("4th block", block3.hash);
-        AddToBlockChain(block4);
+        ledger.AddToBlockChain(block4);
 
 
-        for(Block b : blockchain){
+        for(Block b : ledger.blockchain){
             System.out.println(b.getTransactionsAsJSon());
         }
 
         try{
-            mainSocket = new ServerSocket(1381);
+            ledger.mainSocket = new ServerSocket(1381);
         }catch(IOException ioe){
             ioe.printStackTrace();
         }
 
         while(true) try {
-            final Socket client = mainSocket.accept();
+            final Socket client = ledger.mainSocket.accept();
             Thread th = new Thread(new Runnable() {
 
                 Socket tClient = client;
@@ -109,7 +125,7 @@ public class Ledger{
         }
     }
 
-    private static String createAccount(String publicKeyBase64) {
+    private String createAccount(String publicKeyBase64) {
         try {
             byte[] publicKeyBytes = Base64.decode(publicKeyBase64);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -131,7 +147,7 @@ public class Ledger{
         }
     }
 
-    private static String checkAccount(String key){
+    private  String checkAccount(String key){
         StringBuilder sb = new StringBuilder();
         Account acc = getAccount(key);
         if (acc != null) {
@@ -149,7 +165,7 @@ public class Ledger{
         return sb.toString();
     }
 
-    private static String auditAccount(String key){
+    private  String auditAccount(String key){
         StringBuilder sb = new StringBuilder();
 
         Account acc = getAccount(key);
@@ -171,7 +187,7 @@ public class Ledger{
         return sb.toString();
     }
 
-    private static String createTransaction(String src, String dst, int value){
+    private  String createTransaction(String src, String dst, int value){
         Account acc1 = getAccount(src);
         Account acc2 = getAccount(dst);
 
@@ -193,7 +209,7 @@ public class Ledger{
 
     }
 
-    public static String getChain(){
+    public  String getChain(){
         try {
             StringBuilder sb = new StringBuilder();
             int i = 1;
@@ -218,7 +234,7 @@ public class Ledger{
 
     public static void sendResponseToClient(Request request, DataOutputStream out){
         try{
-            SecurityManager.SignMessage(request, privKey);
+            SecurityManager.SignMessage(request, ledger.privKey);
             out.writeUTF(request.requestAsJson());
             System.out.println("Response sent!");
         }catch(Exception e){
@@ -241,7 +257,7 @@ public class Ledger{
                     return;
                 }
                 if(req.getOpcode() != Opcode.CREATE_ACCOUNT){
-                    Account acc = getAccount(publicKeyBase64);
+                    Account acc = ledger.getAccount(publicKeyBase64);
                     if(acc == null){
                         sendResponseToClient(createResponse("Account not found in our records"), out);
                         return;
@@ -267,34 +283,38 @@ public class Ledger{
 
             switch(req.getOpcode()){
                 case CREATE_ACCOUNT:
-                    sendResponseToClient(createResponse(createAccount(publicKeyBase64)), out);
+                    sendResponseToClient(createResponse(ledger.createAccount(publicKeyBase64)), out);
+                    ledger.saveLedgerState(System.getProperty("user.dir"+"/HDSCoinServer/src/main/resources/"));
                     break;
                 case CHECK_ACCOUNT:
-                    sendResponseToClient(createResponse(checkAccount(publicKeyBase64)), out);
+                    sendResponseToClient(createResponse(ledger.checkAccount(publicKeyBase64)), out);
                     break;
                 case CREATE_TRANSACTION:
                     String src = req.getParameter(0);
                     String dst = req.getParameter(1);
                     int value = Integer.valueOf(req.getParameter(2));
-                    String result = createTransaction(src, dst, value);
+                    String result = ledger.createTransaction(src, dst, value);
                     sendResponseToClient(createResponse(result), out);
+                    ledger.saveLedgerState(System.getProperty("user.dir"+"/HDSCoinServer/src/main/resources/"));
                     break;
                 case RECEIVE_TRANSACTION:
-                    sendResponseToClient(createResponse(ReceiveTransaction(req)), out);
+                    sendResponseToClient(createResponse(ledger.ReceiveTransaction(req)), out);
+                    ledger.saveLedgerState(System.getProperty("user.dir"+"/HDSCoinServer/src/main/resources/"));
                     break;
                 case REQUEST_CHAIN:
-                    sendResponseToClient(createResponse(getChain()),out);
+                    sendResponseToClient(createResponse(ledger.getChain()),out);
                     break;
                 case AUDIT:
-                    sendResponseToClient(createResponse(auditAccount(publicKeyBase64)), out);
+                    sendResponseToClient(createResponse(ledger.auditAccount(publicKeyBase64)), out);
                     break;
                 default:
                     sendResponseToClient(createResponse("Unrecognized command."), out);
                     break;
             }
+
     }
 
-    public static String ReceiveTransaction(Request req){
+    public  String ReceiveTransaction(Request req){
         String sourceKey = req.getParameter(1);
         String destinationKey = req.getParameter(0);
         for(Transaction t: backlog){
@@ -315,7 +335,7 @@ public class Ledger{
     }
 
 
-    public static Account getAccount(String publicKey){
+    public  Account getAccount(String publicKey){
         try {
             byte[] publicKeyBytes = Base64.decode(publicKey);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -331,7 +351,7 @@ public class Ledger{
         }
         return null;
     }
-    public static boolean AddToBlockChain(Block block){
+    public  boolean AddToBlockChain(Block block){
         block.mine(difficulty);
         blockchain.add(block);
         if(verifyChain()) {
@@ -347,7 +367,7 @@ public class Ledger{
 
 
 
-    public static boolean verifyChain(){
+    public  boolean verifyChain(){
         Block current;
         Block previous;
         String objective = new String(new char[difficulty]).replace('\0', '0');
@@ -372,7 +392,7 @@ public class Ledger{
     }
 
 
-    private static void generateServerKeys(){
+    private  void generateServerKeys(){
         try {
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
             keyGen.initialize(KEY_SIZE);
@@ -393,7 +413,7 @@ public class Ledger{
     }
 
 
-    private static void loadKeys(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException{
+    private  void loadKeys(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException{
             File filePublicKey = new File(path + "server.pub");
             FileInputStream fis = new FileInputStream(path + "server.pub");
             byte[] encodedPublicKey = new byte[(int) filePublicKey.length()];
@@ -425,7 +445,7 @@ public class Ledger{
 
     }
 
-    private static void saveKeys(String path, PublicKey publicKey, PrivateKey privateKey){
+    private  void saveKeys(String path, PublicKey publicKey, PrivateKey privateKey){
         X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(
                 publicKey.getEncoded());
         try {
@@ -445,7 +465,33 @@ public class Ledger{
 
     }
 
-    
+    private boolean saveLedgerState(String path){
+        try{
+            Gson gson = new Gson();
+            PrintWriter out = new PrintWriter(path+"ledger.tmp");
+            out.println(gson.toJson(this));
+            out.close();
+        }
+        catch(IOException ioe){
+            System.out.println("Failed to save state.");
+            return false;
+        }
+
+        try{
+            Path from = Paths.get(path+"ledger.tmp");
+            Path to = Paths.get(path+"ledger.bak");
+            Files.move(from,to,ATOMIC_MOVE);
+        }catch(IOException ioe){
+            System.out.println("Something went wrong with the renaming");
+            return false;
+        }
+        return false;
+    }
+
+    private  boolean loadLedgerState(String path){
+        return false;
+    }
+
 
 
 
