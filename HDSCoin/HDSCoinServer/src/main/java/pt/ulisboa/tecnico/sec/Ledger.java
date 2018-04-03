@@ -254,7 +254,7 @@ public class Ledger{
                     sendResponseToClient(createResponse("Invalid Message"), out);
                     return;
                 }
-                if(req.getOpcode() != Opcode.CREATE_ACCOUNT){
+                if(req.getOpcode() != Opcode.CREATE_ACCOUNT && req.getOpcode() != Opcode.REQUEST_SEQUENCE_NUMBER){
                     Account acc = ledger.getAccount(publicKeyBase64);
                     if(acc == null){
                         sendResponseToClient(createResponse("Account not found in our records"), out);
@@ -305,12 +305,23 @@ public class Ledger{
                 case AUDIT:
                     sendResponseToClient(createResponse(ledger.auditAccount(publicKeyBase64)), out);
                     break;
+                case REQUEST_SEQUENCE_NUMBER:
+                    sendResponseToClient(createResponse(""+ledger.getAccountSequenceNumber(publicKeyBase64)), out);
+                    break;
                 default:
                     sendResponseToClient(createResponse("Unrecognized command."), out);
                     break;
             }
 
     }
+
+    public long getAccountSequenceNumber(String key){
+        Account acc = getAccount(key);
+        if(acc != null)
+            return acc.getSequenceNumber();
+        return -1;
+    }
+
 
     public  String ReceiveTransaction(Request req){
         String sourceKey = req.getParameter(1);
@@ -470,11 +481,10 @@ public class Ledger{
         }
 
         try {
-                Path from = Paths.get(path + "ledger.tmp");
-                Path to = Paths.get(path + "ledger.bak");
-                Files.move(from, to, ATOMIC_MOVE);
-                //Files.delete(from);
-                System.out.println("It worked son of a bitch");
+                Path folder = Paths.get(path);
+                Path tmp = folder.resolve("ledger.tmp");
+                Path finalFile = folder.resolve("ledger.bak");
+                Files.move(tmp, finalFile, ATOMIC_MOVE);
                 return true;
 
         }catch(AccessDeniedException ade){
@@ -490,7 +500,9 @@ public class Ledger{
     private  boolean loadLedgerState(String path){
         try {
             System.out.println("Trying to load backup state...");
-            String jsonBackup = new Scanner(new File(path+"ledger.bak")).useDelimiter("\\Z").next();
+            Scanner fileScanner = new Scanner(new File(path+"ledger.bak"));
+            String jsonBackup = fileScanner.useDelimiter("\\Z").next();
+            fileScanner.close();
             Gson gson = new Gson();
             Ledger backup = gson.fromJson(jsonBackup, Ledger.class);
             ledger.blockchain = backup.blockchain;

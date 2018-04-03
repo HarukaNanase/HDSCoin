@@ -96,6 +96,7 @@ public class Wallet {
 
                     publicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
                     privateKeyString = Base64.encode(privKeyBytes); // PKCS#8
+
                     System.out.println("Keys loaded successfully!\nYour key:\n"+publicKeyString);
                 }catch(IOException ioe){
                     System.out.println("Failed to load keys from folder: " + args[0]);
@@ -106,6 +107,19 @@ public class Wallet {
             mainSocket = new Socket("127.0.0.1", 1381);
             out = new DataOutputStream(mainSocket.getOutputStream());
             in = new DataInputStream(mainSocket.getInputStream());
+            System.out.println("Contacting server to request sequence number...");
+            Request seqNumber = new Request(Opcode.REQUEST_SEQUENCE_NUMBER);
+            seqNumber.addParameter(publicKeyString);
+            signAndSendMessage(seqNumber);
+            String seq = receiveAndVerifyAnswer();
+            if(seq != null)
+                sequenceNumber = Long.parseLong(seq);
+            if(sequenceNumber != -1)
+                System.out.println("Done. Current Sequence Number: " + sequenceNumber);
+            else{
+                System.out.println("Sequence Number not found. Setting to 0");
+                sequenceNumber = 0;
+            }
             while(true){
                 System.out.println("What you wanna do?");
                 String opcode = scanner.next();
@@ -135,18 +149,20 @@ public class Wallet {
        return null;
     }
 
-    public static void receiveAndVerifyAnswer() {
+    public static String receiveAndVerifyAnswer() {
         try {
             String incoming = in.readUTF();
             Request inReq = Request.requestFromJson(incoming);
             System.out.println(incoming);
             if (inReq.getOpcode() == Opcode.SERVER_ANSWER && SecurityManager.VerifyMessage(inReq, serverPublicKeyString)) {
-                System.out.println(inReq.getParameter(0));
+                return inReq.getParameter(0);
             } else {
                 System.out.println("Something is wrong with this message...");
+                return null;
             }
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
 
         }
     }
