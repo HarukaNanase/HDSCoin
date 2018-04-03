@@ -273,7 +273,7 @@ public class Ledger{
             /*
             /TODO: sequenceNumber in account to verify replay attacks DONE
             /TODO: transaction signature -> signed by source, signed by destination, signed by server
-            /TODO: Serializable but doesn't need to be secure, just ATOMIC. DONE
+            /TODO: Serializable but doesn't need to be secure, just ATOMIC. DONE... on ubuntu!?
             /TODO: Unit Tests
             /TODO: Demos and readme
             /TODO: Wallet key creation or loads
@@ -333,20 +333,14 @@ public class Ledger{
     }
 
 
-    public  Account getAccount(String publicKey){
-        try {
-            byte[] publicKeyBytes = Base64.decode(publicKey);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
-            PublicKey pubK = keyFactory.generatePublic(publicKeySpec);
-            for (Account a : accounts) {
-                if (a.getPublicKey().equals(pubK)) {
-                    return a;
-                }
+    public Account getAccount(String publicKey){
+
+        for (Account a : accounts) {
+            if (a.getAccountAddress().equals(publicKey)) {
+                return a;
             }
-        }catch(Exception e){
-            return null;
         }
+
         return null;
     }
     public  boolean AddToBlockChain(Block block){
@@ -480,6 +474,7 @@ public class Ledger{
                 Path to = Paths.get(path + "ledger.bak");
                 Files.move(from, to, ATOMIC_MOVE);
                 //Files.delete(from);
+                System.out.println("It worked son of a bitch");
                 return true;
 
         }catch(AccessDeniedException ade){
