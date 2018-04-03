@@ -7,6 +7,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,8 +19,10 @@ import java.security.spec.X509EncodedKeySpec;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Scanner;
 
 import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class Ledger{
     public transient ServerSocket mainSocket;
@@ -27,13 +30,13 @@ public class Ledger{
     public ArrayList<Block> blockchain = new ArrayList<Block>();
     public ArrayList<Account> accounts = new ArrayList<Account>();
     public ArrayList<Transaction> backlog = new ArrayList<Transaction>();
-    public transient int difficulty = 2;
+    public int difficulty = 2;
     private transient String publicKeyString;
     private transient String privateKeyString;
     private transient PublicKey publicKey;
     private transient PrivateKey privKey;
-    private transient int KEY_SIZE = 2048;
-    private transient String ALGORITHM = "RSA";
+    private int KEY_SIZE = 2048;
+    private String ALGORITHM = "RSA";
     private transient static Ledger ledger = null;
 
     private Ledger() {
@@ -48,6 +51,7 @@ public class Ledger{
 
     public static void main(String[] args){
         ledger = getInstance();
+        boolean loaded = ledger.loadLedgerState(System.getProperty("user.dir")+"/src/main/resources/");
 
         try {
             ledger.loadKeys(System.getProperty("user.dir")+"/src/main/resources/");
@@ -63,16 +67,10 @@ public class Ledger{
             ledger.generateServerKeys();
         }
 
-
-        Block genesis = new Block("First block", "0");
-        ledger.AddToBlockChain(genesis);
-        Block block2 = new Block("Second block", genesis.hash);
-        ledger.AddToBlockChain(block2);
-        Block block3 = new Block("Third block", block2.hash);
-        ledger.AddToBlockChain(block3);
-        Block block4 = new Block("4th block", block3.hash);
-        ledger.AddToBlockChain(block4);
-
+        if(loaded == false){
+            Block genesis = new Block("First block", "0");
+            ledger.AddToBlockChain(genesis);
+        }
 
         for(Block b : ledger.blockchain){
             System.out.println(b.getTransactionsAsJSon());
@@ -273,9 +271,9 @@ public class Ledger{
 
 
             /*
-            /TODO: sequenceNumber in account to verify replay attacks
+            /TODO: sequenceNumber in account to verify replay attacks DONE
             /TODO: transaction signature -> signed by source, signed by destination, signed by server
-            /TODO: Serializable but doesn't need to be secure, just ATOMIC.
+            /TODO: Serializable but doesn't need to be secure, just ATOMIC. DONE
             /TODO: Unit Tests
             /TODO: Demos and readme
             /TODO: Wallet key creation or loads
@@ -284,7 +282,7 @@ public class Ledger{
             switch(req.getOpcode()){
                 case CREATE_ACCOUNT:
                     sendResponseToClient(createResponse(ledger.createAccount(publicKeyBase64)), out);
-                    ledger.saveLedgerState(System.getProperty("user.dir"+"/HDSCoinServer/src/main/resources/"));
+                    ledger.saveLedgerState(System.getProperty("user.dir")+"/src/main/resources/");
                     break;
                 case CHECK_ACCOUNT:
                     sendResponseToClient(createResponse(ledger.checkAccount(publicKeyBase64)), out);
@@ -295,11 +293,11 @@ public class Ledger{
                     int value = Integer.valueOf(req.getParameter(2));
                     String result = ledger.createTransaction(src, dst, value);
                     sendResponseToClient(createResponse(result), out);
-                    ledger.saveLedgerState(System.getProperty("user.dir"+"/HDSCoinServer/src/main/resources/"));
+                    ledger.saveLedgerState(System.getProperty("user.dir")+"/src/main/resources/");
                     break;
                 case RECEIVE_TRANSACTION:
                     sendResponseToClient(createResponse(ledger.ReceiveTransaction(req)), out);
-                    ledger.saveLedgerState(System.getProperty("user.dir"+"/HDSCoinServer/src/main/resources/"));
+                    ledger.saveLedgerState(System.getProperty("user.dir")+"/src/main/resources/");
                     break;
                 case REQUEST_CHAIN:
                     sendResponseToClient(createResponse(ledger.getChain()),out);
@@ -440,7 +438,7 @@ public class Ledger{
             byte[] pubKeyBytes = publicKey.getEncoded();
             byte[] privKeyBytes = privKey.getEncoded();
 
-            publicKeyString = Base64.encode(pubKeyBytes, 512);
+            publicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
             privateKeyString = Base64.encode(privKeyBytes); // PKCS#8
 
     }
@@ -477,19 +475,43 @@ public class Ledger{
             return false;
         }
 
-        try{
-            Path from = Paths.get(path+"ledger.tmp");
-            Path to = Paths.get(path+"ledger.bak");
-            Files.move(from,to,ATOMIC_MOVE);
+        try {
+                Path from = Paths.get(path + "ledger.tmp");
+                Path to = Paths.get(path + "ledger.bak");
+                Files.move(from, to, ATOMIC_MOVE);
+                //Files.delete(from);
+                return true;
+
+        }catch(AccessDeniedException ade){
+                System.out.println("Please run this program from an administrator console.");
+                return false;
         }catch(IOException ioe){
             System.out.println("Something went wrong with the renaming");
+            ioe.printStackTrace();
             return false;
         }
-        return false;
     }
 
     private  boolean loadLedgerState(String path){
-        return false;
+        try {
+            System.out.println("Trying to load backup state...");
+            String jsonBackup = new Scanner(new File(path+"ledger.bak")).useDelimiter("\\Z").next();
+            Gson gson = new Gson();
+            Ledger backup = gson.fromJson(jsonBackup, Ledger.class);
+            ledger.blockchain = backup.blockchain;
+            ledger.accounts = backup.accounts;
+            System.out.println("Loaded accounts: " + ledger.accounts.size());
+            System.out.println(gson.toJson(ledger.accounts));
+            ledger.backlog = backup.backlog;
+            ledger.difficulty = backup.difficulty;
+            ledger.KEY_SIZE = backup.KEY_SIZE;
+            ledger.ALGORITHM = backup.ALGORITHM;
+            System.out.println("Backup loaded successfully.");
+            return true;
+        }catch(IOException ioe){
+            System.out.println("Failed to load a backup, starting empty.");
+            return false;
+        }
     }
 
 

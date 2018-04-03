@@ -36,18 +36,72 @@ public class Wallet {
             return;
         }
         try {
-            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-            keyGen.initialize(KEY_SIZE);
-            KeyPair keyPair = keyGen.generateKeyPair();
-            privKey = keyPair.getPrivate();
-            pKey = keyPair.getPublic();
+            if(args.length == 0) {
+                KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+                keyGen.initialize(KEY_SIZE);
+                KeyPair keyPair = keyGen.generateKeyPair();
+                privKey = keyPair.getPrivate();
+                pKey = keyPair.getPublic();
 
-            byte[] pubKeyBytes = pKey.getEncoded();
-            byte[] privKeyBytes = privKey.getEncoded();
+                byte[] pubKeyBytes = pKey.getEncoded();
+                byte[] privKeyBytes = privKey.getEncoded();
 
-            publicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
-            privateKeyString = Base64.encode(privKeyBytes, KEY_SIZE);
-            System.out.println("Your key: " + publicKeyString);
+                publicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
+                privateKeyString = Base64.encode(privKeyBytes, KEY_SIZE);
+                X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(
+                        pKey.getEncoded());
+                try {
+                    FileOutputStream fos = new FileOutputStream(System.getProperty("user.dir")+"/src/main/resources/" + "client.pub");
+                    fos.write(x509EncodedKeySpec.getEncoded());
+                    fos.close();
+                    // Store Private Key.
+                    PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(
+                            privKey.getEncoded());
+                    fos = new FileOutputStream(System.getProperty("user.dir")+"/src/main/resources/"+ "client.priv");
+                    fos.write(pkcs8EncodedKeySpec.getEncoded());
+                    fos.close();
+                }catch(IOException e){
+                    System.out.println("Failed to save key pair to file.");
+                    e.printStackTrace();
+                }
+                System.out.println("Your key: " + publicKeyString);
+            }else{
+                System.out.println("Trying to load keys from folder: " + args[0]);
+                try {
+                    File filePublicKey = new File(System.getProperty("user.dir") + "/src/main/resources/" + args[0] + "/" + "client.pub");
+                    FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + "/src/main/resources/" + args[0] + "/" + "client.pub");
+                    byte[] encodedPublicKey = new byte[(int) filePublicKey.length()];
+                    fis.read(encodedPublicKey);
+                    fis.close();
+
+                    // Read Private Key.
+                    File filePrivateKey = new File(System.getProperty("user.dir") + "/src/main/resources/" + args[0] + "/" + "client.priv");
+                    fis = new FileInputStream(System.getProperty("user.dir") + "/src/main/resources/" + args[0] + "/" + "client.priv");
+                    byte[] encodedPrivateKey = new byte[(int) filePrivateKey.length()];
+                    fis.read(encodedPrivateKey);
+                    fis.close();
+
+                    // Generate KeyPair.
+                    KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
+                    X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(
+                            encodedPublicKey);
+                    pKey = keyFactory.generatePublic(publicKeySpec);
+
+                    PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(
+                            encodedPrivateKey);
+                    privKey = keyFactory.generatePrivate(privateKeySpec);
+
+                    byte[] pubKeyBytes = pKey.getEncoded();
+                    byte[] privKeyBytes = privKey.getEncoded();
+
+                    publicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
+                    privateKeyString = Base64.encode(privKeyBytes); // PKCS#8
+                    System.out.println("Keys loaded successfully!\nYour key:\n"+publicKeyString);
+                }catch(IOException ioe){
+                    System.out.println("Failed to load keys from folder: " + args[0]);
+                    return;
+                }
+            }
 
             mainSocket = new Socket("127.0.0.1", 1381);
             out = new DataOutputStream(mainSocket.getOutputStream());

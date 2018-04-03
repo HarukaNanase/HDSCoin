@@ -9,7 +9,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 
 public class Account {
-        private transient int KEY_SIZE = 512;
+        private transient int KEY_SIZE = 2048;
         private transient PublicKey publicKey;
         private transient PrivateKey privateKey;
         private String publicKeyString;
