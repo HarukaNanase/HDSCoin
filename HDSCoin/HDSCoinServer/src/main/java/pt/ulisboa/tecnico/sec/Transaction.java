@@ -10,7 +10,7 @@ public class Transaction {
     private int value;
     private transient boolean isProcessed = false;
     private transient boolean shouldProcess = false;
-
+    private String tSig;
     public Transaction(Account src, Account dest, int value){
         this.sourceAcc = src;
         this.destinationAcc = dest;
@@ -47,6 +47,14 @@ public class Transaction {
 
     public String getDestinationAddress(){
         return destinationAddress;
+    }
+
+    public void settSig(String transaction_signature){
+        this.tSig = transaction_signature;
+    }
+
+    public String gettSig(){
+        return this.tSig;
     }
 }
 

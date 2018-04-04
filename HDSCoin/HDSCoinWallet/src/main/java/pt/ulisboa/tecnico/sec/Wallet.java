@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.sec;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 
 import java.io.*;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.security.*;
 import java.security.spec.EncodedKeySpec;
@@ -36,7 +37,7 @@ public class Wallet {
             return;
         }
         try {
-            if(args.length == 0) {
+            if (args.length == 0) {
                 KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
                 keyGen.initialize(KEY_SIZE);
                 KeyPair keyPair = keyGen.generateKeyPair();
@@ -51,21 +52,21 @@ public class Wallet {
                 X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(
                         pKey.getEncoded());
                 try {
-                    FileOutputStream fos = new FileOutputStream(System.getProperty("user.dir")+"/src/main/resources/" + "client.pub");
+                    FileOutputStream fos = new FileOutputStream(System.getProperty("user.dir") + "/src/main/resources/" + "client.pub");
                     fos.write(x509EncodedKeySpec.getEncoded());
                     fos.close();
                     // Store Private Key.
                     PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(
                             privKey.getEncoded());
-                    fos = new FileOutputStream(System.getProperty("user.dir")+"/src/main/resources/"+ "client.priv");
+                    fos = new FileOutputStream(System.getProperty("user.dir") + "/src/main/resources/" + "client.priv");
                     fos.write(pkcs8EncodedKeySpec.getEncoded());
                     fos.close();
-                }catch(IOException e){
+                } catch (IOException e) {
                     System.out.println("Failed to save key pair to file.");
                     e.printStackTrace();
                 }
                 System.out.println("Your key: " + publicKeyString);
-            }else{
+            } else {
                 System.out.println("Trying to load keys from folder: " + args[0]);
                 try {
                     File filePublicKey = new File(System.getProperty("user.dir") + "/src/main/resources/" + args[0] + "/" + "client.pub");
@@ -97,8 +98,8 @@ public class Wallet {
                     publicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
                     privateKeyString = Base64.encode(privKeyBytes); // PKCS#8
 
-                    System.out.println("Keys loaded successfully!\nYour key:\n"+publicKeyString);
-                }catch(IOException ioe){
+                    System.out.println("Keys loaded successfully!\nYour key:\n" + publicKeyString);
+                } catch (IOException ioe) {
                     System.out.println("Failed to load keys from folder: " + args[0]);
                     return;
                 }
@@ -112,20 +113,21 @@ public class Wallet {
             seqNumber.addParameter(publicKeyString);
             signAndSendMessage(seqNumber);
             String seq = receiveAndVerifyAnswer();
-            if(seq != null)
+            if (seq != null)
                 sequenceNumber = Long.parseLong(seq);
-            if(sequenceNumber != -1)
+            if (sequenceNumber != -1)
                 System.out.println("Done. Current Sequence Number: " + sequenceNumber);
-            else{
+            else {
                 System.out.println("Sequence Number not found. Setting to 0");
                 sequenceNumber = 0;
             }
-            while(true){
+            while (true) {
                 System.out.println("What you wanna do?");
                 String opcode = scanner.next();
                 handleUserInput(opcode);
             }
-
+        }catch(ConnectException ce){
+            System.out.println("Server seems to be offline...");
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -173,6 +175,7 @@ public class Wallet {
             System.out.println("Unknown command.");
             return;
         }
+
         if(ureq.getOpcode() != Opcode.CREATE_ACCOUNT && ureq.getOpcode() != Opcode.REQUEST_CHAIN && ureq.getOpcode() != Opcode.AUDIT)
             ureq.setSequenceNumber(++sequenceNumber);
 

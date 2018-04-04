@@ -43,7 +43,7 @@ public class Ledger{
 
     }
 
-    public static Ledger getInstance(){
+    private static Ledger getInstance(){
         if(ledger == null)
             ledger = new Ledger();
         return ledger;
@@ -90,16 +90,17 @@ public class Ledger{
                 Boolean shouldRun = true;
 
                 public void run() {
+                    System.out.println("New thread responding to client.");
                     while (shouldRun) {
-                        System.out.println("New thread responding to client.");
                         try {
                             handleClientRequest(tClient);
                         } catch (Exception e) {
                             handleClientDisconnect(tClient);
+                            System.out.println("Client exiting");
                             shouldRun = false;
                         }
 
-
+                        return;
                     }
                 }
             });
@@ -123,7 +124,7 @@ public class Ledger{
         }
     }
 
-    private String createAccount(String publicKeyBase64) {
+    private synchronized String createAccount(String publicKeyBase64) {
         try {
             byte[] publicKeyBytes = Base64.decode(publicKeyBase64);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -145,7 +146,7 @@ public class Ledger{
         }
     }
 
-    private  String checkAccount(String key){
+    private synchronized String checkAccount(String key){
         StringBuilder sb = new StringBuilder();
         Account acc = getAccount(key);
         if (acc != null) {
@@ -163,7 +164,7 @@ public class Ledger{
         return sb.toString();
     }
 
-    private  String auditAccount(String key){
+    private synchronized String auditAccount(String key){
         StringBuilder sb = new StringBuilder();
 
         Account acc = getAccount(key);
@@ -185,7 +186,7 @@ public class Ledger{
         return sb.toString();
     }
 
-    private  String createTransaction(String src, String dst, int value){
+    private synchronized String createTransaction(String src, String dst, int value, String srcSig){
         Account acc1 = getAccount(src);
         Account acc2 = getAccount(dst);
 
@@ -198,6 +199,7 @@ public class Ledger{
             }
             acc1.setBalance(acc1.getBalance() - value);
             Transaction t = new Transaction(acc1, acc2, value);
+            t.settSig(srcSig);
             backlog.add(t);
             return "Transaction has been sent.";
 
@@ -207,7 +209,7 @@ public class Ledger{
 
     }
 
-    public  String getChain(){
+    private  String getChain(){
         try {
             StringBuilder sb = new StringBuilder();
             int i = 1;
@@ -224,13 +226,13 @@ public class Ledger{
         }
     }
 
-    public static Request createResponse(String message){
+    private static Request createResponse(String message){
         Request req = new Request(Opcode.SERVER_ANSWER);
         req.addParameter(message);
         return req;
     }
 
-    public static void sendResponseToClient(Request request, DataOutputStream out){
+    private static void sendResponseToClient(Request request, DataOutputStream out){
         try{
             SecurityManager.SignMessage(request, ledger.privKey);
             out.writeUTF(request.requestAsJson());
@@ -241,7 +243,7 @@ public class Ledger{
     }
 
 
-    public static void handleClientRequest(Socket client) throws SocketException, IOException{
+    private static void handleClientRequest(Socket client) throws SocketException, IOException{
             DataInputStream in = new DataInputStream(client.getInputStream());
             DataOutputStream out = new DataOutputStream(client.getOutputStream());
             String treq = in.readUTF();
@@ -272,11 +274,11 @@ public class Ledger{
 
             /*
             /TODO: sequenceNumber in account to verify replay attacks DONE
-            /TODO: transaction signature -> signed by source, signed by destination, signed by server
-            /TODO: Serializable but doesn't need to be secure, just ATOMIC. DONE... on ubuntu!?
+            /TODO: transaction signature -> signed by source, signed by destination, signed by server - Kindaish
+            /TODO: Serializable but doesn't need to be secure, just ATOMIC. DONE... on ubuntu!? AND WINDOWS!?
             /TODO: Unit Tests
             /TODO: Demos and readme
-            /TODO: Wallet key creation or loads
+            /TODO: Wallet key creation or loads - Added ability to load keys from folder. DONE
              */
 
             switch(req.getOpcode()){
@@ -291,7 +293,7 @@ public class Ledger{
                     String src = req.getParameter(0);
                     String dst = req.getParameter(1);
                     int value = Integer.valueOf(req.getParameter(2));
-                    String result = ledger.createTransaction(src, dst, value);
+                    String result = ledger.createTransaction(src, dst, value, req.getdSig());
                     sendResponseToClient(createResponse(result), out);
                     ledger.saveLedgerState(System.getProperty("user.dir")+"/src/main/resources/");
                     break;
@@ -315,7 +317,7 @@ public class Ledger{
 
     }
 
-    public long getAccountSequenceNumber(String key){
+    private synchronized long getAccountSequenceNumber(String key){
         Account acc = getAccount(key);
         if(acc != null)
             return acc.getSequenceNumber();
@@ -323,12 +325,18 @@ public class Ledger{
     }
 
 
-    public  String ReceiveTransaction(Request req){
+    private synchronized String ReceiveTransaction(Request req){
         String sourceKey = req.getParameter(1);
         String destinationKey = req.getParameter(0);
         for(Transaction t: backlog){
             if(t.getSourceAddress().equals(sourceKey) && t.getDestinationAddress().equals(destinationKey)){
                 if(!t.isProcessed()){
+                    String transactionSignature = SecurityManager.SignMessage((t.gettSig() + req.getdSig()), privKey);
+                    if(transactionSignature != null)
+                        t.settSig(transactionSignature);
+                    else
+                        return "An error has occured while processing this transaction. Please try again.";
+
                     t.signalToProcess();
                     //test, 1 trasaction per block!
                     Block b = new Block("Transaction Completed", blockchain.get((blockchain.size() - 1)).hash);
@@ -344,7 +352,7 @@ public class Ledger{
     }
 
 
-    public Account getAccount(String publicKey){
+    private synchronized Account getAccount(String publicKey){
 
         for (Account a : accounts) {
             if (a.getAccountAddress().equals(publicKey)) {
@@ -354,7 +362,8 @@ public class Ledger{
 
         return null;
     }
-    public  boolean AddToBlockChain(Block block){
+
+    private synchronized boolean AddToBlockChain(Block block){
         block.mine(difficulty);
         blockchain.add(block);
         if(verifyChain()) {
@@ -367,10 +376,7 @@ public class Ledger{
         }
     }
 
-
-
-
-    public  boolean verifyChain(){
+    private synchronized boolean verifyChain(){
         Block current;
         Block previous;
         String objective = new String(new char[difficulty]).replace('\0', '0');
@@ -395,7 +401,7 @@ public class Ledger{
     }
 
 
-    private  void generateServerKeys(){
+    private void generateServerKeys(){
         try {
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
             keyGen.initialize(KEY_SIZE);
@@ -416,7 +422,7 @@ public class Ledger{
     }
 
 
-    private  void loadKeys(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException{
+    private void loadKeys(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException{
             File filePublicKey = new File(path + "server.pub");
             FileInputStream fis = new FileInputStream(path + "server.pub");
             byte[] encodedPublicKey = new byte[(int) filePublicKey.length()];
@@ -448,7 +454,7 @@ public class Ledger{
 
     }
 
-    private  void saveKeys(String path, PublicKey publicKey, PrivateKey privateKey){
+    private void saveKeys(String path, PublicKey publicKey, PrivateKey privateKey){
         X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(
                 publicKey.getEncoded());
         try {
@@ -468,7 +474,7 @@ public class Ledger{
 
     }
 
-    private boolean saveLedgerState(String path){
+    private synchronized boolean saveLedgerState(String path){
         try{
             Gson gson = new Gson();
             PrintWriter out = new PrintWriter(path+"ledger.tmp");
@@ -497,7 +503,7 @@ public class Ledger{
         }
     }
 
-    private  boolean loadLedgerState(String path){
+    private boolean loadLedgerState(String path){
         try {
             System.out.println("Trying to load backup state...");
             Scanner fileScanner = new Scanner(new File(path+"ledger.bak"));
