@@ -26,10 +26,23 @@ public class Transaction {
         if(shouldProcess) {
             if(sourceAcc != null && destinationAcc != null){
                 //this.sourceAcc.makePayment(value);
-                this.destinationAcc.receivePayment(value);
+                try {
+                    this.destinationAcc.receivePayment(value);
+                }catch(Exception e){
+                    System.out.println(e.getMessage());
+                    return;
+                }
                 this.isProcessed = true;
             }
         }
+    }
+
+    public void setSourceAddress(String src){
+        this.sourceAddress = src;
+    }
+
+    public void setDestinationAddress(String dst){
+        this.destinationAddress = dst;
     }
 
     public void signalToProcess(){

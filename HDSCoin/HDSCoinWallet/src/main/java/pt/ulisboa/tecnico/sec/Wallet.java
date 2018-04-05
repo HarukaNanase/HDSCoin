@@ -66,6 +66,7 @@ public class Wallet {
                     e.printStackTrace();
                 }
                 System.out.println("Your key: " + publicKeyString);
+                System.out.println("Your private key: " + privateKeyString);
             } else {
                 System.out.println("Trying to load keys from folder: " + args[0]);
                 try {
@@ -155,7 +156,7 @@ public class Wallet {
         try {
             String incoming = in.readUTF();
             Request inReq = Request.requestFromJson(incoming);
-            System.out.println(incoming);
+           // System.out.println(incoming);
             if (inReq.getOpcode() == Opcode.SERVER_ANSWER && SecurityManager.VerifyMessage(inReq, serverPublicKeyString)) {
                 return inReq.getParameter(0);
             } else {
@@ -214,7 +215,7 @@ public class Wallet {
                 signAndSendMessage(ureq);
                 break;
         }
-        receiveAndVerifyAnswer();
+        System.out.println(receiveAndVerifyAnswer());
     }
 
     private static void signAndSendMessage(Request ureq){

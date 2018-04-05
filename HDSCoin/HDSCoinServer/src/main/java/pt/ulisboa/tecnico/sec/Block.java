@@ -13,6 +13,7 @@ public class Block
     private ArrayList<Transaction> blockTransactions;
     private transient int nonce;
     private transient int MAX_TRANSACTIONS_PER_BLOCK = 10;
+
     public Block(String data, String previousHash){
         this.data = data;
         this.previousBlockHash = previousHash;

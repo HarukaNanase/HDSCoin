@@ -43,7 +43,7 @@ public class Ledger{
 
     }
 
-    private static Ledger getInstance(){
+    public static Ledger getInstance(){
         if(ledger == null)
             ledger = new Ledger();
         return ledger;
@@ -99,8 +99,6 @@ public class Ledger{
                             System.out.println("Client exiting");
                             shouldRun = false;
                         }
-
-                        return;
                     }
                 }
             });
@@ -124,7 +122,7 @@ public class Ledger{
         }
     }
 
-    private synchronized String createAccount(String publicKeyBase64) {
+    public synchronized String createAccount(String publicKeyBase64) {
         try {
             byte[] publicKeyBytes = Base64.decode(publicKeyBase64);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -146,13 +144,17 @@ public class Ledger{
         }
     }
 
-    private synchronized String checkAccount(String key){
+    public synchronized String checkAccount(String key){
         StringBuilder sb = new StringBuilder();
         Account acc = getAccount(key);
         if (acc != null) {
             sb.append("Account : " + acc.getAccountAddress() + "\n");
             sb.append("Balance : " + acc.getBalance() + "\n");
+        }else{
+            sb.append("Account not found. \n");
+            return sb.toString();
         }
+
         sb.append("Incoming transactions pending confirmation:\n");
         for (Transaction t : backlog) {
             //System.out.println(t.getTransactionInfo() + "\n");
@@ -164,7 +166,7 @@ public class Ledger{
         return sb.toString();
     }
 
-    private synchronized String auditAccount(String key){
+    public synchronized String auditAccount(String key){
         StringBuilder sb = new StringBuilder();
 
         Account acc = getAccount(key);
@@ -186,7 +188,7 @@ public class Ledger{
         return sb.toString();
     }
 
-    private synchronized String createTransaction(String src, String dst, int value, String srcSig){
+    public synchronized String createTransaction(String src, String dst, int value, String srcSig){
         Account acc1 = getAccount(src);
         Account acc2 = getAccount(dst);
 
@@ -209,7 +211,7 @@ public class Ledger{
 
     }
 
-    private  String getChain(){
+    public  String getChain(){
         try {
             StringBuilder sb = new StringBuilder();
             int i = 1;
@@ -243,9 +245,11 @@ public class Ledger{
     }
 
 
-    private static void handleClientRequest(Socket client) throws SocketException, IOException{
+    public static void handleClientRequest(Socket client) throws SocketException, IOException{
+            System.out.println("Awaiting client input");
             DataInputStream in = new DataInputStream(client.getInputStream());
             DataOutputStream out = new DataOutputStream(client.getOutputStream());
+
             String treq = in.readUTF();
             Request req = Request.requestFromJson(treq);
             System.out.println("Request Received!");
@@ -317,7 +321,7 @@ public class Ledger{
 
     }
 
-    private synchronized long getAccountSequenceNumber(String key){
+    public synchronized long getAccountSequenceNumber(String key){
         Account acc = getAccount(key);
         if(acc != null)
             return acc.getSequenceNumber();
@@ -325,7 +329,7 @@ public class Ledger{
     }
 
 
-    private synchronized String ReceiveTransaction(Request req){
+    public synchronized String ReceiveTransaction(Request req){
         String sourceKey = req.getParameter(1);
         String destinationKey = req.getParameter(0);
         for(Transaction t: backlog){
@@ -352,7 +356,7 @@ public class Ledger{
     }
 
 
-    private synchronized Account getAccount(String publicKey){
+    public synchronized Account getAccount(String publicKey){
 
         for (Account a : accounts) {
             if (a.getAccountAddress().equals(publicKey)) {
@@ -363,7 +367,7 @@ public class Ledger{
         return null;
     }
 
-    private synchronized boolean AddToBlockChain(Block block){
+    public synchronized boolean AddToBlockChain(Block block){
         block.mine(difficulty);
         blockchain.add(block);
         if(verifyChain()) {
@@ -376,7 +380,7 @@ public class Ledger{
         }
     }
 
-    private synchronized boolean verifyChain(){
+    public synchronized boolean verifyChain(){
         Block current;
         Block previous;
         String objective = new String(new char[difficulty]).replace('\0', '0');
@@ -401,7 +405,7 @@ public class Ledger{
     }
 
 
-    private void generateServerKeys(){
+    public void generateServerKeys(){
         try {
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
             keyGen.initialize(KEY_SIZE);
@@ -421,8 +425,7 @@ public class Ledger{
         }
     }
 
-
-    private void loadKeys(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException{
+    public void loadKeys(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException{
             File filePublicKey = new File(path + "server.pub");
             FileInputStream fis = new FileInputStream(path + "server.pub");
             byte[] encodedPublicKey = new byte[(int) filePublicKey.length()];
@@ -454,7 +457,7 @@ public class Ledger{
 
     }
 
-    private void saveKeys(String path, PublicKey publicKey, PrivateKey privateKey){
+    public void saveKeys(String path, PublicKey publicKey, PrivateKey privateKey){
         X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(
                 publicKey.getEncoded());
         try {
@@ -474,7 +477,7 @@ public class Ledger{
 
     }
 
-    private synchronized boolean saveLedgerState(String path){
+    public synchronized boolean saveLedgerState(String path){
         try{
             Gson gson = new Gson();
             PrintWriter out = new PrintWriter(path+"ledger.tmp");
@@ -503,7 +506,7 @@ public class Ledger{
         }
     }
 
-    private boolean loadLedgerState(String path){
+    public boolean loadLedgerState(String path){
         try {
             System.out.println("Trying to load backup state...");
             Scanner fileScanner = new Scanner(new File(path+"ledger.bak"));

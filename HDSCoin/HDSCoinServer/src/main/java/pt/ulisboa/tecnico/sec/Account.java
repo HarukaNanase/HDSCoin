@@ -59,14 +59,17 @@ public class Account {
         }
 
 
-        public void makePayment(int value){
-            if((this.balance - value) < 0){
+        public void makePayment(int value) throws Exception{
+            if((this.balance - value) < 0 || value <= 0){
                 //error out
+                throw new Exception("Not enough balance or negative value.");
             }
             balance -= value;
         }
 
-        public void receivePayment(int value){
+        public void receivePayment(int value) throws Exception{
+            if(value <= 0)
+                throw new Exception("Receiving negative or zero value");
             this.balance += value;
         }
 
@@ -74,7 +77,7 @@ public class Account {
             Gson gson = new Gson();
             return gson.toJson(this);
         }
-        public String getAccountAddress(){
+    public String getAccountAddress(){
             return this.publicKeyString;
         }
 

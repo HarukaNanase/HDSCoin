@@ -10,7 +10,7 @@ import java.util.Date;
 
 public class SecurityManager {
     private static String algorithm = "RSA";
-    private static long MAX_MESSAGE_DELAY = 5000;
+    private static int MAX_MESSAGE_DELAY = 5000;
     private static String hashAlgorithm = "SHA256";
 
     public static boolean VerifyMessage(Request request, String sender){
@@ -47,8 +47,9 @@ public class SecurityManager {
 
     public static void SignMessage(Request request, PrivateKey privateKey){
         try {
-            request.setCreatedOn(System.currentTimeMillis());
-            request.setExpiresOn(System.currentTimeMillis() + MAX_MESSAGE_DELAY);
+            long currentTime = System.currentTimeMillis();
+            request.setCreatedOn(currentTime);
+            request.setExpiresOn(currentTime + MAX_MESSAGE_DELAY);
             Signature d_sig = Signature.getInstance(hashAlgorithm+"With"+algorithm);
             d_sig.initSign(privateKey);
             d_sig.update(request.requestAsJson().getBytes());
@@ -95,6 +96,8 @@ public class SecurityManager {
     }
 
 
-
+    public static int getMaxMessageDelay(){
+        return MAX_MESSAGE_DELAY;
+    }
 
 }

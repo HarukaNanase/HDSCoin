@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: pt.ulisboa.tecnico.sec.SecurityManagerTest
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.735 sec

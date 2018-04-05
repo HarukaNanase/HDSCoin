@@ -34,7 +34,7 @@ public class Request {
         this.parameters.set(idx, newParam);
     }
     public void setOpcode(Opcode opc){
-        this.opcode = opcode;
+        this.opcode = opc;
     }
 
     public Opcode getOpcode(){

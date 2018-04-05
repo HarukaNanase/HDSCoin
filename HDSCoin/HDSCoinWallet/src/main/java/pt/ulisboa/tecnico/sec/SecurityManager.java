@@ -10,8 +10,11 @@ public class SecurityManager {
     private static String algorithm = "RSA";
     private static long MAX_MESSAGE_DELAY = 5000;
     private static String hashAlgorithm = "SHA256";
+
     public static boolean VerifyMessage(Request request, String sender){
         try {
+            if(request.getOpcode() == Opcode.AUDIT)
+                return true;
             long currentTime = System.currentTimeMillis();
             boolean validTimer = true;
             String signature = request.getdSig();
@@ -42,8 +45,9 @@ public class SecurityManager {
 
     public static void SignMessage(Request request, PrivateKey privateKey){
         try {
-            request.setCreatedOn(System.currentTimeMillis());
-            request.setExpiresOn(System.currentTimeMillis() + MAX_MESSAGE_DELAY);
+            long currentTime = System.currentTimeMillis();
+            request.setCreatedOn(currentTime);
+            request.setExpiresOn(currentTime + MAX_MESSAGE_DELAY);
             Signature d_sig = Signature.getInstance(hashAlgorithm+"With"+algorithm);
             d_sig.initSign(privateKey);
             d_sig.update(request.requestAsJson().getBytes());
@@ -58,6 +62,37 @@ public class SecurityManager {
             se.printStackTrace();
         }
     }
+
+    public static String SignMessage(String message, PrivateKey privateKey){
+        try {
+
+            Signature d_sig = Signature.getInstance(hashAlgorithm+"With"+algorithm);
+            d_sig.initSign(privateKey);
+            d_sig.update(message.getBytes());
+            byte[] sigBytes = d_sig.sign();
+            return Base64.encode(sigBytes);
+
+        }catch(NoSuchAlgorithmException noae){
+            noae.printStackTrace();
+            return null;
+        }catch(InvalidKeyException ike){
+            ike.printStackTrace();
+            return null;
+        }catch(SignatureException se){
+            se.printStackTrace();
+            return null;
+        }
+    }
+
+    public static boolean VerifySequenceNumber(Request request, Account user){
+        System.out.println("\n\n This Account Sequence Number: " + user.getSequenceNumber() + "\n\n");
+        if(request.getSequenceNumber() == (user.getSequenceNumber()+1)){
+            user.setSequenceNumber(request.getSequenceNumber());
+            return true;
+        }
+        return false;
+    }
+
 
 
 
