@@ -11,7 +11,7 @@ public class Block
     private String data;
     private long time;
     private ArrayList<Transaction> blockTransactions;
-    private transient int nonce;
+    private int nonce;
     private transient int MAX_TRANSACTIONS_PER_BLOCK = 10;
 
     public Block(String data, String previousHash){

@@ -518,6 +518,7 @@ public class Ledger{
             ledger.accounts = backup.accounts;
             System.out.println("Loaded accounts: " + ledger.accounts.size());
             System.out.println(gson.toJson(ledger.accounts));
+            System.out.println("Current Blockchain loaded: \n" + gson.toJson(ledger.blockchain));
             ledger.backlog = backup.backlog;
             ledger.difficulty = backup.difficulty;
             ledger.KEY_SIZE = backup.KEY_SIZE;
