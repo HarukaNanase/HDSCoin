@@ -47,11 +47,8 @@ public class SecurityManagerTest {
         Request req = new Request(Opcode.CREATE_ACCOUNT);
         req.addParameter(ACCOUNT_ADDRESS);
         SecurityManager.SignMessage(req, ACCOUNT_PRIVATE_KEY);
-        System.out.println(req.requestAsJson());
         assertEquals(true, SecurityManager.VerifyMessage(req, ACCOUNT_ADDRESS));
         req.setOpcode(Opcode.RECEIVE_TRANSACTION);
-        //req.setParameter(0, "ASDASDASD");
-        System.out.println(req.requestAsJson());
         assertEquals(false, SecurityManager.VerifyMessage(req, ACCOUNT_ADDRESS));
     }
 
@@ -60,10 +57,8 @@ public class SecurityManagerTest {
         Request req = new Request(Opcode.CREATE_ACCOUNT);
         req.addParameter(ACCOUNT_ADDRESS);
         SecurityManager.SignMessage(req, ACCOUNT_PRIVATE_KEY);
-        System.out.println(req.requestAsJson());
         assertEquals(true, SecurityManager.VerifyMessage(req, ACCOUNT_ADDRESS));
         req.setParameter(0, "ASDASDASD");
-        System.out.println(req.requestAsJson());
         assertEquals(false, SecurityManager.VerifyMessage(req, ACCOUNT_ADDRESS));
     }
 
@@ -79,7 +74,6 @@ public class SecurityManagerTest {
         SecurityManager.SignMessage(atkReq, ACCOUNT_PRIVATE_KEY);
         if(SecurityManager.VerifyMessage(atkReq, ACCOUNT_ADDRESS)){
             assertEquals(true, SecurityManager.VerifySequenceNumber(atkReq, account));
-            account.setSequenceNumber(account.getSequenceNumber()+1);
             assertEquals(false, SecurityManager.VerifySequenceNumber(atkReq, account));
         }else{
             fail();
@@ -124,6 +118,17 @@ public class SecurityManagerTest {
         }
     }
 
+    @Test
+    public void PassesExpiresTest(){
+        Request req = new Request(Opcode.CHECK_ACCOUNT);
+        req.addParameter(ACCOUNT_ADDRESS);
+        SecurityManager.SignMessage(req, ACCOUNT_PRIVATE_KEY);
+        try{
+            Thread.sleep(SecurityManager.getMaxMessageDelay() - 1000);
+            assertEquals(true, SecurityManager.VerifyMessage(req, ACCOUNT_ADDRESS));
+        }catch(InterruptedException ie){
 
+        }
+    }
 
 }

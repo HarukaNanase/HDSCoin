@@ -21,7 +21,7 @@ public class Wallet {
     private static DataOutputStream out;
     private static DataInputStream in;
     private static boolean isRegistered = false;
-    private static int KEY_SIZE = 512;
+    private static int KEY_SIZE = 2048;
     private static String ALGORITHM = "RSA";
     private static long sequenceNumber = 0;
     private static String serverPublicKeyString;
@@ -33,7 +33,7 @@ public class Wallet {
         try{
             loadServerKey(System.getProperty("user.dir") + "/src/main/resources/");
         }catch(Exception e){
-            System.out.println("Failed to load server keys");
+            System.out.println("Failed to load server keys @ " + System.getProperty("user.dir") + "/src/main/resources/");
             return;
         }
         try {
@@ -149,6 +149,8 @@ public class Wallet {
            return Opcode.AUDIT;
        else if(new_opcode.equals("request_chain"))
            return Opcode.REQUEST_CHAIN;
+       else if(new_opcode.equals("exit"))
+           System.exit(0);
        return null;
     }
 

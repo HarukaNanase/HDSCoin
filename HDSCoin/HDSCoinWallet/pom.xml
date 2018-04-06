@@ -35,6 +35,7 @@
 			    <mainClass>pt.ulisboa.tecnico.sec.Wallet</mainClass>
 			  </configuration>
 			</plugin>
+			
 		</plugins>
     </build>
 
