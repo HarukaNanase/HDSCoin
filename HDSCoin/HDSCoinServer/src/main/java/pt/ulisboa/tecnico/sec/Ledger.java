@@ -38,7 +38,8 @@ public class Ledger{
     private int KEY_SIZE = 2048;
     private String ALGORITHM = "RSA";
     private transient static Ledger ledger = null;
-
+    private int port;
+    private String RESOURCES_PATH = System.getProperty("user.dir")+"/src/main/resources/";
     private Ledger() {
 
     }
@@ -51,10 +52,27 @@ public class Ledger{
 
     public static void main(String[] args){
         ledger = getInstance();
-        boolean loaded = ledger.loadLedgerState(System.getProperty("user.dir")+"/src/main/resources/");
+        if(args[0] == null){
+            System.out.println("Please indicate which ledger this is.");
+        }
+        ledger.RESOURCES_PATH += args[0]+"/";
+        String thisLedgerPath = null;
+
+        if(args[0].equals("ledger1"))
+            ledger.port = 1380;
+        else if(args[0].equals("ledger2"))
+            ledger.port = 1381;
+        else if(args[0].equals("ledger3"))
+            ledger.port = 1382;
+        else if(args[0].equals("ledger4"))
+            ledger.port = 1383;
+
+        boolean loaded = ledger.loadLedgerState(ledger.RESOURCES_PATH);
+
+
 
         try {
-            ledger.loadKeys(System.getProperty("user.dir")+"/src/main/resources/");
+            ledger.loadKeys(ledger.RESOURCES_PATH);
         }catch(IOException ioe){
             System.out.println("Could not load key files. Generating new ones.");
             ioe.printStackTrace();
@@ -77,7 +95,8 @@ public class Ledger{
         }
 
         try{
-            ledger.mainSocket = new ServerSocket(1381);
+            System.out.println("Server Endpoint: " + "127.0.0.1:" + ledger.port);
+            ledger.mainSocket = new ServerSocket(ledger.port);
         }catch(IOException ioe){
             ioe.printStackTrace();
         }
@@ -288,7 +307,7 @@ public class Ledger{
             switch(req.getOpcode()){
                 case CREATE_ACCOUNT:
                     sendResponseToClient(createResponse(ledger.createAccount(publicKeyBase64)), out);
-                    ledger.saveLedgerState(System.getProperty("user.dir")+"/src/main/resources/");
+                    ledger.saveLedgerState(ledger.RESOURCES_PATH);
                     break;
                 case CHECK_ACCOUNT:
                     sendResponseToClient(createResponse(ledger.checkAccount(publicKeyBase64)), out);
@@ -299,11 +318,11 @@ public class Ledger{
                     int value = Integer.valueOf(req.getParameter(2));
                     String result = ledger.createTransaction(src, dst, value, req.getdSig());
                     sendResponseToClient(createResponse(result), out);
-                    ledger.saveLedgerState(System.getProperty("user.dir")+"/src/main/resources/");
+                    ledger.saveLedgerState(ledger.RESOURCES_PATH);
                     break;
                 case RECEIVE_TRANSACTION:
                     sendResponseToClient(createResponse(ledger.ReceiveTransaction(req)), out);
-                    ledger.saveLedgerState(System.getProperty("user.dir")+"/src/main/resources/");
+                    ledger.saveLedgerState(ledger.RESOURCES_PATH);
                     break;
                 case REQUEST_CHAIN:
                     sendResponseToClient(createResponse(ledger.getChain()),out);
@@ -419,7 +438,7 @@ public class Ledger{
             publicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
             privateKeyString = Base64.encode(privKeyBytes, KEY_SIZE); // PKCS#8
             System.out.println("Server Key: " + publicKeyString);
-            saveKeys(System.getProperty("user.dir")+"/src/main/resources/", publicKey, privKey);
+            saveKeys(ledger.RESOURCES_PATH, publicKey, privKey);
         }catch(Exception e){
 
         }
