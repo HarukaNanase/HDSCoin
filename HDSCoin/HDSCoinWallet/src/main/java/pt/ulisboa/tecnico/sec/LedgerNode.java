@@ -36,7 +36,6 @@ public class LedgerNode {
     public Request sendRequest(Request request){
         try {
             this.out.writeUTF(request.requestAsJson());
-            //this.nodeSocket.setSoTimeout(messageWaitTime);
             String answer = this.in.readUTF();
             return Request.requestFromJson(answer);
         }catch(SocketTimeoutException ste){

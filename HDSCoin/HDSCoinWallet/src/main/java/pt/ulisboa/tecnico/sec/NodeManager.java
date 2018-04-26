@@ -21,7 +21,7 @@ public class NodeManager {
     public void createNode(String name, int port){
         LedgerNode node = new LedgerNode(name, port);
         if(node.connect()) {
-            //node.setMessageTime(DEFAULT_TIMEOUT);
+            node.setMessageTime(DEFAULT_TIMEOUT);
             this.nodes.add(node);
         }
         else
