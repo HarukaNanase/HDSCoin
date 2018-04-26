@@ -35,6 +35,7 @@ public class LedgerNode {
 
     public Request sendRequest(Request request){
         try {
+            SecurityManager.SignMessage(request, Wallet.getPrivateKey());
             this.out.writeUTF(request.requestAsJson());
             String answer = this.in.readUTF();
             return Request.requestFromJson(answer);

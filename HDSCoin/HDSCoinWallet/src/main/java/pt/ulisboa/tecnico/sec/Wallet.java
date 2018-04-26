@@ -28,6 +28,10 @@ public class Wallet {
     private static PublicKey serverPublicKey;
     private static NodeManager manager;
 
+    public static PrivateKey getPrivateKey(){
+        return privKey;
+    }
+
 
     public static void main(String[] args){
         System.out.println("Wallet v0.01");
@@ -117,7 +121,12 @@ public class Wallet {
 
             Request test = new Request(Opcode.TEST_MESSAGE);
 
-            manager.broadcast(test);
+            Request mostCommonAnswer = manager.broadcast(test);
+            if(mostCommonAnswer != null){
+                System.out.println("Most Common Answers:\n" + mostCommonAnswer.requestAsJson());
+            }else{
+                System.out.println("No agreement on the most common answer.");
+            }
             Thread.sleep(50000);
             System.out.println("Contacting server to request sequence number...");
             Request seqNumber = new Request(Opcode.REQUEST_SEQUENCE_NUMBER);

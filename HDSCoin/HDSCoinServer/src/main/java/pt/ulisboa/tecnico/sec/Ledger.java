@@ -275,7 +275,9 @@ public class Ledger{
             System.out.println(req.requestAsJson());
             if(req.getOpcode() == Opcode.TEST_MESSAGE){
                 sendResponseToClient(createResponse("TEST IS WORKING"), out);
+                return;
             }
+
             String publicKeyBase64 = req.getParameter(0);
             if((req.getOpcode() != Opcode.REQUEST_CHAIN && req.getOpcode() != Opcode.AUDIT)){
                 if(!SecurityManager.VerifyMessage(req, publicKeyBase64)){
@@ -340,6 +342,7 @@ public class Ledger{
                     sendResponseToClient(createResponse("Unrecognized command."), out);
                     break;
             }
+
 
     }
 

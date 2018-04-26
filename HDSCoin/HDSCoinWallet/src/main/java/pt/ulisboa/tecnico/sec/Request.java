@@ -2,9 +2,11 @@ package pt.ulisboa.tecnico.sec;
 
 import com.google.gson.Gson;
 
+import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Objects;
 
-public class Request {
+public class Request{
     private Opcode opcode;
     private ArrayList<String> parameters;
     private String dSig;
@@ -99,5 +101,32 @@ public class Request {
         return this.dSig;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof Request) {
+            Request target = (Request) obj;
+            if (this.getOpcode() == target.getOpcode() && this.getSequenceNumber() == target.getSequenceNumber() && this.getParameters().size() == target.getParameters().size()) {
+                for (int i = 0; i < this.getParameters().size(); i++) {
+                    if (!this.getParameter(i).equals(target.getParameter(i))) {
+                        System.out.println("A parameter is different at index: " + i);
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
 
+    @Override
+    public int hashCode(){
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.opcode);
+        sb.append(this.sequenceNumber);
+        for(String str : this.getParameters()){
+            sb.append(str);
+        }
+        return Objects.hash(sb.toString());
+    }
 }
