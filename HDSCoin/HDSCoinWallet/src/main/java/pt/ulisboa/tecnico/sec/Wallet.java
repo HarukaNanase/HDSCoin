@@ -26,9 +26,12 @@ public class Wallet {
     private static long sequenceNumber = 0;
     private static String serverPublicKeyString;
     private static PublicKey serverPublicKey;
+    private static NodeManager manager;
+
 
     public static void main(String[] args){
         System.out.println("Wallet v0.01");
+        manager = new NodeManager();
         Scanner scanner = new Scanner(System.in);
         try{
             loadServerKey(System.getProperty("user.dir") + "/src/main/resources/");
@@ -106,9 +109,16 @@ public class Wallet {
                 }
             }
 
-            mainSocket = new Socket("127.0.0.1", 1381);
-            out = new DataOutputStream(mainSocket.getOutputStream());
-            in = new DataInputStream(mainSocket.getInputStream());
+            //mainSocket = new Socket("127.0.0.1", 1381);
+            //out = new DataOutputStream(mainSocket.getOutputStream());
+            //in = new DataInputStream(mainSocket.getInputStream());
+            manager.createNode("127.0.0.1", 1380);
+            manager.createNode("127.0.0.1", 1381);
+
+            Request test = new Request(Opcode.TEST_MESSAGE);
+
+            manager.broadcast(test);
+            Thread.sleep(50000);
             System.out.println("Contacting server to request sequence number...");
             Request seqNumber = new Request(Opcode.REQUEST_SEQUENCE_NUMBER);
             seqNumber.addParameter(publicKeyString);
@@ -127,9 +137,8 @@ public class Wallet {
                 String opcode = scanner.next();
                 handleUserInput(opcode);
             }
-        }catch(ConnectException ce){
-            System.out.println("Server seems to be offline...");
-        }catch(Exception e){
+        }
+        catch(Exception e){
             e.printStackTrace();
         }
 

@@ -15,7 +15,7 @@ public class SecurityManager {
 
     public static boolean VerifyMessage(Request request, String sender){
         try {
-            if(request.getOpcode() == Opcode.AUDIT)
+            if(request.getOpcode() == Opcode.AUDIT || request.getOpcode() == Opcode.TEST_MESSAGE)
                 return true;
             long currentTime = System.currentTimeMillis();
             boolean validTimer = true;

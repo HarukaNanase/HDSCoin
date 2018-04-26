@@ -273,6 +273,9 @@ public class Ledger{
             Request req = Request.requestFromJson(treq);
             System.out.println("Request Received!");
             System.out.println(req.requestAsJson());
+            if(req.getOpcode() == Opcode.TEST_MESSAGE){
+                sendResponseToClient(createResponse("TEST IS WORKING"), out);
+            }
             String publicKeyBase64 = req.getParameter(0);
             if((req.getOpcode() != Opcode.REQUEST_CHAIN && req.getOpcode() != Opcode.AUDIT)){
                 if(!SecurityManager.VerifyMessage(req, publicKeyBase64)){
