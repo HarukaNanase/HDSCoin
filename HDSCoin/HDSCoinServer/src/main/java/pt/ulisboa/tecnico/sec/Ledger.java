@@ -69,8 +69,6 @@ public class Ledger{
 
         boolean loaded = ledger.loadLedgerState(ledger.RESOURCES_PATH);
 
-
-
         try {
             ledger.loadKeys(ledger.RESOURCES_PATH);
         }catch(IOException ioe){
@@ -85,7 +83,7 @@ public class Ledger{
             ledger.generateServerKeys();
         }
 
-        if(loaded == false){
+        if(!loaded){
             Block genesis = new Block("First block", "0");
             ledger.AddToBlockChain(genesis);
         }
@@ -253,6 +251,12 @@ public class Ledger{
         return req;
     }
 
+    private static Request createResponse(Request request){
+        Request ack = new Request(Opcode.ACK);
+        ack.addParameter(""+request.getSequenceNumber());
+        return ack;
+    }
+
     private static void sendResponseToClient(Request request, DataOutputStream out){
         try{
             SecurityManager.SignMessage(request, ledger.privKey);
@@ -298,16 +302,6 @@ public class Ledger{
             }else{
                 System.out.println("Valid message!");
             }
-
-
-            /*
-            /TODO: sequenceNumber in account to verify replay attacks DONE
-            /TODO: transaction signature -> signed by source, signed by destination, signed by server - Kindaish
-            /TODO: Serializable but doesn't need to be secure, just ATOMIC. DONE... on ubuntu!? AND WINDOWS!?
-            /TODO: Unit Tests
-            /TODO: Demos and readme
-            /TODO: Wallet key creation or loads - Added ability to load keys from folder. DONE
-             */
 
             switch(req.getOpcode()){
                 case CREATE_ACCOUNT:

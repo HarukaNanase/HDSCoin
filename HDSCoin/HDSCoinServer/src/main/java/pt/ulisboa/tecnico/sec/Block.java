@@ -12,6 +12,7 @@ public class Block
     private long time;
     private ArrayList<Transaction> blockTransactions;
     private int nonce;
+    private int height;
     private transient int MAX_TRANSACTIONS_PER_BLOCK = 10;
 
     public Block(String data, String previousHash){
@@ -24,7 +25,7 @@ public class Block
 
     public String calculateHash(){
         Gson gson = new Gson();
-        return StringUtil.sha256(this.previousBlockHash + Long.toString(this.time) + this.data + Integer.toString(nonce) + gson.toJson(this.blockTransactions));
+        return StringUtil.sha256(this.previousBlockHash + Long.toString(this.time) + this.data + Integer.toString(nonce) + gson.toJson(this.blockTransactions)+ this.height);
     }
 
     public ArrayList<Transaction> getBlockTransactions(){
@@ -39,8 +40,9 @@ public class Block
             this.nonce++;
             this.hash = calculateHash();
         }
-
+        this.height = Ledger.getInstance().blockchain.size();
         System.out.println("Block mined! Block hash: " + this.hash);
+        System.out.println("Current height:" + this.height);
     }
 
     public void addTransaction(Transaction tr){

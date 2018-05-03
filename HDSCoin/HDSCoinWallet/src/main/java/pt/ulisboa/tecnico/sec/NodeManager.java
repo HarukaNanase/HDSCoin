@@ -55,6 +55,12 @@ public class NodeManager {
 
     }
 
+    /*
+    * @method - mostCommon
+    * @Input ArrayList of Requests - the answers from N nodes
+    * @Returns Request - the most common request
+     */
+
     public Request mostCommon(ArrayList<Request> answers){
         ArrayList<Request> commonAnswers = new ArrayList<Request>();
         HashMap<Request, Integer> occurrenceMap = new HashMap<Request, Integer>();
