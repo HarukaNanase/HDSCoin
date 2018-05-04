@@ -9,6 +9,7 @@ public class NodeManager {
 
     private ArrayList<LedgerNode> nodes;
     private int DEFAULT_TIMEOUT = 0;
+    private int FAULT_VALUE = 1;
     public NodeManager(){
         nodes = new ArrayList<LedgerNode>();
     }
@@ -35,8 +36,21 @@ public class NodeManager {
 
     public Request broadcast(Request request){
         ArrayList<Request> answers = new ArrayList<Request>();
-        for(LedgerNode node : this.nodes)
-            answers.add(node.sendRequest(request));
+        for(LedgerNode node : this.nodes) {
+            node.clearSocket();
+            node.sendRequest(request);
+        }
+
+        int meta = 0;
+        for(LedgerNode node : this.nodes){
+            Request req = node.receiveRequest();
+            if(req.getOpcode() == Opcode.ACK && Long.parseLong(req.getParameter(0)) == Wallet.getSequenceNumber()){
+                answers.add(req);
+                meta++;
+                if(meta >= (nodes.size() - FAULT_VALUE)/2)
+                    break;
+            }
+        }
         // verify answers and decide based on it.
         for(Request req : answers)
             System.out.println(req.requestAsJson());

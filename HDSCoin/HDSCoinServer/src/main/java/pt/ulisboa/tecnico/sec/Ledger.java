@@ -316,11 +316,12 @@ public class Ledger{
                     String dst = req.getParameter(1);
                     int value = Integer.valueOf(req.getParameter(2));
                     String result = ledger.createTransaction(src, dst, value, req.getdSig());
-                    sendResponseToClient(createResponse(result), out);
+                    sendResponseToClient(createResponse(req), out);
                     ledger.saveLedgerState(ledger.RESOURCES_PATH);
                     break;
                 case RECEIVE_TRANSACTION:
-                    sendResponseToClient(createResponse(ledger.ReceiveTransaction(req)), out);
+                    ledger.ReceiveTransaction(req);
+                    sendResponseToClient(createResponse(req), out);
                     ledger.saveLedgerState(ledger.RESOURCES_PATH);
                     break;
                 case REQUEST_CHAIN:

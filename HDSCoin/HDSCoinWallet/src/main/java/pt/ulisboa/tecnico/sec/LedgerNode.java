@@ -33,16 +33,36 @@ public class LedgerNode {
         }
     }
 
-    public Request sendRequest(Request request){
+    public boolean sendRequest(Request request){
         try {
             SecurityManager.SignMessage(request, Wallet.getPrivateKey());
             this.out.writeUTF(request.requestAsJson());
-            String answer = this.in.readUTF();
-            return Request.requestFromJson(answer);
+            return true;
+         //   String answer = this.in.readUTF();
+         //   return Request.requestFromJson(answer);
         }catch(SocketTimeoutException ste){
             System.out.println("Socket timed out. Handle fault.");
-            return new Request(Opcode.NO_ANSWER);
+            return false;
+          //  return new Request(Opcode.NO_ANSWER);
         } catch(IOException ioe){
+            ioe.printStackTrace();
+            System.out.println("Socket: " + this.nodeSocket);
+            return false;
+           // return new Request(Opcode.SOCKET_ERROR);
+        }
+    }
+
+
+
+    public Request receiveRequest(){
+        try {
+            String answer = this.in.readUTF();
+            return Request.requestFromJson(answer);
+        }catch(SocketTimeoutException ste) {
+            System.out.println("Socket timed out. Handle fault.");
+            return new Request(Opcode.NO_ANSWER);
+        }
+        catch(IOException ioe){
             ioe.printStackTrace();
             System.out.println("Socket: " + this.nodeSocket);
             return new Request(Opcode.SOCKET_ERROR);
@@ -62,7 +82,20 @@ public class LedgerNode {
         }
     }
 
+    public boolean clearSocket(){
+        int n;
+        byte[] b= new byte[1024];
+        try {
+            while ((n = in.read(b)) >= 0) {
+                continue;
+            }
+        }catch(IOException ioe){
+            ioe.printStackTrace();
+            return false;
+        }
 
 
+        return true;
+    }
 
 }

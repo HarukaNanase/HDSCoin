@@ -153,6 +153,9 @@ public class Wallet {
 
     }
 
+    public static long getSequenceNumber(){
+        return sequenceNumber;
+    }
     public static Opcode InputToOpcode(String opcode){
        String new_opcode = opcode.toLowerCase();
        if(new_opcode.equals("create_account"))
