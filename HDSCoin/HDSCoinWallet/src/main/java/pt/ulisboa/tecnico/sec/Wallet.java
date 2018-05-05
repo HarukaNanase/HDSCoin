@@ -10,6 +10,7 @@ import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Wallet {
@@ -37,6 +38,7 @@ public class Wallet {
         System.out.println("Wallet v0.01");
         manager = new NodeManager();
         Scanner scanner = new Scanner(System.in);
+
         try{
             loadServerKey(System.getProperty("user.dir") + "/src/main/resources/");
         }catch(Exception e){
@@ -119,9 +121,9 @@ public class Wallet {
             manager.createNode("127.0.0.1", 1380);
             manager.createNode("127.0.0.1", 1381);
 
-            Request test = new Request(Opcode.TEST_MESSAGE);
+            Request test1 = new Request(Opcode.TEST_MESSAGE);
 
-            Request mostCommonAnswer = manager.broadcast(test);
+            Request mostCommonAnswer = manager.broadcast(test1);
             if(mostCommonAnswer != null){
                 System.out.println("Most Common Answers:\n" + mostCommonAnswer.requestAsJson());
             }else{

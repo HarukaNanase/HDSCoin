@@ -36,21 +36,8 @@ public class NodeManager {
 
     public Request broadcast(Request request){
         ArrayList<Request> answers = new ArrayList<Request>();
-        for(LedgerNode node : this.nodes) {
-            node.clearSocket();
-            node.sendRequest(request);
-        }
-
-        int meta = 0;
-        for(LedgerNode node : this.nodes){
-            Request req = node.receiveRequest();
-            if(req.getOpcode() == Opcode.ACK && Long.parseLong(req.getParameter(0)) == Wallet.getSequenceNumber()){
-                answers.add(req);
-                meta++;
-                if(meta >= (nodes.size() - FAULT_VALUE)/2)
-                    break;
-            }
-        }
+        for(LedgerNode node : this.nodes)
+            answers.add(node.sendRequest(request));
         // verify answers and decide based on it.
         for(Request req : answers)
             System.out.println(req.requestAsJson());
@@ -66,7 +53,6 @@ public class NodeManager {
             }
         }
         return mostCommon(answers);
-
     }
 
     /*
@@ -74,7 +60,6 @@ public class NodeManager {
     * @Input ArrayList of Requests - the answers from N nodes
     * @Returns Request - the most common request
      */
-
     public Request mostCommon(ArrayList<Request> answers){
         ArrayList<Request> commonAnswers = new ArrayList<Request>();
         HashMap<Request, Integer> occurrenceMap = new HashMap<Request, Integer>();
@@ -97,5 +82,55 @@ public class NodeManager {
         return mostOccurrences == null ? null: mostOccurrences.getKey();
 
     }
+
+    /*
+    * @Method - decideRegularRegister
+    * @Input - Answers from N nodes
+    * @Returns boolean - decision of the consensus
+     */
+    //TODO: CHANGE SEQUENCE NUMBER FOR A WRITE/READ ID
+    public boolean decideRegularRegister(ArrayList<Request> answers){
+        //check answer and we must have F + 1 equal answers
+
+        //java 8
+        answers.removeIf(s -> s.getOpcode() == Opcode.NO_ANSWER || s.getOpcode() == Opcode.SOCKET_ERROR);
+        if(answers.size() <= (((float)nodes.size() + FAULT_VALUE)/2))
+            return false;
+
+        HashMap<Request, Integer> occurrenceMap = new HashMap<Request, Integer>();
+        for(Request req : answers){
+            //check above, not needed anymore
+            /*
+            if(req.getOpcode() == Opcode.NO_ANSWER || req.getOpcode() == Opcode.SOCKET_ERROR){
+                answers.remove(req);
+            }
+            else if(answers.size() <= (float)((nodes.size() + FAULT_VALUE)/2)){
+                return false;
+            }
+            */
+            //else {
+                Integer occurrences = occurrenceMap.get(req);
+                occurrenceMap.put(req, occurrences == null ? 1 : occurrences + 1);
+            //}
+        }
+
+        // check if ACK with current sequence number from Wallet satisfies the condition of F + 1
+        for(Entry<Request,Integer> entry : occurrenceMap.entrySet()){
+            Request req = entry.getKey();
+            if(req.getOpcode() == Opcode.ACK && req.getSequenceNumber() == Wallet.getSequenceNumber()){
+                if(entry.getValue() > (FAULT_VALUE + 1))
+                    return true;
+            }
+            //if sequence number is less than wallet sequence number, server is out of sync, so we need to re-sync the missing ops
+            if(req.getOpcode() == Opcode.ACK && req.getSequenceNumber() < Wallet.getSequenceNumber()){
+                //fix ledger that is missing info
+            }
+        }
+        return false;
+
+    }
+
+
+
 
 }

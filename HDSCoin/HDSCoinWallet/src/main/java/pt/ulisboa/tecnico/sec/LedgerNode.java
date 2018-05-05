@@ -33,22 +33,20 @@ public class LedgerNode {
         }
     }
 
-    public boolean sendRequest(Request request){
+    //return answer?
+    public Request sendRequest(Request request){
         try {
             SecurityManager.SignMessage(request, Wallet.getPrivateKey());
             this.out.writeUTF(request.requestAsJson());
-            return true;
-         //   String answer = this.in.readUTF();
-         //   return Request.requestFromJson(answer);
+            String answer = this.in.readUTF();
+            return Request.requestFromJson(answer);
         }catch(SocketTimeoutException ste){
             System.out.println("Socket timed out. Handle fault.");
-            return false;
-          //  return new Request(Opcode.NO_ANSWER);
+            return new Request(Opcode.NO_ANSWER);
         } catch(IOException ioe){
             ioe.printStackTrace();
             System.out.println("Socket: " + this.nodeSocket);
-            return false;
-           // return new Request(Opcode.SOCKET_ERROR);
+            return new Request(Opcode.SOCKET_ERROR);
         }
     }
 
