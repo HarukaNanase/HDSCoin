@@ -58,9 +58,9 @@ public class Ledger{
         ledger = getInstance();
         if(args[0] == null){
             System.out.println("Please indicate which ledger this is.");
+            return;
         }
-        //ledger.RESOURCES_PATH += args[0]+"/";
-        String thisLedgerPath = null;
+        ledger.RESOURCES_PATH += args[0]+"/";
 
         if(args[0].equals("ledger1"))
             ledger.port = 1380;

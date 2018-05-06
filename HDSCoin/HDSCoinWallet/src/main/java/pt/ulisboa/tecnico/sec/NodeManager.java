@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 public class NodeManager {
 
     private ArrayList<LedgerNode> nodes;
-    private int DEFAULT_TIMEOUT = 0;
+    private int DEFAULT_TIMEOUT = 10000;
     private int FAULT_VALUE = 1;
     private long WTS = 0;
     private long RID = 0;
@@ -25,12 +25,12 @@ public class NodeManager {
         this.nodes.add(node);
     }
 
-    public void createNode(String name, int port){
+    public void createNode(String name, int port, String certName){
         LedgerNode node = new LedgerNode(name, port);
         if(node.connect()) {
             node.setMessageTime(DEFAULT_TIMEOUT);
             try {
-                node.loadKey(System.getProperty("user.dir") + "/src/main/resources/");
+                node.loadKey(System.getProperty("user.dir") + "/src/main/resources/"+certName);
             }catch(Exception e){
                 e.printStackTrace();
             }
@@ -48,8 +48,6 @@ public class NodeManager {
     public void setRID(long rid){
         this.RID = rid;
     }
-
-
 
     public boolean broadcastWrite(Request request){
         ArrayList<Request> answers = new ArrayList<Request>();
@@ -69,7 +67,6 @@ public class NodeManager {
      * @Input - Answers from N nodes
      * @Returns boolean - decision of the consensus
      */
-    //TODO: CHANGE SEQUENCE NUMBER FOR A WRITE/READ ID
     public boolean decideRegularRegisterWrite(ArrayList<Request> answers){
         //check answer and we must have F + 1 equal answers
         System.out.println("DECIDE REGULAR REGISTER START: ");
@@ -98,10 +95,6 @@ public class NodeManager {
                     return true;
                 }
             }
-            //if sequence number is less than wallet sequence number, server is out of sync, so we need to re-sync the missing ops
-            if(req.getOpcode() == Opcode.ACK && Long.parseLong(req.getParameter(0)) < this.WTS){
-                //fix ledger that is missing info
-            }
         }
         return false;
 
@@ -122,7 +115,7 @@ public class NodeManager {
         if(readlist.size() > (((float)nodes.size() + FAULT_VALUE)/2)) {
             Request highestval = null;
             for(Request req : readlist){
-                System.out.println(req.requestAsJson());
+               // System.out.println(req.requestAsJson());
                 if(highestval == null || highestval.getWTS() < req.getWTS())
                     highestval = req;
             }

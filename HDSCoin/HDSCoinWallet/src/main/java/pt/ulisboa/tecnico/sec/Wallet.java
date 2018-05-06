@@ -45,43 +45,9 @@ public class Wallet {
         manager = new NodeManager();
         Scanner scanner = new Scanner(System.in);
 
-        try{
-            loadServerKey(System.getProperty("user.dir") + "/src/main/resources/");
-        }catch(Exception e){
-            System.out.println("Failed to load server keys @ " + System.getProperty("user.dir") + "/src/main/resources/");
-            return;
-        }
         try {
             if (args.length == 0) {
-                KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-                keyGen.initialize(KEY_SIZE);
-                KeyPair keyPair = keyGen.generateKeyPair();
-                privKey = keyPair.getPrivate();
-                pKey = keyPair.getPublic();
-
-                byte[] pubKeyBytes = pKey.getEncoded();
-                byte[] privKeyBytes = privKey.getEncoded();
-
-                publicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
-                privateKeyString = Base64.encode(privKeyBytes, KEY_SIZE);
-                X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(
-                        pKey.getEncoded());
-                try {
-                    FileOutputStream fos = new FileOutputStream(System.getProperty("user.dir") + "/src/main/resources/" + "client.pub");
-                    fos.write(x509EncodedKeySpec.getEncoded());
-                    fos.close();
-                    // Store Private Key.
-                    PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(
-                            privKey.getEncoded());
-                    fos = new FileOutputStream(System.getProperty("user.dir") + "/src/main/resources/" + "client.priv");
-                    fos.write(pkcs8EncodedKeySpec.getEncoded());
-                    fos.close();
-                } catch (IOException e) {
-                    System.out.println("Failed to save key pair to file.");
-                    e.printStackTrace();
-                }
-                System.out.println("Your key: " + publicKeyString);
-                System.out.println("Your private key: " + privateKeyString);
+                GenerateKeys();
             } else {
                 System.out.println("Trying to load keys from folder: " + args[0]);
                 try {
@@ -97,9 +63,9 @@ public class Wallet {
             //mainSocket = new Socket("127.0.0.1", 1381);
             //out = new DataOutputStream(mainSocket.getOutputStream());
             //in = new DataInputStream(mainSocket.getInputStream());
-            manager.createNode("127.0.0.1", 1380);
-            manager.createNode("127.0.0.1", 1381);
-            manager.createNode("127.0.0.1", 1382);
+            manager.createNode("127.0.0.1", 1380, "ledger1.cer");
+            manager.createNode("127.0.0.1", 1381, "ledger2.cer");
+            manager.createNode("127.0.0.1", 1382, "ledger3.cer");
             Request test1 = new Request(Opcode.TEST_MESSAGE);
             test1.addParameter(publicKeyString);
             boolean ans = manager.broadcastWrite(test1);
@@ -165,12 +131,10 @@ public class Wallet {
 
 
     public static void loadKeys(String path, String client) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, KeyStoreException, UnrecoverableKeyException, CertificateException {
-        FileInputStream fis = new FileInputStream(path + "clientkeystore" + client);
+        FileInputStream fis = new FileInputStream(path + "clientkeystore");
         KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
         keystore.load(fis, KEYSTORE_PASSWORD.toCharArray());
-
         String alias = client;
-
         privKey = (PrivateKey) keystore.getKey(alias, KEYSTORE_PASSWORD.toCharArray());
         if (privKey != null) {
             // Get certificate of public key
@@ -186,9 +150,6 @@ public class Wallet {
         }
 
     }
-
-
-
 
     public static String receiveAndVerifyAnswer() {
         try {
@@ -275,17 +236,40 @@ public class Wallet {
         }
     }
 
+    private static void GenerateKeys(){
+        try {
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+            keyGen.initialize(KEY_SIZE);
+            KeyPair keyPair = keyGen.generateKeyPair();
+            privKey = keyPair.getPrivate();
+            pKey = keyPair.getPublic();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        byte[] pubKeyBytes = pKey.getEncoded();
+        byte[] privKeyBytes = privKey.getEncoded();
 
-    private static void loadServerKey(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, CertificateException {
-        FileInputStream fin = new FileInputStream(path + "ledger1.cer");
-        CertificateFactory f = CertificateFactory.getInstance("X.509");
-        X509Certificate certificate = (X509Certificate)f.generateCertificate(fin);
-        PublicKey serverPublicKey = certificate.getPublicKey();
-        byte[] pubKeyBytes = serverPublicKey.getEncoded();
-        serverPublicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
-        fin.close();
+        publicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
+        privateKeyString = Base64.encode(privKeyBytes, KEY_SIZE);
+        X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(
+                pKey.getEncoded());
+        try {
+            FileOutputStream fos = new FileOutputStream(System.getProperty("user.dir") + "/src/main/resources/" + "client.pub");
+            fos.write(x509EncodedKeySpec.getEncoded());
+            fos.close();
+            // Store Private Key.
+            PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(
+                    privKey.getEncoded());
+            fos = new FileOutputStream(System.getProperty("user.dir") + "/src/main/resources/" + "client.priv");
+            fos.write(pkcs8EncodedKeySpec.getEncoded());
+            fos.close();
+        } catch (IOException e) {
+            System.out.println("Failed to save key pair to file.");
+            e.printStackTrace();
+        }
+        System.out.println("Your key: " + publicKeyString);
+        System.out.println("Your private key: " + privateKeyString);
     }
-
 
 
 }

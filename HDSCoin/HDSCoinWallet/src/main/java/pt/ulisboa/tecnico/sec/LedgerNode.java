@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.security.KeyFactory;
 import java.security.PublicKey;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.security.spec.X509EncodedKeySpec;
 
 public class LedgerNode {
@@ -21,6 +23,7 @@ public class LedgerNode {
     public LedgerNode(String name, int port){
         this.nodeName = name;
         this.port = port;
+
     }
 
     public boolean connect(){
@@ -101,18 +104,13 @@ public class LedgerNode {
 
     //temp
     public void loadKey(String path) throws Exception{
-        File filePublicKey = new File(path + "server.pub");
-        FileInputStream fis = new FileInputStream(path + "server.pub");
-        byte[] encodedPublicKey = new byte[(int) filePublicKey.length()];
-        fis.read(encodedPublicKey);
-        fis.close();
-        // Generate KeyPair.
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(
-                encodedPublicKey);
-        PublicKey serverPublicKey = keyFactory.generatePublic(publicKeySpec);
+        FileInputStream fin = new FileInputStream(path);
+        CertificateFactory f = CertificateFactory.getInstance("X.509");
+        X509Certificate certificate = (X509Certificate)f.generateCertificate(fin);
+        PublicKey serverPublicKey = certificate.getPublicKey();
         byte[] pubKeyBytes = serverPublicKey.getEncoded();
         this.publicKeyString = Base64.encode(pubKeyBytes, 2048);
+        fin.close();
     }
 
 }
