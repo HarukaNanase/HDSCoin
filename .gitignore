@@ -1,4 +1,4 @@
-HDSCoin/HDSCoinServer/target/
-HDSCoin/HDSCoinWallet/target/
+HDSCoin/HDSCoinServer/target/*
+HDSCoin/HDSCoinWallet/target/*
 *.zip
-HDSCoin/.idea/
+HDSCoin/.idea/workspace.xml

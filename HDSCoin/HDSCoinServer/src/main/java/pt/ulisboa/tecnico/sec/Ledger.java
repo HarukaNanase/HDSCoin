@@ -39,6 +39,7 @@ public class Ledger{
     private String ALGORITHM = "RSA";
     private transient static Ledger ledger = null;
     private int port;
+    private String LEDGER_NAME = null;
     private String RESOURCES_PATH = System.getProperty("user.dir")+"/src/main/resources/";
     private Ledger() {
 
@@ -55,7 +56,7 @@ public class Ledger{
         if(args[0] == null){
             System.out.println("Please indicate which ledger this is.");
         }
-        ledger.RESOURCES_PATH += args[0]+"/";
+        //ledger.RESOURCES_PATH += args[0]+"/";
         String thisLedgerPath = null;
 
         if(args[0].equals("ledger1"))
@@ -245,15 +246,25 @@ public class Ledger{
         }
     }
 
-    private static Request createResponse(String message){
+    private static Request createResponse(String message, long RID){
         Request req = new Request(Opcode.SERVER_ANSWER);
         req.addParameter(message);
+        req.setRID(RID);
         return req;
     }
 
-    private static Request createResponse(Request request){
+    private static Request createReadResponse(String message, Account acc){
+        Request req = new Request(Opcode.SERVER_ANSWER);
+        req.addParameter(message);
+        req.setRID(acc.getRID());
+        req.setWTS(acc.getWTS());
+        return req;
+    }
+
+    private static Request createWriteResponse(Request request){
         Request ack = new Request(Opcode.ACK);
-        ack.addParameter(""+request.getSequenceNumber());
+        ack.addParameter(""+request.getWTS());
+        ack.setWTS(request.getWTS());
         return ack;
     }
 
@@ -278,67 +289,104 @@ public class Ledger{
             System.out.println("Request Received!");
             System.out.println(req.requestAsJson());
             if(req.getOpcode() == Opcode.TEST_MESSAGE){
-                sendResponseToClient(createResponse("TEST IS WORKING"), out);
+                sendResponseToClient(createWriteResponse(req), out);
                 return;
             }
 
             String publicKeyBase64 = req.getParameter(0);
             if((req.getOpcode() != Opcode.REQUEST_CHAIN && req.getOpcode() != Opcode.AUDIT)){
                 if(!SecurityManager.VerifyMessage(req, publicKeyBase64)){
-                    sendResponseToClient(createResponse("Invalid Message"), out);
+                    sendResponseToClient(createResponse("Invalid Message", req.getRID()), out);
                     return;
                 }
                 if(req.getOpcode() != Opcode.CREATE_ACCOUNT && req.getOpcode() != Opcode.REQUEST_SEQUENCE_NUMBER){
                     Account acc = ledger.getAccount(publicKeyBase64);
                     if(acc == null){
-                        sendResponseToClient(createResponse("Account not found in our records"), out);
+                        sendResponseToClient(createResponse("Account not found in our records", req.getRID()), out);
                         return;
                     }
                     if(!SecurityManager.VerifySequenceNumber(req, acc)){
-                        sendResponseToClient(createResponse("Incorrect Sequence Number."), out);
+                        sendResponseToClient(createResponse("Incorrect Sequence Number.", req.getRID()), out);
                         return;
                     }
                 }
             }else{
                 System.out.println("Valid message!");
             }
+            System.out.println("Valid message!");
 
-            switch(req.getOpcode()){
+        switch(req.getOpcode()){
                 case CREATE_ACCOUNT:
-                    sendResponseToClient(createResponse(ledger.createAccount(publicKeyBase64)), out);
+                    //sendResponseToClient(createResponse(ledger.createAccount(publicKeyBase64), req.getRID()), out);
+                    ledger.createAccount(publicKeyBase64);
+                    Account acc2 = ledger.getAccount(publicKeyBase64);
+                    acc2.setWTS(req.getWTS());
+                    sendResponseToClient(createWriteResponse(req), out);
                     ledger.saveLedgerState(ledger.RESOURCES_PATH);
                     break;
                 case CHECK_ACCOUNT:
-                    sendResponseToClient(createResponse(ledger.checkAccount(publicKeyBase64)), out);
+                    Account acc = ledger.getAccount(publicKeyBase64);
+                    acc.setRID(req.getRID());
+                    sendResponseToClient(createReadResponse(ledger.checkAccount(publicKeyBase64), acc), out);
                     break;
                 case CREATE_TRANSACTION:
                     String src = req.getParameter(0);
                     String dst = req.getParameter(1);
                     int value = Integer.valueOf(req.getParameter(2));
-                    String result = ledger.createTransaction(src, dst, value, req.getdSig());
-                    sendResponseToClient(createResponse(req), out);
+                    Account srcAcc = ledger.getAccount(src);
+                    if(srcAcc.getWTS() < req.getWTS()) {
+                        System.out.println("Valid WTS (" + srcAcc.getWTS() + "<" + req.getWTS() + "). Writting request.");
+                        ledger.createTransaction(src, dst, value, req.getdSig());
+                        srcAcc.setWTS(req.getWTS());
+                    }
+                    sendResponseToClient(createWriteResponse(req), out);
                     ledger.saveLedgerState(ledger.RESOURCES_PATH);
                     break;
                 case RECEIVE_TRANSACTION:
-                    ledger.ReceiveTransaction(req);
-                    sendResponseToClient(createResponse(req), out);
+                    Account rec = ledger.getAccount(publicKeyBase64);
+                    if(rec.getWTS() < req.getWTS()) {
+                        System.out.println("Valid WTS (" + rec.getWTS() + "<" + req.getWTS() + "). Writting request.");
+                        ledger.ReceiveTransaction(req);
+                        rec.setWTS(req.getWTS());
+                    }
+                    //ledger.ReceiveTransaction(req);
+                    sendResponseToClient(createWriteResponse(req), out);
                     ledger.saveLedgerState(ledger.RESOURCES_PATH);
                     break;
                 case REQUEST_CHAIN:
-                    sendResponseToClient(createResponse(ledger.getChain()),out);
+                    sendResponseToClient(createResponse(ledger.getChain(), req.getRID()),out);
                     break;
                 case AUDIT:
-                    sendResponseToClient(createResponse(ledger.auditAccount(publicKeyBase64)), out);
+                    Account acc1 = ledger.getAccount(publicKeyBase64);
+                    acc1.setRID(req.getRID());
+                    sendResponseToClient(createResponse(ledger.auditAccount(publicKeyBase64), req.getRID()), out);
                     break;
                 case REQUEST_SEQUENCE_NUMBER:
-                    sendResponseToClient(createResponse(""+ledger.getAccountSequenceNumber(publicKeyBase64)), out);
+                    String sq = ""+ledger.getAccountSequenceNumber(publicKeyBase64);
+                    String wts = ""+ledger.getAccountWTS(publicKeyBase64);
+                    String rid = ""+ledger.getAccountRID(publicKeyBase64);
+                    sendResponseToClient(createResponse(sq+"/"+wts+"/"+rid, req.getRID()), out);
                     break;
                 default:
-                    sendResponseToClient(createResponse("Unrecognized command."), out);
+                    sendResponseToClient(createResponse("Unrecognized command.", req.getRID()), out);
                     break;
             }
 
 
+    }
+
+    public synchronized long getAccountWTS(String key){
+        Account acc = getAccount(key);
+        if(acc != null)
+            return acc.getWTS();
+        return -1;
+    }
+
+    public synchronized long getAccountRID(String key){
+        Account acc = getAccount(key);
+        if(acc != null)
+            return acc.getRID();
+        return -1;
     }
 
     public synchronized long getAccountSequenceNumber(String key){

@@ -13,6 +13,8 @@ public class Request{
     private long createdOn;
     private long expiresOn;
     private long sequenceNumber = 0;
+    private long RID = 0;
+    private long WTS = 0;
 
     public Request(Opcode opcode, ArrayList<String> param){
         this.opcode = opcode;
@@ -99,6 +101,22 @@ public class Request{
 
     public String getdSig(){
         return this.dSig;
+    }
+
+    public void setRID(long rid){
+        this.RID = rid;
+    }
+
+    public long getRID(){
+        return this.RID;
+    }
+
+    public void setWTS(long wts){
+        this.WTS = wts;
+    }
+
+    public long getWTS(){
+        return this.WTS;
     }
 
     @Override

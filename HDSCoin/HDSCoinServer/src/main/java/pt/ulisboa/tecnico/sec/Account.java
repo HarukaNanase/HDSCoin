@@ -16,6 +16,8 @@ public class Account {
         private int balance;
         private Transaction[] backlog;
         private long sequenceNumber;
+        private long RID;
+        private long WTS;
 
         public Account(PublicKey pkey){
             this.publicKey = pkey;
@@ -84,5 +86,20 @@ public class Account {
 
     public void setBalance(int balance) {
         this.balance = balance;
+    }
+
+    public void setRID(long rid){
+            this.RID = rid;
+    }
+
+    public void setWTS(long wts){
+        this.WTS = wts;
+    }
+
+    public long getRID(){
+            return this.RID;
+    }
+    public long getWTS(){
+        return this.WTS;
     }
 }

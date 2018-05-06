@@ -1,11 +1,13 @@
 package pt.ulisboa.tecnico.sec;
 
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import com.sun.org.apache.xml.internal.security.utils.Base64;
+
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
 
 public class LedgerNode {
     private String nodeName;
@@ -39,7 +41,10 @@ public class LedgerNode {
             SecurityManager.SignMessage(request, Wallet.getPrivateKey());
             this.out.writeUTF(request.requestAsJson());
             String answer = this.in.readUTF();
-            return Request.requestFromJson(answer);
+            Request ans = Request.requestFromJson(answer);
+            if(SecurityManager.VerifyMessage(ans, this.publicKeyString))
+                return ans;
+            return new Request(Opcode.INVALID_SIG);
         }catch(SocketTimeoutException ste){
             System.out.println("Socket timed out. Handle fault.");
             return new Request(Opcode.NO_ANSWER);
@@ -91,9 +96,23 @@ public class LedgerNode {
             ioe.printStackTrace();
             return false;
         }
-
-
         return true;
+    }
+
+    //temp
+    public void loadKey(String path) throws Exception{
+        File filePublicKey = new File(path + "server.pub");
+        FileInputStream fis = new FileInputStream(path + "server.pub");
+        byte[] encodedPublicKey = new byte[(int) filePublicKey.length()];
+        fis.read(encodedPublicKey);
+        fis.close();
+        // Generate KeyPair.
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(
+                encodedPublicKey);
+        PublicKey serverPublicKey = keyFactory.generatePublic(publicKeySpec);
+        byte[] pubKeyBytes = serverPublicKey.getEncoded();
+        this.publicKeyString = Base64.encode(pubKeyBytes, 2048);
     }
 
 }
