@@ -6,6 +6,10 @@ import java.io.*;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.security.*;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -24,10 +28,12 @@ public class Wallet {
     private static boolean isRegistered = false;
     private static int KEY_SIZE = 2048;
     private static String ALGORITHM = "RSA";
+    private static String KEYSTORE_PASSWORD = "sec2018";
     private static long sequenceNumber = 0;
     private static String serverPublicKeyString;
     private static PublicKey serverPublicKey;
     private static NodeManager manager;
+
 
     public static PrivateKey getPrivateKey(){
         return privKey;
@@ -79,37 +85,10 @@ public class Wallet {
             } else {
                 System.out.println("Trying to load keys from folder: " + args[0]);
                 try {
-                    File filePublicKey = new File(System.getProperty("user.dir") + "/src/main/resources/" + args[0] + "/" + "client.pub");
-                    FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + "/src/main/resources/" + args[0] + "/" + "client.pub");
-                    byte[] encodedPublicKey = new byte[(int) filePublicKey.length()];
-                    fis.read(encodedPublicKey);
-                    fis.close();
-
-                    // Read Private Key.
-                    File filePrivateKey = new File(System.getProperty("user.dir") + "/src/main/resources/" + args[0] + "/" + "client.priv");
-                    fis = new FileInputStream(System.getProperty("user.dir") + "/src/main/resources/" + args[0] + "/" + "client.priv");
-                    byte[] encodedPrivateKey = new byte[(int) filePrivateKey.length()];
-                    fis.read(encodedPrivateKey);
-                    fis.close();
-
-                    // Generate KeyPair.
-                    KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
-                    X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(
-                            encodedPublicKey);
-                    pKey = keyFactory.generatePublic(publicKeySpec);
-
-                    PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(
-                            encodedPrivateKey);
-                    privKey = keyFactory.generatePrivate(privateKeySpec);
-
-                    byte[] pubKeyBytes = pKey.getEncoded();
-                    byte[] privKeyBytes = privKey.getEncoded();
-
-                    publicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
-                    privateKeyString = Base64.encode(privKeyBytes); // PKCS#8
-
+                    loadKeys(System.getProperty("user.dir") + "/src/main/resources/"+args[0]+"/" , args[0]);
                     System.out.println("Keys loaded successfully!\nYour key:\n" + publicKeyString);
                 } catch (IOException ioe) {
+                    ioe.printStackTrace();
                     System.out.println("Failed to load keys from folder: " + args[0]);
                     return;
                 }
@@ -176,6 +155,34 @@ public class Wallet {
            System.exit(0);
        return null;
     }
+
+
+
+    public static void loadKeys(String path, String client) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, KeyStoreException, UnrecoverableKeyException, CertificateException {
+        FileInputStream fis = new FileInputStream(path + "clientkeystore" + client);
+        KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+        keystore.load(fis, KEYSTORE_PASSWORD.toCharArray());
+
+        String alias = client;
+
+        privKey = (PrivateKey) keystore.getKey(alias, KEYSTORE_PASSWORD.toCharArray());
+        if (privKey != null) {
+            // Get certificate of public key
+            Certificate cert = keystore.getCertificate(alias);
+            // Get public key
+            pKey = cert.getPublicKey();
+
+            byte[] pubKeyBytes = pKey.getEncoded();
+            byte[] privKeyBytes = privKey.getEncoded();
+
+            publicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
+            privateKeyString = Base64.encode(privKeyBytes); // PKCS#8
+        }
+
+    }
+
+
+
 
     public static String receiveAndVerifyAnswer() {
         try {
@@ -262,19 +269,16 @@ public class Wallet {
     }
 
 
-    private static void loadServerKey(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        File filePublicKey = new File(path + "server.pub");
-        FileInputStream fis = new FileInputStream(path + "server.pub");
-        byte[] encodedPublicKey = new byte[(int) filePublicKey.length()];
-        fis.read(encodedPublicKey);
-        fis.close();
-        // Generate KeyPair.
-        KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
-        X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(
-                encodedPublicKey);
-        serverPublicKey = keyFactory.generatePublic(publicKeySpec);
+    private static void loadServerKey(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, CertificateException {
+        FileInputStream fin = new FileInputStream(path + "ledger1.cer");
+        CertificateFactory f = CertificateFactory.getInstance("X.509");
+        X509Certificate certificate = (X509Certificate)f.generateCertificate(fin);
+        PublicKey serverPublicKey = certificate.getPublicKey();
         byte[] pubKeyBytes = serverPublicKey.getEncoded();
         serverPublicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
-
+        fin.close();
     }
+
+
+
 }

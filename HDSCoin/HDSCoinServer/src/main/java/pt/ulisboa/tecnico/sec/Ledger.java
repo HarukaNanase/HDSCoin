@@ -12,6 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.*;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -36,6 +38,7 @@ public class Ledger{
     private transient PublicKey publicKey;
     private transient PrivateKey privKey;
     private int KEY_SIZE = 2048;
+    private String KEYSTORE_PASSWORD = "sec2018";
     private String ALGORITHM = "RSA";
     private transient static Ledger ledger = null;
     private int port;
@@ -70,7 +73,7 @@ public class Ledger{
         boolean loaded = ledger.loadLedgerState(ledger.RESOURCES_PATH);
 
         try {
-            ledger.loadKeys(ledger.RESOURCES_PATH);
+            ledger.loadKeys(ledger.RESOURCES_PATH, args[0]);
         }catch(IOException ioe){
             System.out.println("Could not load key files. Generating new ones.");
             ioe.printStackTrace();
@@ -81,6 +84,12 @@ public class Ledger{
         }catch(InvalidKeySpecException ikse){
             System.out.println("Invalid or corrupt keys. Generating new ones");
             ledger.generateServerKeys();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (UnrecoverableKeyException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
         }
 
         if(!loaded){
@@ -445,35 +454,26 @@ public class Ledger{
         }
     }
 
-    public void loadKeys(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException{
-            File filePublicKey = new File(path + "server.pub");
-            FileInputStream fis = new FileInputStream(path + "server.pub");
-            byte[] encodedPublicKey = new byte[(int) filePublicKey.length()];
-            fis.read(encodedPublicKey);
-            fis.close();
+    public void loadKeys(String path, String ledger) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, KeyStoreException, UnrecoverableKeyException, CertificateException {
+            FileInputStream fis = new FileInputStream(path + "serverkeystore"+ledger);
+            KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keystore.load(fis, KEYSTORE_PASSWORD.toCharArray());
 
-            // Read Private Key.
-            File filePrivateKey = new File(path + "server.priv");
-            fis = new FileInputStream(path + "server.priv");
-            byte[] encodedPrivateKey = new byte[(int) filePrivateKey.length()];
-            fis.read(encodedPrivateKey);
-            fis.close();
+            String alias = ledger;
 
-            // Generate KeyPair.
-            KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
-            X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(
-                    encodedPublicKey);
-            publicKey = keyFactory.generatePublic(publicKeySpec);
+            privKey = (PrivateKey) keystore.getKey(alias, KEYSTORE_PASSWORD.toCharArray());
+            if (privKey != null) {
+                // Get certificate of public key
+                Certificate cert = keystore.getCertificate(alias);
+                // Get public key
+                publicKey = cert.getPublicKey();
 
-            PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(
-                    encodedPrivateKey);
-            privKey = keyFactory.generatePrivate(privateKeySpec);
+                byte[] pubKeyBytes = publicKey.getEncoded();
+                byte[] privKeyBytes = privKey.getEncoded();
 
-            byte[] pubKeyBytes = publicKey.getEncoded();
-            byte[] privKeyBytes = privKey.getEncoded();
-
-            publicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
-            privateKeyString = Base64.encode(privKeyBytes); // PKCS#8
+                publicKeyString = Base64.encode(pubKeyBytes, KEY_SIZE);
+                privateKeyString = Base64.encode(privKeyBytes); // PKCS#8
+            }
 
     }
 
