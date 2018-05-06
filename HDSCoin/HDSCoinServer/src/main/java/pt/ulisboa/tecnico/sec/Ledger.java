@@ -28,6 +28,8 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class Ledger{
     public transient ServerSocket mainSocket;
+    public transient ServerSocket nodeEndpoint;
+    //private transient NodeManager manager;
 
     public ArrayList<Block> blockchain = new ArrayList<Block>();
     public ArrayList<Account> accounts = new ArrayList<Account>();
@@ -44,6 +46,8 @@ public class Ledger{
     private int port;
     private String LEDGER_NAME = null;
     private String RESOURCES_PATH = System.getProperty("user.dir")+"/src/main/resources/";
+
+
     private Ledger() {
 
     }
@@ -56,6 +60,9 @@ public class Ledger{
 
     public static void main(String[] args){
         ledger = getInstance();
+      //  ledger.manager = new NodeManager();
+
+
         if(args[0] == null){
             System.out.println("Please indicate which ledger this is.");
             return;
@@ -70,6 +77,21 @@ public class Ledger{
             ledger.port = 1382;
         else if(args[0].equals("ledger4"))
             ledger.port = 1383;
+
+        try {
+            ledger.nodeEndpoint = new ServerSocket(ledger.port + 1000);
+        }catch(Exception e){
+            System.out.println("Failed to set up node listener endpoint.");
+        }
+
+
+        Thread listener = new Thread(new Runnable(){
+            public void run(){
+                while(true){
+                    ledger.listenerNode();
+                }
+            }
+        });
 
         boolean loaded = ledger.loadLedgerState(ledger.RESOURCES_PATH);
 
@@ -139,6 +161,42 @@ public class Ledger{
 
     }
 
+    private void listenerNode() {
+        while (true) {
+            try {
+                final Socket node = ledger.nodeEndpoint.accept();
+                Thread th = new Thread(new Runnable() {
+
+                    Socket listenNode = node;
+                    Boolean nodeRun = true;
+                    public void run() {
+                        System.out.println("Node Listener setup");
+                        while (nodeRun) {
+                            try {
+                                handleNodeListen(listenNode);
+                            } catch (Exception e) {
+                                handleClientDisconnect(listenNode);
+                                System.out.println("Client exiting");
+                                nodeRun = false;
+                            }
+                        }
+                    }
+                });
+                th.start();
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public PrivateKey getPrivateKey(){
+        return this.privKey;
+    }
+
+
+    private static void handleNodeListen(Socket socket){
+
+    }
     private static void handleClientDisconnect(Socket client){
         try{
             client.close();
@@ -323,8 +381,13 @@ public class Ledger{
                 System.out.println("Valid message!");
             }
             System.out.println("Valid message!");
-
-        switch(req.getOpcode()){
+           /* if(ledger.getAccount(publicKeyBase64).getDelivered().contains(req)){
+                System.out.println("Account already delivered this request.");
+                return ;
+            }else
+                ledger.getAccount(publicKeyBase64).getDelivered().add(req);
+            */
+            switch(req.getOpcode()){
                 case CREATE_ACCOUNT:
                     //sendResponseToClient(createResponse(ledger.createAccount(publicKeyBase64), req.getRID()), out);
                     ledger.createAccount(publicKeyBase64);

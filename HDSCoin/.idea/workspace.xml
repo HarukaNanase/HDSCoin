@@ -3,45 +3,19 @@
   <component name="ChangeListManager">
     <list default="true" id="1ec2add6-d15a-441e-8433-3bd9873d3dc8" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Account.java" afterPath="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Account.java" />
       <change beforePath="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Ledger.java" afterPath="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Ledger.java" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinServer/src/main/resources/ledger1/ledger1.cer" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinServer/src/main/resources/ledger1/serverkeystoreledger1" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinServer/target/classes/pt/ulisboa/tecnico/sec/Account.class" afterPath="$PROJECT_DIR$/HDSCoinServer/target/classes/pt/ulisboa/tecnico/sec/Account.class" />
+      <change beforePath="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Opcode.java" afterPath="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Opcode.java" />
+      <change beforePath="$PROJECT_DIR$/HDSCoinServer/target/classes/ledger1/server.priv" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/HDSCoinServer/target/classes/ledger1/server.pub" afterPath="" />
       <change beforePath="$PROJECT_DIR$/HDSCoinServer/target/classes/pt/ulisboa/tecnico/sec/Ledger$1.class" afterPath="$PROJECT_DIR$/HDSCoinServer/target/classes/pt/ulisboa/tecnico/sec/Ledger$1.class" />
       <change beforePath="$PROJECT_DIR$/HDSCoinServer/target/classes/pt/ulisboa/tecnico/sec/Ledger$2.class" afterPath="$PROJECT_DIR$/HDSCoinServer/target/classes/pt/ulisboa/tecnico/sec/Ledger$2.class" />
       <change beforePath="$PROJECT_DIR$/HDSCoinServer/target/classes/pt/ulisboa/tecnico/sec/Ledger.class" afterPath="$PROJECT_DIR$/HDSCoinServer/target/classes/pt/ulisboa/tecnico/sec/Ledger.class" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinServer/target/classes/pt/ulisboa/tecnico/sec/Request.class" afterPath="$PROJECT_DIR$/HDSCoinServer/target/classes/pt/ulisboa/tecnico/sec/Request.class" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinServer/target/classes/pt/ulisboa/tecnico/sec/SecurityManager.class" afterPath="$PROJECT_DIR$/HDSCoinServer/target/classes/pt/ulisboa/tecnico/sec/SecurityManager.class" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinServer/target/classes/server.priv" afterPath="$PROJECT_DIR$/HDSCoinServer/target/classes/server.priv" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinServer/target/classes/server.pub" afterPath="$PROJECT_DIR$/HDSCoinServer/target/classes/server.pub" />
+      <change beforePath="$PROJECT_DIR$/HDSCoinServer/target/classes/pt/ulisboa/tecnico/sec/Opcode.class" afterPath="$PROJECT_DIR$/HDSCoinServer/target/classes/pt/ulisboa/tecnico/sec/Opcode.class" />
       <change beforePath="$PROJECT_DIR$/HDSCoinServer/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterPath="$PROJECT_DIR$/HDSCoinServer/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" />
       <change beforePath="$PROJECT_DIR$/HDSCoinServer/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterPath="$PROJECT_DIR$/HDSCoinServer/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" />
       <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/LedgerNode.java" afterPath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/LedgerNode.java" />
       <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/NodeManager.java" afterPath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/NodeManager.java" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Wallet.java" afterPath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Wallet.java" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/resources/client.priv" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/resources/client.pub" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/resources/client1/client1.cer" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/resources/client1/clientkeystoreclient1" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/resources/client2/client2.cer" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/resources/client2/clientkeystoreclient2" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/resources/ledger1.cer" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/resources/ledger2.cer" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/resources/ledger3.cer" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/resources/ledger4.cer" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/resources/server.pub" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/target/classes/client.priv" afterPath="$PROJECT_DIR$/HDSCoinWallet/target/classes/client.priv" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/target/classes/client.pub" afterPath="$PROJECT_DIR$/HDSCoinWallet/target/classes/client.pub" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/target/classes/client1/client1.cer" afterPath="$PROJECT_DIR$/HDSCoinWallet/target/classes/client1/client1.cer" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/target/classes/pt/ulisboa/tecnico/sec/LedgerNode.class" afterPath="$PROJECT_DIR$/HDSCoinWallet/target/classes/pt/ulisboa/tecnico/sec/LedgerNode.class" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/target/classes/pt/ulisboa/tecnico/sec/NodeManager.class" afterPath="$PROJECT_DIR$/HDSCoinWallet/target/classes/pt/ulisboa/tecnico/sec/NodeManager.class" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/target/classes/pt/ulisboa/tecnico/sec/Opcode.class" afterPath="$PROJECT_DIR$/HDSCoinWallet/target/classes/pt/ulisboa/tecnico/sec/Opcode.class" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/target/classes/pt/ulisboa/tecnico/sec/Request.class" afterPath="$PROJECT_DIR$/HDSCoinWallet/target/classes/pt/ulisboa/tecnico/sec/Request.class" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/target/classes/pt/ulisboa/tecnico/sec/SecurityManager.class" afterPath="$PROJECT_DIR$/HDSCoinWallet/target/classes/pt/ulisboa/tecnico/sec/SecurityManager.class" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/target/classes/pt/ulisboa/tecnico/sec/Wallet$1.class" afterPath="$PROJECT_DIR$/HDSCoinWallet/target/classes/pt/ulisboa/tecnico/sec/Wallet$1.class" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/target/classes/pt/ulisboa/tecnico/sec/Wallet.class" afterPath="$PROJECT_DIR$/HDSCoinWallet/target/classes/pt/ulisboa/tecnico/sec/Wallet.class" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterPath="$PROJECT_DIR$/HDSCoinWallet/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" />
-      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterPath="$PROJECT_DIR$/HDSCoinWallet/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" />
     </list>
     <ignored path="$PROJECT_DIR$/HDSCoinServer/target/" />
     <ignored path="$PROJECT_DIR$/HDSCoinWallet/target/" />
@@ -58,14 +32,39 @@
       <file leaf-file-name="Ledger.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Ledger.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="355">
-              <caret line="40" column="47" lean-forward="false" selection-start-line="40" selection-start-column="40" selection-end-line="40" selection-end-column="47" />
+            <state relative-caret-position="542">
+              <caret line="388" column="14" lean-forward="false" selection-start-line="388" selection-start-column="14" selection-end-line="388" selection-end-column="14" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#1002#1009#0" expanded="true" />
-                <element signature="e#1067#1076#0" expanded="true" />
-                <element signature="e#1137#1150#0" expanded="true" />
+                <element signature="e#1095#1102#0" expanded="true" />
+                <element signature="e#1160#1169#0" expanded="true" />
+                <element signature="e#1230#1243#0" expanded="true" />
+                <element signature="e#6245#6246#0" expanded="true" />
+                <element signature="e#6280#6281#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Account.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Account.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="612">
+              <caret line="52" column="9" lean-forward="false" selection-start-line="52" selection-start-column="9" selection-end-line="52" selection-end-column="9" />
+              <folding>
+                <element signature="e#1539#1540#0" expanded="true" />
+                <element signature="e#1584#1585#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Opcode.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Opcode.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="85">
+              <caret line="5" column="47" lean-forward="false" selection-start-line="5" selection-start-column="47" selection-end-line="5" selection-end-column="47" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -73,7 +72,7 @@
       <file leaf-file-name="Wallet.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Wallet.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="510">
+            <state relative-caret-position="17">
               <caret line="30" column="54" lean-forward="false" selection-start-line="30" selection-start-column="47" selection-end-line="30" selection-end-column="54" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -89,8 +88,8 @@
       <file leaf-file-name="NodeManager.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/NodeManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="38" column="9" lean-forward="false" selection-start-line="38" selection-start-column="9" selection-end-line="38" selection-end-column="9" />
+            <state relative-caret-position="459">
+              <caret line="61" column="46" lean-forward="false" selection-start-line="61" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -101,11 +100,11 @@
       <file leaf-file-name="LedgerNode.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/LedgerNode.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="652">
-              <caret line="111" column="50" lean-forward="false" selection-start-line="111" selection-start-column="50" selection-end-line="111" selection-end-column="50" />
+            <state relative-caret-position="425">
+              <caret line="62" column="50" lean-forward="false" selection-start-line="62" selection-start-column="38" selection-end-line="62" selection-end-column="50" />
               <folding>
-                <element signature="e#2530#2531#0" expanded="true" />
-                <element signature="e#2573#2574#0" expanded="true" />
+                <element signature="e#2794#2795#0" expanded="true" />
+                <element signature="e#2837#2838#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -157,6 +156,10 @@
       <find>alias</find>
       <find>loadKeys</find>
       <find>thisLedgerPath</find>
+      <find>wALLETR</find>
+      <find>Wallet</find>
+      <find>private</find>
+      <find>handleClient</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -173,7 +176,6 @@
         <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/StringUtil.java" />
         <option value="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Account.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Account.java" />
         <option value="$PROJECT_DIR$/HDSCoinServer/src/test/java/pt/ulisboa/tecnico/sec/AccountTest.java" />
         <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Transaction.java" />
         <option value="$PROJECT_DIR$/HDSCoinServer/src/test/java/pt/ulisboa/tecnico/sec/ServerTest.java" />
@@ -186,11 +188,14 @@
         <option value="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Opcode.java" />
         <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Opcode.java" />
         <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/SecurityManager.java" />
-        <option value="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/LedgerNode.java" />
-        <option value="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/NodeManager.java" />
-        <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Ledger.java" />
         <option value="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Wallet.java" />
         <option value="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/SecurityManager.java" />
+        <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/NodeManager.java" />
+        <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/LedgerNode.java" />
+        <option value="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/LedgerNode.java" />
+        <option value="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/NodeManager.java" />
+        <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Account.java" />
+        <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Ledger.java" />
       </list>
     </option>
   </component>
@@ -207,7 +212,7 @@
       </MavenImportingSettings>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="y" value="40" />
     <option name="width" value="1292" />
     <option name="height" value="992" />
@@ -227,7 +232,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="AndroidView" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -245,6 +251,30 @@
               <item name="HDSCoin" type="462c0819:PsiDirectoryNode" />
               <item name="HDSCoinServer" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="HDSCoin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HDSCoin" type="462c0819:PsiDirectoryNode" />
+              <item name="HDSCoinServer" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="HDSCoin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HDSCoin" type="462c0819:PsiDirectoryNode" />
+              <item name="HDSCoinServer" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="HDSCoin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HDSCoin" type="462c0819:PsiDirectoryNode" />
+              <item name="HDSCoinServer" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="sec" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="HDSCoin" type="b2602c69:ProjectViewProjectNode" />
@@ -286,13 +316,20 @@
         </subPane>
       </pane>
       <pane id="Scratches" />
-      <pane id="AndroidView" />
-      <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="pt.ulisboa.tecnico.sec" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\andre\Desktop\SEC\HDSCoin\HDSCoin\HDSCoinServer\src\main\java\pt\ulisboa\tecnico\sec" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -421,15 +458,16 @@
       <workItem from="1525358786772" duration="10114000" />
       <workItem from="1525383072573" duration="9265000" />
       <workItem from="1525529961990" duration="10048000" />
-      <workItem from="1525570467810" duration="4136000" />
+      <workItem from="1525570467810" duration="5516000" />
+      <workItem from="1525621600350" duration="20747000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="11996000" />
+    <option name="totallyTimeSpent" value="34123000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1296" height="1000" extended-state="7" />
+    <frame x="-8" y="-8" width="1296" height="1000" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -439,26 +477,26 @@
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.178125" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32919955" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Database Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32979852" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -474,22 +512,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Transaction.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="13" lean-forward="false" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/SecurityManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="45" column="34" lean-forward="false" selection-start-line="45" selection-start-column="23" selection-end-line="45" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Wallet.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1870">
@@ -536,10 +558,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="748">
           <caret line="64" column="43" lean-forward="false" selection-start-line="64" selection-start-column="43" selection-end-line="64" selection-end-column="43" />
-          <folding>
-            <element signature="e#1604#1605#0" expanded="false" />
-            <element signature="e#1642#1643#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -549,9 +568,11 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#1002#1009#0" expanded="true" />
-            <element signature="e#1067#1076#0" expanded="true" />
-            <element signature="e#1137#1150#0" expanded="true" />
+            <element signature="e#1095#1102#0" expanded="true" />
+            <element signature="e#1160#1169#0" expanded="true" />
+            <element signature="e#1230#1243#0" expanded="true" />
+            <element signature="e#6245#6246#0" expanded="true" />
+            <element signature="e#6280#6281#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -609,10 +630,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="697">
           <caret line="64" column="43" lean-forward="false" selection-start-line="64" selection-start-column="43" selection-end-line="64" selection-end-column="43" />
-          <folding>
-            <element signature="e#1604#1605#0" expanded="false" />
-            <element signature="e#1642#1643#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -622,9 +640,11 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#1002#1009#0" expanded="true" />
-            <element signature="e#1067#1076#0" expanded="true" />
-            <element signature="e#1137#1150#0" expanded="true" />
+            <element signature="e#1095#1102#0" expanded="true" />
+            <element signature="e#1160#1169#0" expanded="true" />
+            <element signature="e#1230#1243#0" expanded="true" />
+            <element signature="e#6245#6246#0" expanded="true" />
+            <element signature="e#6280#6281#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -682,10 +702,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="697">
           <caret line="64" column="43" lean-forward="false" selection-start-line="64" selection-start-column="43" selection-end-line="64" selection-end-column="43" />
-          <folding>
-            <element signature="e#1604#1605#0" expanded="false" />
-            <element signature="e#1642#1643#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -695,9 +712,11 @@
           <caret line="319" column="18" lean-forward="false" selection-start-line="319" selection-start-column="14" selection-end-line="319" selection-end-column="18" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#1002#1009#0" expanded="true" />
-            <element signature="e#1067#1076#0" expanded="true" />
-            <element signature="e#1137#1150#0" expanded="true" />
+            <element signature="e#1095#1102#0" expanded="true" />
+            <element signature="e#1160#1169#0" expanded="true" />
+            <element signature="e#1230#1243#0" expanded="true" />
+            <element signature="e#6245#6246#0" expanded="true" />
+            <element signature="e#6280#6281#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -748,10 +767,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="459">
           <caret line="36" column="25" lean-forward="false" selection-start-line="36" selection-start-column="25" selection-end-line="36" selection-end-column="25" />
-          <folding>
-            <element signature="e#1604#1605#0" expanded="false" />
-            <element signature="e#1642#1643#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -776,6 +792,11 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1131">
           <caret line="89" column="60" lean-forward="false" selection-start-line="89" selection-start-column="41" selection-end-line="89" selection-end-column="60" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#1975#1976#0" expanded="false" />
+            <element signature="e#2004#2005#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -799,24 +820,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Account.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="25" column="51" lean-forward="false" selection-start-line="25" selection-start-column="51" selection-end-line="25" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Block.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="618">
           <caret line="48" column="0" lean-forward="false" selection-start-line="48" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Opcode.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="47" lean-forward="false" selection-start-line="5" selection-start-column="47" selection-end-line="5" selection-end-column="47" />
         </state>
       </provider>
     </entry>
@@ -863,27 +870,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/NodeManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="38" column="9" lean-forward="false" selection-start-line="38" selection-start-column="9" selection-end-line="38" selection-end-column="9" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/LedgerNode.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="652">
-          <caret line="111" column="50" lean-forward="false" selection-start-line="111" selection-start-column="50" selection-end-line="111" selection-end-column="50" />
-          <folding>
-            <element signature="e#2530#2531#0" expanded="true" />
-            <element signature="e#2573#2574#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/SecurityManager.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
@@ -894,7 +880,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Wallet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
+        <state relative-caret-position="17">
           <caret line="30" column="54" lean-forward="false" selection-start-line="30" selection-start-column="47" selection-end-line="30" selection-end-column="54" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -906,15 +892,73 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Ledger.java">
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/NodeManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="355">
-          <caret line="40" column="47" lean-forward="false" selection-start-line="40" selection-start-column="40" selection-end-line="40" selection-end-column="47" />
+        <state relative-caret-position="270">
+          <caret line="53" column="53" lean-forward="false" selection-start-line="53" selection-start-column="47" selection-end-line="53" selection-end-column="53" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/LedgerNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2">
+          <caret line="49" column="0" lean-forward="false" selection-start-line="48" selection-start-column="0" selection-end-line="49" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/LedgerNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="62" column="50" lean-forward="false" selection-start-line="62" selection-start-column="38" selection-end-line="62" selection-end-column="50" />
+          <folding>
+            <element signature="e#2794#2795#0" expanded="true" />
+            <element signature="e#2837#2838#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Opcode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="47" lean-forward="false" selection-start-line="5" selection-start-column="47" selection-end-line="5" selection-end-column="47" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/NodeManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="459">
+          <caret line="61" column="46" lean-forward="false" selection-start-line="61" selection-start-column="0" selection-end-line="62" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#1002#1009#0" expanded="true" />
-            <element signature="e#1067#1076#0" expanded="true" />
-            <element signature="e#1137#1150#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Account.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="612">
+          <caret line="52" column="9" lean-forward="false" selection-start-line="52" selection-start-column="9" selection-end-line="52" selection-end-column="9" />
+          <folding>
+            <element signature="e#1539#1540#0" expanded="true" />
+            <element signature="e#1584#1585#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Ledger.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="542">
+          <caret line="388" column="14" lean-forward="false" selection-start-line="388" selection-start-column="14" selection-end-line="388" selection-end-column="14" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1095#1102#0" expanded="true" />
+            <element signature="e#1160#1169#0" expanded="true" />
+            <element signature="e#1230#1243#0" expanded="true" />
+            <element signature="e#6245#6246#0" expanded="true" />
+            <element signature="e#6280#6281#0" expanded="true" />
           </folding>
         </state>
       </provider>

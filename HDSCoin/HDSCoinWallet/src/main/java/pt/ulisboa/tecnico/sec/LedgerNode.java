@@ -10,6 +10,7 @@ import java.security.PublicKey;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 
 public class LedgerNode {
     private String nodeName;
@@ -19,11 +20,12 @@ public class LedgerNode {
     private DataOutputStream out;
     private DataInputStream in;
     private String publicKeyString;
+    private ArrayList<Request> delivered;
 
     public LedgerNode(String name, int port){
         this.nodeName = name;
         this.port = port;
-
+        this.delivered = new ArrayList<Request>();
     }
 
     public boolean connect(){
@@ -45,13 +47,17 @@ public class LedgerNode {
             this.out.writeUTF(request.requestAsJson());
             String answer = this.in.readUTF();
             Request ans = Request.requestFromJson(answer);
-            if(SecurityManager.VerifyMessage(ans, this.publicKeyString))
+            if(SecurityManager.VerifyMessage(ans, this.publicKeyString) && !delivered.contains(request)){
+                delivered.add(request);
                 return ans;
+            }
             return new Request(Opcode.INVALID_SIG);
         }catch(SocketTimeoutException ste){
             System.out.println("Socket timed out. Handle fault.");
+            //retry?
             return new Request(Opcode.NO_ANSWER);
         } catch(IOException ioe){
+            //reconnect and resend?
             ioe.printStackTrace();
             System.out.println("Socket: " + this.nodeSocket);
             return new Request(Opcode.SOCKET_ERROR);

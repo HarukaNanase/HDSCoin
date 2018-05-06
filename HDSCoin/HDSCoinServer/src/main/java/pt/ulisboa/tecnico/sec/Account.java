@@ -7,6 +7,7 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.ArrayList;
 
 public class Account {
         private transient int KEY_SIZE = 2048;
@@ -18,16 +19,19 @@ public class Account {
         private long sequenceNumber;
         private long RID;
         private long WTS;
+        private ArrayList<Request> delivered;
 
         public Account(PublicKey pkey){
             this.publicKey = pkey;
             balance = 50;
+            delivered = new ArrayList<>();
         }
 
         public Account(String publicKeyString){
             this.publicKeyString = publicKeyString;
             this.balance = 50;
             this.sequenceNumber = 0;
+            delivered = new ArrayList<>();
         }
 
         public Account(PublicKey pkey, String publicKeyString){
@@ -35,11 +39,17 @@ public class Account {
             this.publicKeyString = publicKeyString;
             this.balance = 50;
             this.sequenceNumber = 0;
+            delivered = new ArrayList<>();
         }
 
         public Account(){
             balance = 50;
             this.sequenceNumber = 0;
+            delivered = new ArrayList<>();
+        }
+
+        public ArrayList<Request> getDelivered(){
+            return this.delivered;
         }
 
         public long getSequenceNumber(){

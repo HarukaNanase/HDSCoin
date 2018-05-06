@@ -64,7 +64,7 @@ public class NodeManager {
 
     /*
      * @Method - decideRegularRegister
-     * @Input - Answers from N nodes
+     * @Input - Answers from N node s
      * @Returns boolean - decision of the consensus
      */
     public boolean decideRegularRegisterWrite(ArrayList<Request> answers){
