@@ -45,6 +45,8 @@ public class SecurityManager {
 
     public static void SignMessage(Request request, PrivateKey privateKey){
         try {
+            if(request.getdSig() != null)
+                request.setdSig(null);
             long currentTime = System.currentTimeMillis();
             request.setCreatedOn(currentTime);
             request.setExpiresOn(currentTime + MAX_MESSAGE_DELAY);

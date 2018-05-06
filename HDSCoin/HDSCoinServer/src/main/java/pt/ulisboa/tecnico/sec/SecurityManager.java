@@ -17,8 +17,6 @@ public class SecurityManager {
         try {
             if(request.getOpcode() == Opcode.AUDIT || request.getOpcode() == Opcode.TEST_MESSAGE)
                 return true;
-            long currentTime = System.currentTimeMillis();
-            boolean validTimer = true;
             String signature = request.getdSig();
             byte[] signatureBytes = Base64.decode(signature);
             request.setdSig(null);
@@ -31,13 +29,15 @@ public class SecurityManager {
             sign.initVerify(publicKey);
             sign.update(data);
             boolean validSign = sign.verify(signatureBytes);
+            long currentTime = System.currentTimeMillis();
+            boolean validTimer = true;
             if(validSign) {
                 if (currentTime > request.getExpiresOn() || currentTime < request.getCreatedOn()) {
                     validTimer = false;
                 }
                 return (validSign && validTimer);
             }
-
+            System.out.println("Invalid sign");
             return false;
 
         }catch(Exception e){
@@ -47,6 +47,9 @@ public class SecurityManager {
 
     public static void SignMessage(Request request, PrivateKey privateKey){
         try {
+            if(request.getdSig() != null)
+                request.setdSig(null);
+
             long currentTime = System.currentTimeMillis();
             request.setCreatedOn(currentTime);
             request.setExpiresOn(currentTime + MAX_MESSAGE_DELAY);
@@ -54,7 +57,7 @@ public class SecurityManager {
             d_sig.initSign(privateKey);
             d_sig.update(request.requestAsJson().getBytes());
             byte[] sigBytes = d_sig.sign();
-            request.setdSig(Base64.encode(sigBytes, 1024));
+            request.setdSig(Base64.encode(sigBytes, 2048));
 
         }catch(NoSuchAlgorithmException noae){
             noae.printStackTrace();

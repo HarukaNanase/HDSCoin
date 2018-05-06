@@ -99,29 +99,35 @@ public class Wallet {
             //in = new DataInputStream(mainSocket.getInputStream());
             manager.createNode("127.0.0.1", 1380);
             manager.createNode("127.0.0.1", 1381);
-
+            manager.createNode("127.0.0.1", 1382);
             Request test1 = new Request(Opcode.TEST_MESSAGE);
+            test1.addParameter(publicKeyString);
+            boolean ans = manager.broadcastWrite(test1);
+            System.out.println(ans);
 
-            Request mostCommonAnswer = manager.broadcast(test1);
-            if(mostCommonAnswer != null){
-                System.out.println("Most Common Answers:\n" + mostCommonAnswer.requestAsJson());
-            }else{
-                System.out.println("No agreement on the most common answer.");
-            }
-            Thread.sleep(50000);
             System.out.println("Contacting server to request sequence number...");
             Request seqNumber = new Request(Opcode.REQUEST_SEQUENCE_NUMBER);
             seqNumber.addParameter(publicKeyString);
-            signAndSendMessage(seqNumber);
-            String seq = receiveAndVerifyAnswer();
-            if (seq != null)
-                sequenceNumber = Long.parseLong(seq);
+            Request seq = manager.broadcastRead(seqNumber);
+            if (seq != null) {
+                String[] values = seq.getParameter(0).split("/");
+                sequenceNumber = Long.parseLong(values[0]);
+                long wts = Long.parseLong(values[1]);
+                long rid = Long.parseLong(values[2]);
+                sequenceNumber = sequenceNumber == -1 ? 0 : sequenceNumber;
+                manager.setWTS(wts == -1? 0 : wts);
+                manager.setRID(rid == -1? 0: rid);
+                System.out.println("Manager : WTS: " + wts + " RID: " + rid);
+            }
             if (sequenceNumber != -1)
                 System.out.println("Done. Current Sequence Number: " + sequenceNumber);
             else {
                 System.out.println("Sequence Number not found. Setting to 0");
                 sequenceNumber = 0;
             }
+
+
+
             while (true) {
                 System.out.println("What you wanna do?");
                 String opcode = scanner.next();
@@ -216,11 +222,12 @@ public class Wallet {
         Scanner scanner = new Scanner(System.in);
         switch(ureq.getOpcode()) {
             case CREATE_ACCOUNT:
-                signAndSendMessage(ureq);
-                isRegistered = true;
+                //signAndSendMessage(ureq);
+                isRegistered = manager.broadcastWrite(ureq);
                 break;
             case CHECK_ACCOUNT:
-                signAndSendMessage(ureq);
+                //signAndSendMessage(ureq);
+                manager.broadcastRead(ureq);
                 break;
             case CREATE_TRANSACTION:
                 System.out.println("Enter destination address: ");
@@ -229,13 +236,14 @@ public class Wallet {
                 int value = scanner.nextInt();
                 ureq.addParameter(destination);
                 ureq.addParameter(Integer.toString(value));
-                signAndSendMessage(ureq);
+                //signAndSendMessage(ureq);
+                manager.broadcastWrite(ureq);
                 break;
             case RECEIVE_TRANSACTION:
                 System.out.println("Enter the payer's address:");
                 String payerAddress = scanner.next();
                 ureq.addParameter(payerAddress);
-                signAndSendMessage(ureq);
+                manager.broadcastWrite(ureq);
                 break;
             case REQUEST_CHAIN:
                 signAndSendMessage(ureq);
@@ -244,10 +252,9 @@ public class Wallet {
                 System.out.println("Enter the account to be audited:");
                 String auditTarget = scanner.next();
                 ureq.setParameter(0, auditTarget);
-                signAndSendMessage(ureq);
+                manager.broadcastRead(ureq);
                 break;
         }
-        System.out.println(receiveAndVerifyAnswer());
     }
 
     private static void signAndSendMessage(Request ureq){

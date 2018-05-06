@@ -1,0 +1,795 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="1ec2add6-d15a-441e-8433-3bd9873d3dc8" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/HDSCoinServer/src/main/resources/ledger.bak" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Account.java" beforeDir="false" afterPath="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Account.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Ledger.java" beforeDir="false" afterPath="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Ledger.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Request.java" beforeDir="false" afterPath="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Request.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/SecurityManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/SecurityManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/LedgerNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/LedgerNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/NodeManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/NodeManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Opcode.java" beforeDir="false" afterPath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Opcode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Request.java" beforeDir="false" afterPath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Request.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/SecurityManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/SecurityManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Wallet.java" beforeDir="false" afterPath="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Wallet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/resources/client.priv" beforeDir="false" afterPath="$PROJECT_DIR$/HDSCoinWallet/src/main/resources/client.priv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HDSCoinWallet/src/main/resources/client.pub" beforeDir="false" afterPath="$PROJECT_DIR$/HDSCoinWallet/src/main/resources/client.pub" afterDir="false" />
+    </list>
+    <ignored path="$PROJECT_DIR$/HDSCoinServer/target/" />
+    <ignored path="$PROJECT_DIR$/HDSCoinWallet/target/" />
+    <ignored path="$PROJECT_DIR$/target/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="Ledger.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Ledger.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-4552">
+              <caret line="44" column="38" selection-start-line="44" selection-end-line="44" selection-end-column="19" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Wallet.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Wallet.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="300">
+              <caret line="147" column="46" lean-forward="true" selection-start-line="147" selection-start-column="46" selection-end-line="147" selection-end-column="46" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#1329#1330#0" expanded="true" />
+                <element signature="e#1359#1360#0" expanded="true" />
+                <element signature="e#6042#6043#0" expanded="true" />
+                <element signature="e#6079#6080#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="NodeManager.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/NodeManager.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="900">
+              <caret line="60" column="23" selection-start-line="60" selection-start-column="23" selection-end-line="60" selection-end-column="23" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Transaction.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Transaction.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="30">
+              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SecurityManager.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/SecurityManager.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="301">
+              <caret line="45" column="34" selection-start-line="45" selection-start-column="23" selection-end-line="45" selection-end-column="34" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>generateServerKeys</find>
+      <find>saveKeys</find>
+      <find>loadke</find>
+      <find>KEY_SIZE</find>
+      <find>Could not load key files. Generating new ones.</find>
+      <find>RESOURCES_PATH</find>
+      <find>loadKeys</find>
+      <find>loadServerKey</find>
+      <find>createNode</find>
+      <find>privateKey</find>
+      <find>SignMessage</find>
+      <find>privKey</find>
+      <find>HEAD</find>
+    </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/StringUtil.java" />
+        <option value="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Account.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Account.java" />
+        <option value="$PROJECT_DIR$/HDSCoinServer/src/test/java/pt/ulisboa/tecnico/sec/AccountTest.java" />
+        <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Transaction.java" />
+        <option value="$PROJECT_DIR$/HDSCoinServer/src/test/java/pt/ulisboa/tecnico/sec/ServerTest.java" />
+        <option value="$PROJECT_DIR$/HDSCoinServer/src/test/java/pt/ulisboa/tecnico/sec/LedgerTest.java" />
+        <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Request.java" />
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/HDSCoinServer/src/test/java/pt/ulisboa/tecnico/sec/SecurityManagerTest.java" />
+        <option value="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Request.java" />
+        <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Block.java" />
+        <option value="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Opcode.java" />
+        <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Opcode.java" />
+        <option value="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/LedgerNode.java" />
+        <option value="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/NodeManager.java" />
+        <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/SecurityManager.java" />
+        <option value="$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Ledger.java" />
+        <option value="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/SecurityManager.java" />
+        <option value="$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Wallet.java" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="lookForNested" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="PackagesPane" />
+      <pane id="AndroidView" />
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="HDSCoin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HDSCoin" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="HDSCoin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HDSCoin" type="462c0819:PsiDirectoryNode" />
+              <item name="HDSCoinServer" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="HDSCoin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HDSCoin" type="462c0819:PsiDirectoryNode" />
+              <item name="HDSCoinServer" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="HDSCoin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HDSCoin" type="462c0819:PsiDirectoryNode" />
+              <item name="HDSCoinWallet" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="HDSCoin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HDSCoin" type="462c0819:PsiDirectoryNode" />
+              <item name="HDSCoinWallet" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="HDSCoin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HDSCoin" type="462c0819:PsiDirectoryNode" />
+              <item name="HDSCoinWallet" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="HDSCoin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HDSCoin" type="462c0819:PsiDirectoryNode" />
+              <item name="HDSCoinWallet" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="HDSCoin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="HDSCoin" type="462c0819:PsiDirectoryNode" />
+              <item name="HDSCoinWallet" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="sec" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <patterns />
+    </configuration>
+    <configuration default="true" type="TestNG" factoryName="TestNG">
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="OUTPUT_DIRECTORY" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <option name="USE_DEFAULT_REPORTERS" value="false" />
+      <option name="PROPERTIES_FILE" />
+      <properties />
+      <listeners />
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+    </configuration>
+    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
+      <module name="" />
+      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
+      <option name="PROGRAM_PARAMETERS" />
+      <predefined_log_file id="idea.log" enabled="true" />
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1ec2add6-d15a-441e-8433-3bd9873d3dc8" name="Default" comment="" />
+      <created>1522682670341</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1522682670341</updated>
+      <workItem from="1522682671812" duration="670000" />
+      <workItem from="1522684485105" duration="7415000" />
+      <workItem from="1522745768921" duration="6516000" />
+      <workItem from="1522759725016" duration="3047000" />
+      <workItem from="1522853207458" duration="15599000" />
+      <workItem from="1522934537051" duration="2271000" />
+      <workItem from="1522938896888" duration="5259000" />
+      <workItem from="1522950805694" duration="3942000" />
+      <workItem from="1522963394588" duration="10986000" />
+      <workItem from="1523022315063" duration="735000" />
+      <workItem from="1523279460688" duration="185000" />
+      <workItem from="1524478909820" duration="2949000" />
+      <workItem from="1524578604625" duration="2010000" />
+      <workItem from="1524694273519" duration="14436000" />
+      <workItem from="1524753737503" duration="9452000" />
+      <workItem from="1524830889557" duration="2096000" />
+      <workItem from="1525083503592" duration="2513000" />
+      <workItem from="1525358786772" duration="10114000" />
+      <workItem from="1525383072573" duration="9265000" />
+      <workItem from="1525529961990" duration="10048000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="7860000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-388" y="-1057" width="1920" height="1057" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info anchor="right" id="Palette" order="3" />
+      <window_info anchor="bottom" id="TODO" order="7" />
+      <window_info anchor="right" id="Palette&#9;" order="8" />
+      <window_info id="Image Layers" order="6" />
+      <window_info anchor="right" id="Capture Analysis" order="6" />
+      <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" />
+      <window_info anchor="right" id="Maven Projects" order="4" />
+      <window_info anchor="bottom" id="Database Changes" order="0" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="10" />
+      <window_info anchor="bottom" id="Run" order="3" />
+      <window_info anchor="bottom" id="Terminal" order="9" />
+      <window_info id="Capture Tool" order="2" />
+      <window_info id="Designer" order="3" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.178125" />
+      <window_info anchor="right" id="Database" order="5" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info id="UI Designer" order="4" />
+      <window_info anchor="right" id="Theme Preview" order="7" />
+      <window_info id="Favorites" order="5" side_tool="true" />
+      <window_info anchor="bottom" id="Debug" order="4" weight="0.4" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="6" weight="0.4" />
+      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="bottom" id="Message" order="1" />
+      <window_info anchor="bottom" id="Cvs" order="5" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="2" visible="true" weight="0.32979852" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Wallet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1870">
+          <caret line="119" column="59" lean-forward="true" selection-start-line="119" selection-start-column="59" selection-end-line="119" selection-end-column="59" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1329#1330#0" expanded="true" />
+            <element signature="e#1359#1360#0" expanded="true" />
+            <element signature="e#6042#6043#0" expanded="true" />
+            <element signature="e#6079#6080#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Opcode.java">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/StringUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="23" selection-start-line="23" selection-end-line="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/SecurityManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1003">
+          <caret line="65" column="1" lean-forward="true" selection-start-line="65" selection-start-column="1" selection-end-line="65" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Account.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="11" column="45" selection-start-line="11" selection-start-column="45" selection-end-line="11" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Transaction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="21" selection-start-line="5" selection-start-column="12" selection-end-line="5" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Request.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="748">
+          <caret line="64" column="43" selection-start-line="64" selection-start-column="43" selection-end-line="64" selection-end-column="43" />
+          <folding>
+            <element signature="e#1604#1605#0" />
+            <element signature="e#1642#1643#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Ledger.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Block.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="32" column="77" selection-start-line="32" selection-start-column="77" selection-end-line="32" selection-end-column="77" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Wallet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3604">
+          <caret line="221" column="24" lean-forward="true" selection-start-line="221" selection-start-column="24" selection-end-line="221" selection-end-column="24" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1329#1330#0" expanded="true" />
+            <element signature="e#1359#1360#0" expanded="true" />
+            <element signature="e#6042#6043#0" expanded="true" />
+            <element signature="e#6079#6080#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/StringUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="23" selection-start-line="23" selection-end-line="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/SecurityManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1003">
+          <caret line="65" column="78" selection-start-line="65" selection-start-column="78" selection-end-line="65" selection-end-column="78" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Account.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="11" column="45" selection-start-line="11" selection-start-column="45" selection-end-line="11" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Transaction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="21" selection-start-line="5" selection-start-column="12" selection-end-line="5" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Request.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="697">
+          <caret line="64" column="43" selection-start-line="64" selection-start-column="43" selection-end-line="64" selection-end-column="43" />
+          <folding>
+            <element signature="e#1604#1605#0" />
+            <element signature="e#1642#1643#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Ledger.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Block.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="544">
+          <caret line="32" column="77" selection-start-line="32" selection-start-column="77" selection-end-line="32" selection-end-column="77" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Wallet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1802">
+          <caret line="106" column="53" selection-start-line="106" selection-start-column="53" selection-end-line="106" selection-end-column="53" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1329#1330#0" expanded="true" />
+            <element signature="e#1359#1360#0" expanded="true" />
+            <element signature="e#6042#6043#0" expanded="true" />
+            <element signature="e#6079#6080#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/StringUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="23" selection-start-line="23" selection-end-line="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Account.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="14" column="39" selection-start-line="14" selection-start-column="39" selection-end-line="14" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/SecurityManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1003">
+          <caret line="65" column="78" selection-start-line="65" selection-start-column="78" selection-end-line="65" selection-end-column="78" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Transaction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="21" selection-start-line="5" selection-start-column="12" selection-end-line="5" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Request.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="697">
+          <caret line="64" column="43" selection-start-line="64" selection-start-column="43" selection-end-line="64" selection-end-column="43" />
+          <folding>
+            <element signature="e#1604#1605#0" />
+            <element signature="e#1642#1643#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Ledger.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5202">
+          <caret line="319" column="18" selection-start-line="319" selection-start-column="14" selection-end-line="319" selection-end-column="18" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/StringUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="23" selection-start-line="23" selection-end-line="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Block.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="544">
+          <caret line="32" column="77" lean-forward="true" selection-start-line="32" selection-start-column="77" selection-end-line="32" selection-end-column="77" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/SecurityManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="969">
+          <caret line="63" selection-start-line="63" selection-end-line="63" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Account.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="23" column="36" selection-start-line="23" selection-start-column="36" selection-end-line="23" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="459">
+          <caret line="27" column="21" selection-start-line="27" selection-start-column="21" selection-end-line="27" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/pom.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="20" column="64" selection-start-line="16" selection-start-column="8" selection-end-line="20" selection-end-column="64" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Request.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="459">
+          <caret line="36" column="25" selection-start-line="36" selection-start-column="25" selection-end-line="36" selection-end-column="25" />
+          <folding>
+            <element signature="e#1604#1605#0" />
+            <element signature="e#1642#1643#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/test/java/pt/ulisboa/tecnico/sec/AccountTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="27" column="47" selection-start-line="27" selection-start-column="47" selection-end-line="27" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="153">
+            <caret line="9" selection-start-line="9" selection-end-line="9" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/test/java/pt/ulisboa/tecnico/sec/SecurityManagerTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1131">
+          <caret line="89" column="60" selection-start-line="89" selection-start-column="41" selection-end-line="89" selection-end-column="60" />
+          <folding>
+            <element signature="imports" />
+            <element signature="e#1975#1976#0" />
+            <element signature="e#2004#2005#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/test/java/pt/ulisboa/tecnico/sec/ServerTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="21" column="10" selection-start-line="21" selection-start-column="10" selection-end-line="21" selection-end-column="10" />
+          <folding>
+            <element signature="imports" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/test/java/pt/ulisboa/tecnico/sec/LedgerTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="5" selection-start-line="5" selection-end-line="5" />
+          <folding>
+            <element signature="imports" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Account.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="25" column="51" selection-start-line="25" selection-start-column="51" selection-end-line="25" selection-end-column="51" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Block.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="618">
+          <caret line="48" selection-start-line="48" selection-end-line="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Opcode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="47" selection-start-line="5" selection-start-column="47" selection-end-line="5" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Opcode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/SecurityManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="394">
+          <caret line="73" column="43" lean-forward="true" selection-start-line="73" selection-start-column="43" selection-end-line="73" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/StringUtil.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="23" selection-start-line="23" selection-end-line="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Transaction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="585">
+          <caret line="44" column="38" selection-start-line="44" selection-start-column="38" selection-end-line="44" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/LedgerNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="363">
+          <caret line="67" column="5" selection-start-line="67" selection-start-column="5" selection-end-line="67" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Request.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="44" selection-start-line="44" selection-end-line="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinServer/src/main/java/pt/ulisboa/tecnico/sec/Ledger.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4552">
+          <caret line="44" column="38" selection-start-line="44" selection-end-line="44" selection-end-column="19" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/NodeManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="900">
+          <caret line="60" column="23" selection-start-line="60" selection-start-column="23" selection-end-line="60" selection-end-column="23" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Transaction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/SecurityManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="301">
+          <caret line="45" column="34" selection-start-line="45" selection-start-column="23" selection-end-line="45" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HDSCoinWallet/src/main/java/pt/ulisboa/tecnico/sec/Wallet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="300">
+          <caret line="147" column="46" lean-forward="true" selection-start-line="147" selection-start-column="46" selection-end-line="147" selection-end-column="46" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1329#1330#0" expanded="true" />
+            <element signature="e#1359#1360#0" expanded="true" />
+            <element signature="e#6042#6043#0" expanded="true" />
+            <element signature="e#6079#6080#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
