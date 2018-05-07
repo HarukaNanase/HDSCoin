@@ -6,7 +6,7 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Request{
+public class Request implements Comparable<Request>{
     private Opcode opcode;
     private ArrayList<String> parameters;
     private String dSig;
@@ -146,5 +146,9 @@ public class Request{
             sb.append(str);
         }
         return Objects.hash(sb.toString());
+    }
+
+    public int compareTo(Request target){
+       return Long.compare(this.WTS, target.WTS);
     }
 }

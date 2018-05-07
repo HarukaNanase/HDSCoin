@@ -8,18 +8,21 @@ import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Queue;
 
 public class Account {
-        private transient int KEY_SIZE = 2048;
+        private transient int KEY_SIZE = 4096;
         private transient PublicKey publicKey;
         private transient PrivateKey privateKey;
         private String publicKeyString;
         private int balance;
         private Transaction[] backlog;
         private long sequenceNumber;
+        private long transactionId = 1;
         private long RID;
         private long WTS;
         private ArrayList<Request> delivered;
+        private ArrayList<Request> queue;
 
         public Account(PublicKey pkey){
             this.publicKey = pkey;
@@ -48,10 +51,13 @@ public class Account {
             delivered = new ArrayList<>();
         }
 
+        public void setTransactionId(long id){ this.transactionId = id;}
+        public long getTransactionId(){ return this.transactionId;}
+
         public ArrayList<Request> getDelivered(){
             return this.delivered;
         }
-
+        public ArrayList<Request> getQueue() { return this.queue;}
         public long getSequenceNumber(){
             return this.sequenceNumber;
         }

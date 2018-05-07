@@ -3,8 +3,9 @@ package pt.ulisboa.tecnico.sec;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
-public class Request {
+public class Request implements Comparable<Request>{
     private Opcode opcode;
     private ArrayList<String> parameters;
     private String dSig;
@@ -13,7 +14,6 @@ public class Request {
     private long sequenceNumber = 0;
     private long RID = 0;
     private long WTS = 0;
-    private String sender;
 
     public Request(Opcode opcode, ArrayList<String> param){
         this.opcode = opcode;
@@ -37,7 +37,7 @@ public class Request {
         this.parameters.set(idx, newParam);
     }
     public void setOpcode(Opcode opc){
-        this.opcode = opc;
+        this.opcode = opcode;
     }
 
     public Opcode getOpcode(){
@@ -118,4 +118,36 @@ public class Request {
         return this.WTS;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof Request) {
+            Request target = (Request) obj;
+            if (this.getOpcode() == target.getOpcode() && this.getSequenceNumber() == target.getSequenceNumber() && this.getParameters().size() == target.getParameters().size()) {
+                for (int i = 0; i < this.getParameters().size(); i++) {
+                    if (!this.getParameter(i).equals(target.getParameter(i))) {
+                        System.out.println("A parameter is different at index: " + i);
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode(){
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.opcode);
+        sb.append(this.sequenceNumber);
+        for(String str : this.getParameters()){
+            sb.append(str);
+        }
+        return Objects.hash(sb.toString());
+    }
+
+    public int compareTo(Request target){
+       return Long.compare(this.WTS, target.WTS);
+    }
 }

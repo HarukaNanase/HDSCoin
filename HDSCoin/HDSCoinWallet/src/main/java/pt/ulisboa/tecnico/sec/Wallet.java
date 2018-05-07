@@ -26,7 +26,7 @@ public class Wallet {
     private static DataOutputStream out;
     private static DataInputStream in;
     private static boolean isRegistered = false;
-    private static int KEY_SIZE = 2048;
+    private static int KEY_SIZE = 4096;
     private static String ALGORITHM = "RSA";
     private static String KEYSTORE_PASSWORD = "sec2018";
     private static long sequenceNumber = 0;
@@ -188,7 +188,10 @@ public class Wallet {
                 break;
             case CHECK_ACCOUNT:
                 //signAndSendMessage(ureq);
-                manager.broadcastRead(ureq);
+                Request status = manager.broadcastRead(ureq);
+                for(String s : status.getParameters()){
+                    System.out.println(s);
+                }
                 break;
             case CREATE_TRANSACTION:
                 System.out.println("Enter destination address: ");
@@ -197,13 +200,18 @@ public class Wallet {
                 int value = scanner.nextInt();
                 ureq.addParameter(destination);
                 ureq.addParameter(Integer.toString(value));
-                //signAndSendMessage(ureq);
+                String tSign = SecurityManager.SignMessage(publicKeyString + destination + value, privKey);
+                ureq.addParameter(tSign);
                 manager.broadcastWrite(ureq);
                 break;
             case RECEIVE_TRANSACTION:
                 System.out.println("Enter the payer's address:");
                 String payerAddress = scanner.next();
                 ureq.addParameter(payerAddress);
+                System.out.println("Input the Transaction ID: ");
+                String id = scanner.next();
+                ureq.addParameter(SecurityManager.SignMessage(publicKeyString + payerAddress + id, privKey));
+                ureq.addParameter(id);
                 manager.broadcastWrite(ureq);
                 break;
             case REQUEST_CHAIN:
@@ -213,7 +221,9 @@ public class Wallet {
                 System.out.println("Enter the account to be audited:");
                 String auditTarget = scanner.next();
                 ureq.setParameter(0, auditTarget);
-                manager.broadcastRead(ureq);
+                Request audit = manager.broadcastRead(ureq);
+                for(String s : audit.getParameters())
+                    System.out.println(s);
                 break;
         }
     }

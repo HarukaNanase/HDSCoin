@@ -10,13 +10,22 @@ public class Transaction {
     private int value;
     private transient boolean isProcessed = false;
     private transient boolean shouldProcess = false;
-    private String tSig;
-    public Transaction(Account src, Account dest, int value){
+    private String TSig;
+    private String RSig;
+    private long transactionId;
+    private long receiverId;
+    private String transactionSignature;
+    public Transaction(Account src, Account dest, int value, String tSig){
         this.sourceAcc = src;
         this.destinationAcc = dest;
         this.sourceAddress = src.getAccountAddress();
         this.destinationAddress = dest.getAccountAddress();
         this.value = value;
+        this.TSig = tSig;
+        this.RSig = null;
+        this.transactionId = src.getTransactionId();
+        src.setTransactionId(this.transactionId+1);
+        this.receiverId = 0;
     }
     public boolean isProcessed(){
         return this.isProcessed;
@@ -28,6 +37,8 @@ public class Transaction {
                 //this.sourceAcc.makePayment(value);
                 try {
                     this.destinationAcc.receivePayment(value);
+                    this.receiverId = destinationAcc.getTransactionId();
+                    destinationAcc.setTransactionId(this.receiverId+1);
                 }catch(Exception e){
                     System.out.println(e.getMessage());
                     return;
@@ -35,6 +46,25 @@ public class Transaction {
                 this.isProcessed = true;
             }
         }
+    }
+
+    public void setRSig(String RSig){
+        this.RSig = RSig;
+    }
+    public String getRSig(){
+        return this.RSig;
+    }
+
+    public void setTSig(String tsig){
+        this.TSig = tsig;
+    }
+
+    public String getTSig(){
+        return this.TSig;
+    }
+
+    public int getValue(){
+        return this.value;
     }
 
     public void setSourceAddress(String src){
@@ -63,11 +93,23 @@ public class Transaction {
     }
 
     public void settSig(String transaction_signature){
-        this.tSig = transaction_signature;
+        this.transactionSignature = transaction_signature;
     }
 
     public String gettSig(){
-        return this.tSig;
+        return this.transactionSignature;
+    }
+
+    public long getTransactionId(){
+        return this.transactionId;
+    }
+
+    public long getReceiverId(){
+        return this.receiverId;
+    }
+
+    public void setReceiverId( long id){
+        this.receiverId = id;
     }
 }
 

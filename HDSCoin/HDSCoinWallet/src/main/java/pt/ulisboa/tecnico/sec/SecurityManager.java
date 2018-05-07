@@ -8,7 +8,7 @@ import java.security.spec.X509EncodedKeySpec;
 
 public class SecurityManager {
     private static String algorithm = "RSA";
-    private static long MAX_MESSAGE_DELAY = 5000;
+    private static long MAX_MESSAGE_DELAY = 10000;
     private static String hashAlgorithm = "SHA256";
 
     public static boolean VerifyMessage(Request request, String sender){
@@ -54,8 +54,8 @@ public class SecurityManager {
             d_sig.initSign(privateKey);
             d_sig.update(request.requestAsJson().getBytes());
             byte[] sigBytes = d_sig.sign();
-            request.setdSig(Base64.encode(sigBytes, 1024));
-
+            request.setdSig(Base64.encode(sigBytes, 2048));
+           // System.out.println("Final Request: \n " + request.requestAsJson());
         }catch(NoSuchAlgorithmException noae){
             noae.printStackTrace();
         }catch(InvalidKeyException ike){

@@ -20,6 +20,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -40,8 +41,8 @@ public class Ledger{
     private transient PublicKey publicKey;
     private transient PrivateKey privKey;
     private int KEY_SIZE = 2048;
-    private String KEYSTORE_PASSWORD = "sec2018";
-    private String ALGORITHM = "RSA";
+    private transient String KEYSTORE_PASSWORD = "sec2018";
+    private transient String ALGORITHM = "RSA";
     private transient static Ledger ledger = null;
     private int port;
     private String LEDGER_NAME = null;
@@ -239,12 +240,12 @@ public class Ledger{
             sb.append("Account not found. \n");
             return sb.toString();
         }
-
-        sb.append("Incoming transactions pending confirmation:\n");
+        //sb.append("Incoming transactions pending confirmation:\n");
         for (Transaction t : backlog) {
-            //System.out.println(t.getTransactionInfo() + "\n");
             if (t.getDestinationAddress().equals(key)) {
-                sb.append(t.getTransactionInfo());
+                sb.append("Transaction ID: " + t.getTransactionId()+"\n");
+                sb.append("Sender key: " + t.getSourceAddress()+"\n");
+                sb.append("Value: " + t.getValue()+"\n");
                 sb.append("\n");
             }
         }
@@ -257,16 +258,25 @@ public class Ledger{
         Account acc = getAccount(key);
         if(acc == null)
             return "Account not found.";
-        sb.append("Audit for account: " + key + "\n");
-        sb.append("Pending Transactions: \n");
+        sb.append("Audit for account:\n" + key + "\n");
+        sb.append("\nPending Transactions: \n");
         for(Transaction t : backlog){
-            sb.append(t.getTransactionInfo() + "\n");
+            sb.append("Transaction ID: " + t.getTransactionId() +"\n");
+            sb.append("Sender: " + t.getSourceAddress() + "\n");
+            sb.append("Value: " + t.getValue()+ "\n");
+            sb.append("\n");
         }
-        sb.append("Completed Transactions: \n");
+        sb.append("\nCompleted Transactions: \n");
         for(Block b: blockchain){
             for(Transaction t: b.getBlockTransactions()){
                 if(t.getDestinationAddress().equals(key) || t.getSourceAddress().equals(key)){
-                    sb.append(t.getTransactionInfo()+"\n");
+                    sb.append("\n*********** TRANSACTION START ***********\n");
+                    sb.append("Transaction ID: " + t.getTransactionId() + "\n");
+                    sb.append("Receiver ID: " + t.getReceiverId() + "\n");
+                    sb.append("From: " + t.getSourceAddress() + "\n");
+                    sb.append("To: " + t.getDestinationAddress() + "\n");
+                    sb.append("Value: " + t.getValue() +"\n");
+                    sb.append("*********** TRANSACTION END ***********\n");
                 }
             }
         }
@@ -285,7 +295,7 @@ public class Ledger{
                 return "Not enough balance.";
             }
             acc1.setBalance(acc1.getBalance() - value);
-            Transaction t = new Transaction(acc1, acc2, value);
+            Transaction t = new Transaction(acc1, acc2, value, srcSig);
             t.settSig(srcSig);
             backlog.add(t);
             return "Transaction has been sent.";
@@ -338,6 +348,7 @@ public class Ledger{
     private static void sendResponseToClient(Request request, DataOutputStream out){
         try{
             SecurityManager.SignMessage(request, ledger.privKey);
+            //System.out.println("Client Answer:\n" + request.requestAsJson());
             out.writeUTF(request.requestAsJson());
             System.out.println("Response sent!");
         }catch(Exception e){
@@ -353,8 +364,8 @@ public class Ledger{
 
             String treq = in.readUTF();
             Request req = Request.requestFromJson(treq);
-            System.out.println("Request Received!");
-            System.out.println(req.requestAsJson());
+            System.out.println("Request Received! OP:" + req.getOpcode());
+            //System.out.println(req.requestAsJson());
             if(req.getOpcode() == Opcode.TEST_MESSAGE){
                 sendResponseToClient(createWriteResponse(req), out);
                 return;
@@ -381,21 +392,15 @@ public class Ledger{
                 System.out.println("Valid message!");
             }
             System.out.println("Valid message!");
-           /* if(ledger.getAccount(publicKeyBase64).getDelivered().contains(req)){
-                System.out.println("Account already delivered this request.");
-                return ;
-            }else
-                ledger.getAccount(publicKeyBase64).getDelivered().add(req);
-            */
             switch(req.getOpcode()){
                 case CREATE_ACCOUNT:
                     //sendResponseToClient(createResponse(ledger.createAccount(publicKeyBase64), req.getRID()), out);
-                    ledger.createAccount(publicKeyBase64);
-                    Account acc2 = ledger.getAccount(publicKeyBase64);
-                    acc2.setWTS(req.getWTS());
-                    sendResponseToClient(createWriteResponse(req), out);
-                    ledger.saveLedgerState(ledger.RESOURCES_PATH);
-                    break;
+                        ledger.createAccount(publicKeyBase64);
+                        Account acc2 = ledger.getAccount(publicKeyBase64);
+                        acc2.setWTS(req.getWTS());
+                        ledger.saveLedgerState(ledger.RESOURCES_PATH);
+                        sendResponseToClient(createWriteResponse(req), out);
+                        break;
                 case CHECK_ACCOUNT:
                     Account acc = ledger.getAccount(publicKeyBase64);
                     acc.setRID(req.getRID());
@@ -403,18 +408,45 @@ public class Ledger{
                     break;
                 case CREATE_TRANSACTION:
                     String src = req.getParameter(0);
+                    Account srcAcc = ledger.getAccount(src);
+                    System.out.println("ACC WTS: " + srcAcc.getWTS() + " REQ WTS: " + req.getWTS());
                     String dst = req.getParameter(1);
                     int value = Integer.valueOf(req.getParameter(2));
-                    Account srcAcc = ledger.getAccount(src);
-                    if(srcAcc.getWTS() < req.getWTS()) {
-                        System.out.println("Valid WTS (" + srcAcc.getWTS() + "<" + req.getWTS() + "). Writting request.");
-                        ledger.createTransaction(src, dst, value, req.getdSig());
+                    String tSign = req.getParameter(3);
+                    if(((srcAcc.getWTS()+1) == req.getWTS())) {
+                        System.out.println("Creating transaction..");
+                        System.out.println(ledger.createTransaction(src, dst, value, tSign));
                         srcAcc.setWTS(req.getWTS());
+                        /*
+                        if(srcAcc.getQueue().size() > 0){
+                            while(srcAcc.getQueue().get(0).getWTS() == srcAcc.getWTS()+1){
+                                Request toProcess = srcAcc.getQueue().get(0);
+                                srcAcc.getQueue().remove(0);
+                                ledger.processWriteRequest(toProcess);
+                                srcAcc.setWTS(toProcess.getWTS());
+                            }
+                        }
+                    }else if(req.getWTS() > (srcAcc.getWTS() + 1)){
+                        srcAcc.getQueue().add(req);
+                        srcAcc.getQueue().sort(RequestComparator.WTS);
                     }
+                    */}
+                    System.out.println("Finishing transaction...");
                     sendResponseToClient(createWriteResponse(req), out);
                     ledger.saveLedgerState(ledger.RESOURCES_PATH);
                     break;
+
                 case RECEIVE_TRANSACTION:
+                    /*Account rec = ledger.getAccount(publicKeyBase64);
+                    if(((rec.getWTS()+1) == req.getWTS())) {
+                        System.out.println("Processing transaction...");
+                        System.out.println(ledger.ReceiveTransaction(req));
+                        rec.setWTS(req.getWTS());
+                        System.out.println("Transaction finalized.");
+                    }
+                    sendResponseToClient(createWriteResponse(req), out);
+                    ledger.saveLedgerState(ledger.RESOURCES_PATH);
+                    break;*/
                     Account rec = ledger.getAccount(publicKeyBase64);
                     if(rec.getWTS() < req.getWTS()) {
                         System.out.println("Valid WTS (" + rec.getWTS() + "<" + req.getWTS() + "). Writting request.");
@@ -431,7 +463,7 @@ public class Ledger{
                 case AUDIT:
                     Account acc1 = ledger.getAccount(publicKeyBase64);
                     acc1.setRID(req.getRID());
-                    sendResponseToClient(createResponse(ledger.auditAccount(publicKeyBase64), req.getRID()), out);
+                    sendResponseToClient(createReadResponse(ledger.auditAccount(publicKeyBase64), acc1), out);
                     break;
                 case REQUEST_SEQUENCE_NUMBER:
                     String sq = ""+ledger.getAccountSequenceNumber(publicKeyBase64);
@@ -441,10 +473,28 @@ public class Ledger{
                     break;
                 default:
                     sendResponseToClient(createResponse("Unrecognized command.", req.getRID()), out);
+                    System.out.println("WTF");
                     break;
             }
 
 
+    }
+
+
+    public synchronized void processWriteRequest(Request req) {
+        switch (req.getOpcode()) {
+            case CREATE_TRANSACTION:
+                String src = req.getParameter(0);
+                String dst = req.getParameter(1);
+                int value = Integer.valueOf(req.getParameter(2));
+                String tSign = req.getParameter(3);
+                Account srcAcc = ledger.getAccount(src);
+                ledger.createTransaction(src, dst, value, tSign);
+                break;
+            case RECEIVE_TRANSACTION:
+                ledger.ReceiveTransaction(req);
+                break;
+        }
     }
 
     public synchronized long getAccountWTS(String key){
@@ -470,12 +520,56 @@ public class Ledger{
 
 
     public synchronized String ReceiveTransaction(Request req){
+        /*
+        System.out.println("Running ReceiveTransaction...");
         String sourceKey = req.getParameter(1);
         String destinationKey = req.getParameter(0);
+        String rSign = req.getParameter(2);
+        System.out.println("rSign:" + rSign);
         for(Transaction t: backlog){
             if(t.getSourceAddress().equals(sourceKey) && t.getDestinationAddress().equals(destinationKey)){
                 if(!t.isProcessed()){
-                    String transactionSignature = SecurityManager.SignMessage((t.gettSig() + req.getdSig()), privKey);
+                    if(!SecurityManager.VerifyMessage(t.getSourceAddress() + t.getDestinationAddress() + t.getValue(), t.getTSig(), t.getSourceAddress())) {
+                        System.out.println("Invalid Sender Signature.");
+                        return "Invalid sender signature... information may have been tempered with.";
+                    }
+                    t.setRSig(rSign);
+                    String transactionSignature = SecurityManager.SignMessage(t.getTransactionInfo(), ledger.privKey);
+                    if(transactionSignature != null)
+                        t.settSig(transactionSignature);
+                    else {
+                        System.out.println("Couldn't calculate transaction signature.");
+                        return "An error has occured while processing this transaction. Please try again.";
+                    }
+                    t.signalToProcess();
+                    //test, 1 trasaction per block!
+                    Block b = new Block("Transaction Completed", blockchain.get((blockchain.size() - 1)).hash);
+                    b.addTransaction(t);
+                    AddToBlockChain(b);
+                    backlog.remove(t);
+                    System.out.println("Transaction has been mined.");
+                    return "Transaction has been accepted! Check your new balance!";
+                }
+                return "No transaction to be processed with for the addresses.";
+            }
+        }
+        return "Transaction not found. Re-check your payer's address.";
+    */
+        String sourceKey = req.getParameter(1);
+        String destinationKey = req.getParameter(0);
+        String rSign = req.getParameter(2);
+        String transactionId = req.getParameter(3);
+        for(Transaction t: backlog){
+            if(t.getSourceAddress().equals(sourceKey) && t.getDestinationAddress().equals(destinationKey) && t.getTransactionId() == Long.parseLong(transactionId)){
+                if(!t.isProcessed()){
+                    if(!SecurityManager.VerifyMessage(t.getSourceAddress() + t.getDestinationAddress() + t.getValue(), t.getTSig(), t.getSourceAddress()))
+                        System.out.println("Wrong sender signature. Transaction corrupted?");
+                    if(!SecurityManager.VerifyMessage(t.getDestinationAddress() + t.getSourceAddress() + t.getTransactionId(), rSign, t.getDestinationAddress()))
+                        System.out.println("Wrong receiver signature. Transaction corrupted?");
+                    t.setRSig(rSign);
+                    t.setReceiverId(ledger.getAccount(t.getDestinationAddress()).getTransactionId());
+                    ledger.getAccount(t.getDestinationAddress()).setTransactionId(t.getReceiverId()+1);
+                    String transactionSignature = SecurityManager.SignMessage(t.getTransactionInfo(), privKey);
                     if(transactionSignature != null)
                         t.settSig(transactionSignature);
                     else
@@ -515,7 +609,7 @@ public class Ledger{
             return true;
         }
         else {
-            System.out.println("Chain's corrupted, altered and not viable");
+            //System.out.println("Chain's corrupted, altered and not viable");
             return false;
         }
     }
@@ -648,8 +742,8 @@ public class Ledger{
             ledger.blockchain = backup.blockchain;
             ledger.accounts = backup.accounts;
             System.out.println("Loaded accounts: " + ledger.accounts.size());
-            System.out.println(gson.toJson(ledger.accounts));
-            System.out.println("Current Blockchain loaded: \n" + gson.toJson(ledger.blockchain));
+            //System.out.println(gson.toJson(ledger.accounts));
+            //System.out.println("Current Blockchain loaded: \n" + gson.toJson(ledger.blockchain));
             ledger.backlog = backup.backlog;
             ledger.difficulty = backup.difficulty;
             ledger.KEY_SIZE = backup.KEY_SIZE;

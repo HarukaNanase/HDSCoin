@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 public class NodeManager {
 
     private ArrayList<LedgerNode> nodes;
-    private int DEFAULT_TIMEOUT = 10000;
+    private int DEFAULT_TIMEOUT = 0;
     private int FAULT_VALUE = 1;
     private long WTS = 0;
     private long RID = 0;
@@ -54,7 +54,7 @@ public class NodeManager {
         this.WTS++;
         request.setWTS(WTS);
         //SecurityManager.SignMessage(request, Wallet.getPrivateKey());
-        System.out.println("SENDING OUT: " + request.requestAsJson());
+        //System.out.println("SENDING OUT: " + request.requestAsJson());
         for(LedgerNode node : this.nodes)
             answers.add(node.sendRequest(request));
         // verify answers and decide based on it.
@@ -82,7 +82,6 @@ public class NodeManager {
 
         HashMap<Request, Integer> occurrenceMap = new HashMap<Request, Integer>();
         for(Request req : answers){
-            System.out.println(req.requestAsJson());
             Integer occurrences = occurrenceMap.get(req);
             occurrenceMap.put(req, occurrences == null ? 1 : occurrences + 1);
         }
@@ -115,12 +114,13 @@ public class NodeManager {
         if(readlist.size() > (((float)nodes.size() + FAULT_VALUE)/2)) {
             Request highestval = null;
             for(Request req : readlist){
-               // System.out.println(req.requestAsJson());
+              // System.out.println(req.requestAsJson());
                 if(highestval == null || highestval.getWTS() < req.getWTS())
                     highestval = req;
             }
-            System.out.println("Decision: ");
-            System.out.println(highestval.requestAsJson());
+            //System.out.println("Decision: ");
+            //for(String s : highestval.getParameters())
+             //   System.out.println(s);
             return highestval;
         }
         return null;

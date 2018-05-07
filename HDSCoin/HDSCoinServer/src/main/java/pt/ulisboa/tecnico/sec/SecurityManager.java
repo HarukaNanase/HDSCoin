@@ -10,7 +10,7 @@ import java.util.Date;
 
 public class SecurityManager {
     private static String algorithm = "RSA";
-    private static int MAX_MESSAGE_DELAY = 5000;
+    private static int MAX_MESSAGE_DELAY = 10000;
     private static String hashAlgorithm = "SHA256";
 
     public static boolean VerifyMessage(Request request, String sender){
@@ -41,6 +41,21 @@ public class SecurityManager {
             return false;
 
         }catch(Exception e){
+            return false;
+        }
+    }
+
+    public static boolean VerifyMessage(String message, String signature, String sender){
+        try{
+            Signature sign = Signature.getInstance(hashAlgorithm+"With"+algorithm);
+            KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+            EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.decode(sender));
+            PublicKey publicKey = keyFactory.generatePublic(keySpec);
+            sign.initVerify(publicKey);
+            sign.update(message.getBytes());
+            return sign.verify(Base64.decode(signature));
+        }catch(Exception e){
+            e.printStackTrace();
             return false;
         }
     }
@@ -90,7 +105,7 @@ public class SecurityManager {
     }
 
     public static boolean VerifySequenceNumber(Request request, Account user){
-        System.out.println("\n\n This Account Sequence Number: " + user.getSequenceNumber() + "\n\n");
+        //System.out.println("\n\n This Account Sequence Number: " + user.getSequenceNumber() + "\n\n");
         if(request.getSequenceNumber() == (user.getSequenceNumber()+1)){
             user.setSequenceNumber(request.getSequenceNumber());
             return true;
