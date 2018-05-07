@@ -28,6 +28,7 @@ public class Account {
             this.publicKey = pkey;
             balance = 50;
             delivered = new ArrayList<>();
+            queue = new ArrayList<>();
         }
 
         public Account(String publicKeyString){
@@ -35,6 +36,7 @@ public class Account {
             this.balance = 50;
             this.sequenceNumber = 0;
             delivered = new ArrayList<>();
+            queue = new ArrayList<>();
         }
 
         public Account(PublicKey pkey, String publicKeyString){
@@ -43,12 +45,14 @@ public class Account {
             this.balance = 50;
             this.sequenceNumber = 0;
             delivered = new ArrayList<>();
+            queue = new ArrayList<>();
         }
 
         public Account(){
             balance = 50;
             this.sequenceNumber = 0;
             delivered = new ArrayList<>();
+            queue = new ArrayList<>();
         }
 
         public void setTransactionId(long id){ this.transactionId = id;}

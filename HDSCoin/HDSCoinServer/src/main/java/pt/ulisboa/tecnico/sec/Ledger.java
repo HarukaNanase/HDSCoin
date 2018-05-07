@@ -417,7 +417,7 @@ public class Ledger{
                         System.out.println("Creating transaction..");
                         System.out.println(ledger.createTransaction(src, dst, value, tSign));
                         srcAcc.setWTS(req.getWTS());
-                        /*
+
                         if(srcAcc.getQueue().size() > 0){
                             while(srcAcc.getQueue().get(0).getWTS() == srcAcc.getWTS()+1){
                                 Request toProcess = srcAcc.getQueue().get(0);
@@ -430,7 +430,7 @@ public class Ledger{
                         srcAcc.getQueue().add(req);
                         srcAcc.getQueue().sort(RequestComparator.WTS);
                     }
-                    */}
+
                     System.out.println("Finishing transaction...");
                     sendResponseToClient(createWriteResponse(req), out);
                     ledger.saveLedgerState(ledger.RESOURCES_PATH);
@@ -448,10 +448,21 @@ public class Ledger{
                     ledger.saveLedgerState(ledger.RESOURCES_PATH);
                     break;*/
                     Account rec = ledger.getAccount(publicKeyBase64);
-                    if(rec.getWTS() < req.getWTS()) {
+                    if((rec.getWTS()+1) == req.getWTS()) {
                         System.out.println("Valid WTS (" + rec.getWTS() + "<" + req.getWTS() + "). Writting request.");
                         ledger.ReceiveTransaction(req);
                         rec.setWTS(req.getWTS());
+                        if(rec.getQueue().size() > 0){
+                            while(rec.getQueue().get(0).getWTS() == rec.getWTS()+1){
+                                Request toProcess = rec.getQueue().get(0);
+                                rec.getQueue().remove(0);
+                                ledger.processWriteRequest(toProcess);
+                                rec.setWTS(toProcess.getWTS());
+                            }
+                        }
+                    }else if(req.getWTS() > (rec.getWTS() + 1)){
+                        rec.getQueue().add(req);
+                        rec.getQueue().sort(RequestComparator.WTS);
                     }
                     //ledger.ReceiveTransaction(req);
                     sendResponseToClient(createWriteResponse(req), out);
