@@ -118,6 +118,15 @@ public class NodeManager {
                 if(highestval == null || highestval.getWTS() < req.getWTS())
                     highestval = req;
             }
+
+            //TODO: To transform regular register into atomic do the following:
+            //instead of returning just highest val, check quorum for 2F+1 equal answers.
+            //if quorum of 2F+1 equal answers not found, initiate write-back phase
+            //esperar 2F+1 acks de volta.
+
+
+
+
             //System.out.println("Decision: ");
             //for(String s : highestval.getParameters())
              //   System.out.println(s);
