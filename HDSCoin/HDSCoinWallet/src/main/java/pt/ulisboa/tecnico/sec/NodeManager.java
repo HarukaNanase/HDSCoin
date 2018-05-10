@@ -89,8 +89,8 @@ public class NodeManager {
         for(Entry<Request,Integer> entry : occurrenceMap.entrySet()){
             Request req = entry.getKey();
             if(req.getOpcode() == Opcode.ACK && Long.parseLong(req.getParameter(0)) == this.WTS){
-                if(entry.getValue() > (FAULT_VALUE + 1)) {
-                    System.out.println("Got F + 1 acks with correct WTS.");
+                if(entry.getValue() >= (2*FAULT_VALUE + 1)) {
+                    System.out.println("Got 2F + 1 acks with correct WTS.");
                     return true;
                 }
             }
@@ -103,26 +103,59 @@ public class NodeManager {
         ArrayList<Request> readlist = new ArrayList<>();
         this.RID++;
         request.setRID(this.RID);
-        for(LedgerNode node : this.nodes)
+        for(LedgerNode node : this.nodes) {
+            request.setNodeID(node.getPublicKeyString());
             readlist.add(node.sendRequest(request));
+        }
         return decideRegularRegisterRead(readlist);
     }
 
     public Request decideRegularRegisterRead(ArrayList<Request> readlist){
-        readlist.removeIf(r -> r.getRID() != this.RID || r.getOpcode() != Opcode.SERVER_ANSWER);
+        readlist.removeIf(r -> r.getRID() != this.RID || r.getOpcode() != Opcode.SERVER_ANSWER || r.getWTS() > this.WTS);
         System.out.println("DECIDE REGULAR REGISTER READ:");
         if(readlist.size() > (((float)nodes.size() + FAULT_VALUE)/2)) {
             Request highestval = null;
             for(Request req : readlist){
-              // System.out.println(req.requestAsJson());
                 if(highestval == null || highestval.getWTS() < req.getWTS())
                     highestval = req;
             }
+
+            HashMap<Request, Integer> occurrenceMap = new HashMap<Request, Integer>();
+            for(Request req : readlist){
+                Integer occurrences = occurrenceMap.get(req);
+                occurrenceMap.put(req, occurrences == null ? 1 : occurrences + 1);
+            }
+
 
             //TODO: To transform regular register into atomic do the following:
             //instead of returning just highest val, check quorum for 2F+1 equal answers.
             //if quorum of 2F+1 equal answers not found, initiate write-back phase
             //esperar 2F+1 acks de volta.
+
+            for(Entry<Request,Integer> entry : occurrenceMap.entrySet()){
+                Request req = entry.getKey();
+                System.out.println("Values: " + entry.getValue());
+                if(req.getOpcode() == Opcode.SERVER_ANSWER && req.getWTS() == this.WTS){
+                    if(entry.getValue() >= (2*FAULT_VALUE + 1)) {
+                        System.out.println("Quorum sucessfull. 2F+1 equal highestvals.");
+                        return req;
+                    }
+                }else if(req.getOpcode() == Opcode.SERVER_ANSWER && req.getWTS() < this.WTS){
+                        //fall back to RR and write-back phase
+                    if(highestval != null) {
+                        LedgerNode node = this.getNodeByKey(highestval.getNodeID());
+                        Request request = new Request(Opcode.GET_CURRENT_STATE);
+                        Request highestState = node.sendRequest(request);
+                        String stateData = highestState.getParameter(0);
+                        Request writeBack = new Request(Opcode.WRITE_BACK);
+                        writeBack.addParameter(stateData);
+                        LedgerNode delayedNode = this.getNodeByKey(req.getNodeID());
+                        delayedNode.sendRequest(writeBack);
+                        //TODO: END THIS AFTER DISCUSSING WITH OTHERS WHAT TO DO
+                    }
+
+                    }
+                }
 
 
 
@@ -130,7 +163,7 @@ public class NodeManager {
             //System.out.println("Decision: ");
             //for(String s : highestval.getParameters())
              //   System.out.println(s);
-            return highestval;
+            return null;
         }
         return null;
     }
@@ -163,6 +196,14 @@ public class NodeManager {
 
     }
 
+
+    public LedgerNode getNodeByKey(String pkey){
+        for(LedgerNode ledger : this.nodes){
+            if(ledger.getPublicKeyString().equals(pkey))
+                return ledger;
+        }
+        return null;
+    }
 
 
 

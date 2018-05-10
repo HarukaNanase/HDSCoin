@@ -15,6 +15,7 @@ public class Request implements Comparable<Request>{
     private long sequenceNumber = 0;
     private long RID = 0;
     private long WTS = 0;
+    private String NodeID = null;
 
     public Request(Opcode opcode, ArrayList<String> param){
         this.opcode = opcode;
@@ -69,6 +70,13 @@ public class Request implements Comparable<Request>{
         this.sequenceNumber = new_sequence;
     }
 
+    public void setNodeID(String id){
+        this.NodeID = id;
+    }
+
+    public String getNodeID(){
+        return this.NodeID;
+    }
 
     public String requestAsJson(){
         Gson gson = new Gson();

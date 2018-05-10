@@ -66,6 +66,7 @@ public class Wallet {
             manager.createNode("127.0.0.1", 1380, "ledger1.cer");
             manager.createNode("127.0.0.1", 1381, "ledger2.cer");
             manager.createNode("127.0.0.1", 1382, "ledger3.cer");
+            manager.createNode("127.0.0.1", 1383, "ledger4.cer");
             Request test1 = new Request(Opcode.TEST_MESSAGE);
             test1.addParameter(publicKeyString);
             boolean ans = manager.broadcastWrite(test1);
@@ -185,6 +186,7 @@ public class Wallet {
             case CREATE_ACCOUNT:
                 //signAndSendMessage(ureq);
                 isRegistered = manager.broadcastWrite(ureq);
+                sequenceNumber = 0;
                 break;
             case CHECK_ACCOUNT:
                 //signAndSendMessage(ureq);

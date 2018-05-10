@@ -10,6 +10,13 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Queue;
 
+//TODO: LOTS OF SHIT TO FIX
+//TODO: CREATE A WRITE MAP TO MAP WTS TO WRITE
+//TODO: REPLACE BALANCE WITH CALCULATION (INITIAL_BALANCE + RECEIVING_PENDING + RECEIVING_DONE - SENDING_PENDING - SENDING_DONE)
+//TODO: TRANSACTION CHAIN FROM BLOCKCHAIN TO ACCOUNT?
+//TODO: MORE SHIT I DONT REMEMBER CUZ IM SLEEPY AF
+
+
 public class Account {
         private transient int KEY_SIZE = 4096;
         private transient PublicKey publicKey;

@@ -108,6 +108,13 @@ public class LedgerNode {
         return true;
     }
 
+    public void setPublicKeyString(String key){
+        this.publicKeyString = key;
+    }
+
+    public String getPublicKeyString(){
+        return this.publicKeyString;
+    }
     //temp
     public void loadKey(String path) throws Exception{
         FileInputStream fin = new FileInputStream(path);

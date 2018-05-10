@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.sec;
 
 import com.google.gson.Gson;
+import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 
 import java.io.*;
@@ -19,10 +20,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.sql.Time;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Scanner;
+import java.util.*;
 
 import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
@@ -335,6 +333,7 @@ public class Ledger{
         req.addParameter(message);
         req.setRID(acc.getRID());
         req.setWTS(acc.getWTS());
+        req.setNodeID(ledger.publicKeyString);
         return req;
     }
 
@@ -342,6 +341,7 @@ public class Ledger{
         Request ack = new Request(Opcode.ACK);
         ack.addParameter(""+request.getWTS());
         ack.setWTS(request.getWTS());
+        request.setNodeID(ledger.publicKeyString);
         return ack;
     }
 
@@ -482,6 +482,39 @@ public class Ledger{
                     String rid = ""+ledger.getAccountRID(publicKeyBase64);
                     sendResponseToClient(createResponse(sq+"/"+wts+"/"+rid, req.getRID()), out);
                     break;
+                case WRITE_BACK:
+                    try {
+                        byte[] recent_data = Base64.decode(req.getParameter(0));
+                        Map<String, List> map;
+                    }catch(Base64DecodingException b64){
+                        b64.printStackTrace();
+                    }
+                    break;
+                case GET_CURRENT_STATE:
+                    Map<String, List> currentInfo = new HashMap<>();
+                    ArrayList<Account> accountStatus = new ArrayList<>();
+                    accountStatus.add(ledger.getAccount(publicKeyBase64));
+                    currentInfo.put("account", accountStatus);
+                    ArrayList<Transaction> accountBacklog = new ArrayList<>();
+                    for(Transaction t : ledger.backlog){
+                        if(t.getSourceAddress().equals(publicKeyBase64)){
+                            accountBacklog.add(t);
+                        }
+                    }
+                    ArrayList<Block> acceptedTransactions = new ArrayList<>();
+                    currentInfo.put("accountBacklog", accountBacklog);
+                    for(Block b : ledger.blockchain){
+                        for(Transaction t : b.getBlockTransactions()){
+                            if(t.getDestinationAddress().equals(publicKeyBase64)){
+
+                            }
+                        }
+                    }
+
+                    byte[] serializedMap = ledger.serializeMap(currentInfo);
+                    //sendResponseToClient(createR);
+
+
                 default:
                     sendResponseToClient(createResponse("Unrecognized command.", req.getRID()), out);
                     System.out.println("WTF");
@@ -491,6 +524,28 @@ public class Ledger{
 
     }
 
+
+    public synchronized byte[] serializeMap(Map<String,List> serializable){
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutput oo = null;
+        try{
+            oo = new ObjectOutputStream(bos);
+            oo.writeObject(serializable);
+            oo.flush();
+            byte[] mapBytes = bos.toByteArray();
+            bos.close();
+            return mapBytes;
+        }catch(IOException ee){
+            //
+            return null;
+        }
+    }
+
+    public synchronized Map<String, List> ledgerFromBytes(byte[] ledgerInfo){
+        //TODO: IMPLEMENT THIS? WHAT DO I DO
+        return new HashMap<String, List>();
+
+    }
 
     public synchronized void processWriteRequest(Request req) {
         switch (req.getOpcode()) {
