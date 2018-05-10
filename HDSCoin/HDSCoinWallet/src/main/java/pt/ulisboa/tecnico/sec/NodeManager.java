@@ -100,6 +100,7 @@ public class NodeManager {
     }
 
     public Request broadcastRead(Request request){
+
         ArrayList<Request> readlist = new ArrayList<>();
         this.RID++;
         request.setRID(this.RID);
@@ -107,11 +108,18 @@ public class NodeManager {
             request.setNodeID(node.getPublicKeyString());
             readlist.add(node.sendRequest(request));
         }
+        System.out.println("THIS RID: " + this.RID);
+        System.out.println("THIS WTS: " + this.WTS);
+        System.out.println("ANSWERS RECEIVED:\n");
+        for(Request r : readlist){
+            System.out.println(r.requestAsJson());
+        }
         return decideRegularRegisterRead(readlist);
     }
 
     public Request decideRegularRegisterRead(ArrayList<Request> readlist){
-        readlist.removeIf(r -> r.getRID() != this.RID || r.getOpcode() != Opcode.SERVER_ANSWER || r.getWTS() > this.WTS);
+        readlist.removeIf(r->r.getOpcode() != Opcode.SERVER_ANSWER || r.getWTS() > this.WTS);
+        System.out.println("VALID ANSWERS SIZE: " + readlist.size());
         System.out.println("DECIDE REGULAR REGISTER READ:");
         if(readlist.size() > (((float)nodes.size() + FAULT_VALUE)/2)) {
             Request highestval = null;
@@ -126,36 +134,38 @@ public class NodeManager {
                 occurrenceMap.put(req, occurrences == null ? 1 : occurrences + 1);
             }
 
-
             //TODO: To transform regular register into atomic do the following:
             //instead of returning just highest val, check quorum for 2F+1 equal answers.
             //if quorum of 2F+1 equal answers not found, initiate write-back phase
             //esperar 2F+1 acks de volta.
 
-            for(Entry<Request,Integer> entry : occurrenceMap.entrySet()){
+            for(Entry<Request,Integer> entry : occurrenceMap.entrySet()) {
                 Request req = entry.getKey();
                 System.out.println("Values: " + entry.getValue());
-                if(req.getOpcode() == Opcode.SERVER_ANSWER && req.getWTS() == this.WTS){
-                    if(entry.getValue() >= (2*FAULT_VALUE + 1)) {
+                if (req.getOpcode() == Opcode.SERVER_ANSWER && req.getWTS() == this.WTS) {
+                    if (entry.getValue() >= (2 * FAULT_VALUE + 1)) {
                         System.out.println("Quorum sucessfull. 2F+1 equal highestvals.");
                         return req;
                     }
-                }else if(req.getOpcode() == Opcode.SERVER_ANSWER && req.getWTS() < this.WTS){
-                        //fall back to RR and write-back phase
-                    if(highestval != null) {
+                } else if (req.getOpcode() == Opcode.SERVER_ANSWER && req.getWTS() < this.WTS) {
+                    //fall back to RR and write-back phase
+                    if (highestval != null) {
                         LedgerNode node = this.getNodeByKey(highestval.getNodeID());
                         Request request = new Request(Opcode.GET_CURRENT_STATE);
                         Request highestState = node.sendRequest(request);
                         String stateData = highestState.getParameter(0);
                         Request writeBack = new Request(Opcode.WRITE_BACK);
                         writeBack.addParameter(stateData);
-                        LedgerNode delayedNode = this.getNodeByKey(req.getNodeID());
-                        delayedNode.sendRequest(writeBack);
-                        //TODO: END THIS AFTER DISCUSSING WITH OTHERS WHAT TO DO
-                    }
+                        if (broadcastWrite(writeBack)) {
+                            return highestval;
+                        } else {
+                            //?
+                            return highestval;
+                        }
 
                     }
                 }
+            }
 
 
 
@@ -163,7 +173,7 @@ public class NodeManager {
             //System.out.println("Decision: ");
             //for(String s : highestval.getParameters())
              //   System.out.println(s);
-            return null;
+           return highestval;
         }
         return null;
     }

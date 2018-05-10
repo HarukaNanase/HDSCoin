@@ -11,38 +11,38 @@ public class Block
     private String data;
     private long time;
     private ArrayList<Transaction> blockTransactions;
-    private int nonce;
-    private int height;
+    private transient Account acc;
+    private long height;
     private transient int MAX_TRANSACTIONS_PER_BLOCK = 10;
 
-    public Block(String data, String previousHash){
+    public Block(String data, Account acc){
         this.data = data;
-        this.previousBlockHash = previousHash;
+        this.acc = acc;
+        this.previousBlockHash = acc.getBlockChainLastHash();
         this.time = new Date().getTime();
-        this.hash = calculateHash();
+        this.height = acc.getWTS();
+        //this.hash = calculateHash(acc.getWTS());
         this.blockTransactions = new ArrayList<Transaction>();
     }
 
     public String calculateHash(){
         Gson gson = new Gson();
-        return StringUtil.sha256(this.previousBlockHash + Long.toString(this.time) + this.data + Integer.toString(nonce) + gson.toJson(this.blockTransactions)+ this.height);
+        return StringUtil.sha256(this.previousBlockHash + this.data + gson.toJson(this.blockTransactions)+ this.height);
     }
 
     public ArrayList<Transaction> getBlockTransactions(){
         return this.blockTransactions;
     }
-    public void mine(int dificulty){
-        String objective = new String(new char[dificulty]).replace('\0','0');
+
+    public void mine(){
+        //String objective = new String(new char[dificulty]).replace('\0','0');
         for(Transaction t : this.blockTransactions){
+            System.out.println("PROCESSING THIS TRANSACTION:\n" + t.getTransactionInfo());
             t.process();
         }
-        while(!this.hash.substring(0, dificulty).equals(objective)){
-            this.nonce++;
-            this.hash = calculateHash();
-        }
-        this.height = Ledger.getInstance().blockchain.size();
-        System.out.println("Block mined! Block hash: " + this.hash);
-        System.out.println("Current height:" + this.height);
+        this.hash = calculateHash();
+        System.out.println("Block mined for a client! Block hash: " + this.hash);
+
     }
 
     public void addTransaction(Transaction tr){

@@ -38,7 +38,7 @@ public class Transaction {
                 try {
                     this.destinationAcc.receivePayment(value);
                     this.receiverId = destinationAcc.getTransactionId();
-                    destinationAcc.setTransactionId(this.receiverId+1);
+                    destinationAcc.setTransactionId(destinationAcc.getTransactionId()+1);
                 }catch(Exception e){
                     System.out.println(e.getMessage());
                     return;

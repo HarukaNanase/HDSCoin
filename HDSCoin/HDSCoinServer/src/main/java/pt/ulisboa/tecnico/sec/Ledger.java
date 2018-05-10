@@ -1,10 +1,12 @@
 package pt.ulisboa.tecnico.sec;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -30,7 +32,7 @@ public class Ledger{
     public transient ServerSocket nodeEndpoint;
     //private transient NodeManager manager;
 
-    public ArrayList<Block> blockchain = new ArrayList<Block>();
+    //public ArrayList<Block> blockchain = new ArrayList<Block>();
     public ArrayList<Account> accounts = new ArrayList<Account>();
     public ArrayList<Transaction> backlog = new ArrayList<Transaction>();
     public int difficulty = 2;
@@ -59,8 +61,6 @@ public class Ledger{
 
     public static void main(String[] args){
         ledger = getInstance();
-      //  ledger.manager = new NodeManager();
-
 
         if(args[0] == null){
             System.out.println("Please indicate which ledger this is.");
@@ -114,14 +114,6 @@ public class Ledger{
             e.printStackTrace();
         }
 
-        if(!loaded){
-            Block genesis = new Block("First block", "0");
-            ledger.AddToBlockChain(genesis);
-        }
-
-        for(Block b : ledger.blockchain){
-            System.out.println(b.getTransactionsAsJSon());
-        }
 
         try{
             System.out.println("Server Endpoint: " + "127.0.0.1:" + ledger.port);
@@ -265,7 +257,7 @@ public class Ledger{
             sb.append("\n");
         }
         sb.append("\nCompleted Transactions: \n");
-        for(Block b: blockchain){
+        for(Block b: acc.getBlockChain()){
             for(Transaction t: b.getBlockTransactions()){
                 if(t.getDestinationAddress().equals(key) || t.getSourceAddress().equals(key)){
                     sb.append("\n*********** TRANSACTION START ***********\n");
@@ -296,6 +288,9 @@ public class Ledger{
             Transaction t = new Transaction(acc1, acc2, value, srcSig);
             t.settSig(srcSig);
             backlog.add(t);
+            Block b = new Block("Sent Transaction", acc1);
+            acc1.addBlockToBlockChain(b);
+            System.out.println("Dead.");
             return "Transaction has been sent.";
 
         } else {
@@ -308,12 +303,6 @@ public class Ledger{
         try {
             StringBuilder sb = new StringBuilder();
             int i = 1;
-            for (Block b : blockchain) {
-                sb.append("Block " + i + ": " + "\n");
-                sb.append(b.getBlockAsJSon());
-                sb.append("\n");
-                i++;
-            }
             return sb.toString();
         } catch (Exception e) {
             e.printStackTrace();
@@ -334,6 +323,8 @@ public class Ledger{
         req.setRID(acc.getRID());
         req.setWTS(acc.getWTS());
         req.setNodeID(ledger.publicKeyString);
+        System.out.println("THIS RID: " + req.getRID());
+        System.out.println("THIS WTS: " + req.getWTS());
         return req;
     }
 
@@ -392,6 +383,7 @@ public class Ledger{
                 System.out.println("Valid message!");
             }
             System.out.println("Valid message!");
+            Gson gson = new Gson();
             switch(req.getOpcode()){
                 case CREATE_ACCOUNT:
                     //sendResponseToClient(createResponse(ledger.createAccount(publicKeyBase64), req.getRID()), out);
@@ -416,8 +408,8 @@ public class Ledger{
                     if(((srcAcc.getWTS()+1) == req.getWTS())) {
                         System.out.println("Creating transaction..");
                         System.out.println(ledger.createTransaction(src, dst, value, tSign));
+                        System.out.println("Transaction created.");
                         srcAcc.setWTS(req.getWTS());
-
                         if(srcAcc.getQueue().size() > 0){
                             while(srcAcc.getQueue().get(0).getWTS() == srcAcc.getWTS()+1){
                                 Request toProcess = srcAcc.getQueue().get(0);
@@ -437,16 +429,6 @@ public class Ledger{
                     break;
 
                 case RECEIVE_TRANSACTION:
-                    /*Account rec = ledger.getAccount(publicKeyBase64);
-                    if(((rec.getWTS()+1) == req.getWTS())) {
-                        System.out.println("Processing transaction...");
-                        System.out.println(ledger.ReceiveTransaction(req));
-                        rec.setWTS(req.getWTS());
-                        System.out.println("Transaction finalized.");
-                    }
-                    sendResponseToClient(createWriteResponse(req), out);
-                    ledger.saveLedgerState(ledger.RESOURCES_PATH);
-                    break;*/
                     Account rec = ledger.getAccount(publicKeyBase64);
                     if((rec.getWTS()+1) == req.getWTS()) {
                         System.out.println("Valid WTS (" + rec.getWTS() + "<" + req.getWTS() + "). Writting request.");
@@ -483,36 +465,58 @@ public class Ledger{
                     sendResponseToClient(createResponse(sq+"/"+wts+"/"+rid, req.getRID()), out);
                     break;
                 case WRITE_BACK:
-                    try {
-                        byte[] recent_data = Base64.decode(req.getParameter(0));
-                        Map<String, List> map;
-                    }catch(Base64DecodingException b64){
-                        b64.printStackTrace();
-                    }
+                        String recent_data = req.getParameter(0);
+                        HashMap<String, ArrayList<String>> data = ledger.ledgerFromJSON(recent_data);
+                        ArrayList<Transaction> clientBacklog = new ArrayList<>();
+                        ArrayList<Transaction> clientChain = new ArrayList<>();
+
+
+                        for(Map.Entry<String, ArrayList<String>> entry : data.entrySet()){
+                            if(entry.getKey().equals("account")){
+                                //load account
+                            }
+                            else if(entry.getKey().equals("backlog")){
+                                for(String s : entry.getValue()){
+                                    Transaction t = gson.fromJson(s, Transaction.class);
+                                    clientBacklog.add(t);
+                                }
+                            }
+                            else if(entry.getKey().equals("finalizedTransactions")){
+                                for(String s : entry.getValue()){
+                                    Block b = gson.fromJson(s, Block.class);
+                                    clientChain.addAll(b.getBlockTransactions());
+                                }
+                            }
+                            for(Transaction t : clientBacklog){
+                                if(!SecurityManager.VerifyMessage(t.getSourceAddress()+t.getDestinationAddress()+t.getValue(), t.getTSig(), t.getSourceAddress())){
+                                    //send back NO_ACK
+                                    Request errorAnswer = new Request(Opcode.NO_ACK);
+                                    errorAnswer.setWTS(req.getWTS());
+                                    sendResponseToClient(createWriteResponse(errorAnswer), out);
+                                }
+                            }
+
+                            //verify backlog and transactions
+                        }
                     break;
                 case GET_CURRENT_STATE:
-                    Map<String, List> currentInfo = new HashMap<>();
-                    ArrayList<Account> accountStatus = new ArrayList<>();
-                    accountStatus.add(ledger.getAccount(publicKeyBase64));
-                    currentInfo.put("account", accountStatus);
-                    ArrayList<Transaction> accountBacklog = new ArrayList<>();
+                    HashMap<String, ArrayList<String>> currentInfo = new HashMap<>();
+                    ArrayList<String> accountInfo = new ArrayList<String>();
+                    accountInfo.add(gson.toJson(ledger.getAccount(publicKeyBase64), Account.class));
+                    currentInfo.put("account", accountInfo);
+                    ArrayList<String> accountBacklog = new ArrayList<>();
                     for(Transaction t : ledger.backlog){
                         if(t.getSourceAddress().equals(publicKeyBase64)){
-                            accountBacklog.add(t);
+                            accountBacklog.add(gson.toJson(t, Transaction.class));
                         }
                     }
-                    ArrayList<Block> acceptedTransactions = new ArrayList<>();
-                    currentInfo.put("accountBacklog", accountBacklog);
-                    for(Block b : ledger.blockchain){
-                        for(Transaction t : b.getBlockTransactions()){
-                            if(t.getDestinationAddress().equals(publicKeyBase64)){
+                    ArrayList<String> acceptedTransactions = new ArrayList<>();
 
-                            }
-                        }
-                    }
+                    currentInfo.put("backlog", accountBacklog);
+                    currentInfo.put("finalizedTransactions", acceptedTransactions);
+                    String serializedMap = ledger.serializeMap(currentInfo);
 
-                    byte[] serializedMap = ledger.serializeMap(currentInfo);
-                    //sendResponseToClient(createR);
+                    sendResponseToClient(createReadResponse(serializedMap, ledger.getAccount(publicKeyBase64)),out);
 
 
                 default:
@@ -525,25 +529,17 @@ public class Ledger{
     }
 
 
-    public synchronized byte[] serializeMap(Map<String,List> serializable){
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutput oo = null;
-        try{
-            oo = new ObjectOutputStream(bos);
-            oo.writeObject(serializable);
-            oo.flush();
-            byte[] mapBytes = bos.toByteArray();
-            bos.close();
-            return mapBytes;
-        }catch(IOException ee){
-            //
-            return null;
-        }
+    public synchronized String serializeMap(HashMap<String, ArrayList<String>> serializable){
+        Gson gson = new Gson();
+        Type type = new TypeToken<HashMap<String, ArrayList<String>>>(){}.getType();
+        return gson.toJson(serializable, type);
+
     }
 
-    public synchronized Map<String, List> ledgerFromBytes(byte[] ledgerInfo){
-        //TODO: IMPLEMENT THIS? WHAT DO I DO
-        return new HashMap<String, List>();
+    public synchronized HashMap<String, ArrayList<String>> ledgerFromJSON(String ledgerInfo){
+        Gson gson = new Gson();
+        Type type = new TypeToken<HashMap<String, ArrayList<String>>>(){}.getType();
+        return gson.fromJson(ledgerInfo, type);
 
     }
 
@@ -586,41 +582,7 @@ public class Ledger{
 
 
     public synchronized String ReceiveTransaction(Request req){
-        /*
-        System.out.println("Running ReceiveTransaction...");
-        String sourceKey = req.getParameter(1);
-        String destinationKey = req.getParameter(0);
-        String rSign = req.getParameter(2);
-        System.out.println("rSign:" + rSign);
-        for(Transaction t: backlog){
-            if(t.getSourceAddress().equals(sourceKey) && t.getDestinationAddress().equals(destinationKey)){
-                if(!t.isProcessed()){
-                    if(!SecurityManager.VerifyMessage(t.getSourceAddress() + t.getDestinationAddress() + t.getValue(), t.getTSig(), t.getSourceAddress())) {
-                        System.out.println("Invalid Sender Signature.");
-                        return "Invalid sender signature... information may have been tempered with.";
-                    }
-                    t.setRSig(rSign);
-                    String transactionSignature = SecurityManager.SignMessage(t.getTransactionInfo(), ledger.privKey);
-                    if(transactionSignature != null)
-                        t.settSig(transactionSignature);
-                    else {
-                        System.out.println("Couldn't calculate transaction signature.");
-                        return "An error has occured while processing this transaction. Please try again.";
-                    }
-                    t.signalToProcess();
-                    //test, 1 trasaction per block!
-                    Block b = new Block("Transaction Completed", blockchain.get((blockchain.size() - 1)).hash);
-                    b.addTransaction(t);
-                    AddToBlockChain(b);
-                    backlog.remove(t);
-                    System.out.println("Transaction has been mined.");
-                    return "Transaction has been accepted! Check your new balance!";
-                }
-                return "No transaction to be processed with for the addresses.";
-            }
-        }
-        return "Transaction not found. Re-check your payer's address.";
-    */
+
         String sourceKey = req.getParameter(1);
         String destinationKey = req.getParameter(0);
         String rSign = req.getParameter(2);
@@ -634,7 +596,7 @@ public class Ledger{
                         System.out.println("Wrong receiver signature. Transaction corrupted?");
                     t.setRSig(rSign);
                     t.setReceiverId(ledger.getAccount(t.getDestinationAddress()).getTransactionId());
-                    ledger.getAccount(t.getDestinationAddress()).setTransactionId(t.getReceiverId()+1);
+                    //ledger.getAccount(t.getDestinationAddress()).setTransactionId(t.getReceiverId()+1);
                     String transactionSignature = SecurityManager.SignMessage(t.getTransactionInfo(), privKey);
                     if(transactionSignature != null)
                         t.settSig(transactionSignature);
@@ -643,9 +605,7 @@ public class Ledger{
 
                     t.signalToProcess();
                     //test, 1 trasaction per block!
-                    Block b = new Block("Transaction Completed", blockchain.get((blockchain.size() - 1)).hash);
-                    b.addTransaction(t);
-                    AddToBlockChain(b);
+                    ledger.getAccount(destinationKey).addTransactionToBlockChain(t);
                     backlog.remove(t);
                     return "Transaction has been accepted! Check your new balance!";
                 }
@@ -667,6 +627,7 @@ public class Ledger{
         return null;
     }
 
+    /*
     public synchronized boolean AddToBlockChain(Block block){
         block.mine(difficulty);
         blockchain.add(block);
@@ -679,30 +640,8 @@ public class Ledger{
             return false;
         }
     }
+    */
 
-    public synchronized boolean verifyChain(){
-        Block current;
-        Block previous;
-        String objective = new String(new char[difficulty]).replace('\0', '0');
-        for(int i = 1; i< blockchain.size(); i++){
-            current = blockchain.get(i);
-            previous = blockchain.get(i-1);
-            if(!current.hash.equals(current.calculateHash())){
-                System.out.println("Current block hash does not match.");
-                return false;
-            }
-            if(!current.previousBlockHash.equals(previous.hash)){
-                System.out.println("Previous block hash does not match current block previous hash.");
-                return false;
-            }
-            if(!current.hash.substring(0, difficulty).equals(objective)) {
-                System.out.println("This block hasn't been mined");
-                return false;
-            }
-        }
-
-        return true;
-    }
 
 
     public void generateServerKeys(){
@@ -770,9 +709,10 @@ public class Ledger{
 
     public synchronized boolean saveLedgerState(String path){
         try{
+            System.out.println("Starting atomic backup.");
             Gson gson = new Gson();
             PrintWriter out = new PrintWriter(path+"ledger.tmp");
-            out.println(gson.toJson(this));
+            out.println(gson.toJson(ledger));
             out.close();
         }
         catch(IOException ioe){
@@ -785,6 +725,8 @@ public class Ledger{
                 Path tmp = folder.resolve("ledger.tmp");
                 Path finalFile = folder.resolve("ledger.bak");
                 Files.move(tmp, finalFile, ATOMIC_MOVE);
+
+            System.out.println("Finished atomic backup.");
                 return true;
 
         }catch(AccessDeniedException ade){
@@ -805,7 +747,6 @@ public class Ledger{
             fileScanner.close();
             Gson gson = new Gson();
             Ledger backup = gson.fromJson(jsonBackup, Ledger.class);
-            ledger.blockchain = backup.blockchain;
             ledger.accounts = backup.accounts;
             System.out.println("Loaded accounts: " + ledger.accounts.size());
             //System.out.println(gson.toJson(ledger.accounts));

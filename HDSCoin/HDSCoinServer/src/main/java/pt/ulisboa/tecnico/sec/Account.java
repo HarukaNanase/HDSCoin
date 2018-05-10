@@ -23,7 +23,8 @@ public class Account {
         private transient PrivateKey privateKey;
         private String publicKeyString;
         private int balance;
-        private Transaction[] backlog;
+        private ArrayList<Transaction> backlog;
+        private ArrayList<Block> blockchain;
         private long sequenceNumber;
         private long transactionId = 1;
         private long RID;
@@ -36,6 +37,7 @@ public class Account {
             balance = 50;
             delivered = new ArrayList<>();
             queue = new ArrayList<>();
+            blockchain = new ArrayList<>();
         }
 
         public Account(String publicKeyString){
@@ -44,6 +46,7 @@ public class Account {
             this.sequenceNumber = 0;
             delivered = new ArrayList<>();
             queue = new ArrayList<>();
+            blockchain = new ArrayList<>();
         }
 
         public Account(PublicKey pkey, String publicKeyString){
@@ -53,6 +56,7 @@ public class Account {
             this.sequenceNumber = 0;
             delivered = new ArrayList<>();
             queue = new ArrayList<>();
+            blockchain = new ArrayList<>();
         }
 
         public Account(){
@@ -60,6 +64,7 @@ public class Account {
             this.sequenceNumber = 0;
             delivered = new ArrayList<>();
             queue = new ArrayList<>();
+            blockchain = new ArrayList<>();
         }
 
         public void setTransactionId(long id){ this.transactionId = id;}
@@ -128,5 +133,46 @@ public class Account {
     }
     public long getWTS(){
         return this.WTS;
+    }
+
+    public ArrayList<Block> getBlockChain(){
+        return this.blockchain;
+    }
+
+    public void setReceived(ArrayList<Block> chain){
+        this.blockchain = chain;
+    }
+
+    public String getBlockChainLastHash(){
+        return this.blockchain.size()-1 > 0 ? this.blockchain.get(this.blockchain.size() - 1).hash : "0";
+    }
+    public void addTransactionToBlockChain(Transaction t){
+        Block b = new Block("Received Transaction", this);
+        b.addTransaction(t);
+        b.mine();
+        this.blockchain.add(b);
+    }
+    public void addBlockToBlockChain(Block b){
+        b.mine();
+        this.blockchain.add(b);
+    }
+
+    public synchronized boolean verifyChain(){
+        Block current;
+        Block previous;
+        for(int i = 1; i< blockchain.size(); i++){
+            current = blockchain.get(i);
+            previous = blockchain.get(i-1);
+            if(!current.hash.equals(current.calculateHash())){
+                System.out.println("Current block hash does not match.");
+                return false;
+            }
+            if(!current.previousBlockHash.equals(previous.hash)){
+                System.out.println("Previous block hash does not match current block previous hash.");
+                return false;
+            }
+
+        }
+        return true;
     }
 }

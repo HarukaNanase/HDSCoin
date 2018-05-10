@@ -47,6 +47,7 @@ public class LedgerNode {
             this.out.writeUTF(request.requestAsJson());
             String answer = this.in.readUTF();
             Request ans = Request.requestFromJson(answer);
+            System.out.println("Valid message? " + SecurityManager.VerifyMessage(ans, this.publicKeyString));
             if(SecurityManager.VerifyMessage(ans, this.publicKeyString) && !delivered.contains(request)){
                 delivered.add(request);
                 return ans;

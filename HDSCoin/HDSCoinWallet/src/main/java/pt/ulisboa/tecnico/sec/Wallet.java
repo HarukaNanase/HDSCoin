@@ -67,10 +67,6 @@ public class Wallet {
             manager.createNode("127.0.0.1", 1381, "ledger2.cer");
             manager.createNode("127.0.0.1", 1382, "ledger3.cer");
             manager.createNode("127.0.0.1", 1383, "ledger4.cer");
-            Request test1 = new Request(Opcode.TEST_MESSAGE);
-            test1.addParameter(publicKeyString);
-            boolean ans = manager.broadcastWrite(test1);
-            System.out.println(ans);
 
             System.out.println("Contacting server to request sequence number...");
             Request seqNumber = new Request(Opcode.REQUEST_SEQUENCE_NUMBER);
@@ -124,6 +120,9 @@ public class Wallet {
            return Opcode.AUDIT;
        else if(new_opcode.equals("request_chain"))
            return Opcode.REQUEST_CHAIN;
+       else if(new_opcode.equals("get_state")){
+        return Opcode.GET_CURRENT_STATE;
+       }
        else if(new_opcode.equals("exit"))
            System.exit(0);
        return null;
@@ -177,7 +176,7 @@ public class Wallet {
             return;
         }
 
-        if(ureq.getOpcode() != Opcode.CREATE_ACCOUNT && ureq.getOpcode() != Opcode.REQUEST_CHAIN && ureq.getOpcode() != Opcode.AUDIT)
+        if(ureq.getOpcode() != Opcode.CREATE_ACCOUNT && ureq.getOpcode() != Opcode.REQUEST_CHAIN)
             ureq.setSequenceNumber(++sequenceNumber);
 
         ureq.addParameter(publicKeyString);
@@ -224,8 +223,10 @@ public class Wallet {
                 String auditTarget = scanner.next();
                 ureq.setParameter(0, auditTarget);
                 Request audit = manager.broadcastRead(ureq);
-                for(String s : audit.getParameters())
-                    System.out.println(s);
+                if(audit != null) {
+                    for (String s : audit.getParameters())
+                        System.out.println(s);
+                }
                 break;
         }
     }
