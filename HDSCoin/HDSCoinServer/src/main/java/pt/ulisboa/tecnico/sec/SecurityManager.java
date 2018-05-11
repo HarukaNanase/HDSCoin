@@ -10,7 +10,7 @@ import java.util.Date;
 
 public class SecurityManager {
     private static String algorithm = "RSA";
-    private static int MAX_MESSAGE_DELAY = 10000;
+    private static int MAX_MESSAGE_DELAY = 15000;
     private static String hashAlgorithm = "SHA256";
 
     public static boolean VerifyMessage(Request request, String sender){

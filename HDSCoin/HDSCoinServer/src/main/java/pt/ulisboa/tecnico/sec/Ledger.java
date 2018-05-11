@@ -289,6 +289,7 @@ public class Ledger{
             t.settSig(srcSig);
             backlog.add(t);
             Block b = new Block("Sent Transaction", acc1);
+            b.addTransaction(t);
             acc1.addBlockToBlockChain(b);
             System.out.println("Dead.");
             return "Transaction has been sent.";
@@ -365,16 +366,19 @@ public class Ledger{
             String publicKeyBase64 = req.getParameter(0);
             if((req.getOpcode() != Opcode.REQUEST_CHAIN && req.getOpcode() != Opcode.AUDIT)){
                 if(!SecurityManager.VerifyMessage(req, publicKeyBase64)){
+                    System.out.println("Failed to check signature for : " + req.getOpcode());
                     sendResponseToClient(createResponse("Invalid Message", req.getRID()), out);
                     return;
                 }
                 if(req.getOpcode() != Opcode.CREATE_ACCOUNT && req.getOpcode() != Opcode.REQUEST_SEQUENCE_NUMBER){
                     Account acc = ledger.getAccount(publicKeyBase64);
                     if(acc == null){
+                        System.out.println("Account not found: " + req.getOpcode());
                         sendResponseToClient(createResponse("Account not found in our records", req.getRID()), out);
                         return;
                     }
-                    if(!SecurityManager.VerifySequenceNumber(req, acc)){
+                    if(!SecurityManager.VerifySequenceNumber(req, acc) && req.getOpcode() != Opcode.WRITE_BACK){
+                        System.out.println("Incorrect Sequence Number: " + req.getSequenceNumber() + " Should be: " + acc.getSequenceNumber());
                         sendResponseToClient(createResponse("Incorrect Sequence Number.", req.getRID()), out);
                         return;
                     }
@@ -465,59 +469,72 @@ public class Ledger{
                     sendResponseToClient(createResponse(sq+"/"+wts+"/"+rid, req.getRID()), out);
                     break;
                 case WRITE_BACK:
-                        String recent_data = req.getParameter(0);
-                        HashMap<String, ArrayList<String>> data = ledger.ledgerFromJSON(recent_data);
-                        ArrayList<Transaction> clientBacklog = new ArrayList<>();
-                        ArrayList<Transaction> clientChain = new ArrayList<>();
-
-
-                        for(Map.Entry<String, ArrayList<String>> entry : data.entrySet()){
+                        System.out.println("Starting Write Back for Client: " + req.getParameter(0));
+                        String recent_data = req.getParameter(1);
+                        HashMap<String, String> data = gson.fromJson(recent_data, new TypeToken<HashMap<String,String>>(){}.getType());
+                        Account acc_hi = null;
+                        ArrayList<Transaction> acc_backlog = null;
+                        for(Map.Entry<String, String> entry : data.entrySet()){
                             if(entry.getKey().equals("account")){
-                                //load account
+                                acc_hi = gson.fromJson(entry.getValue(), Account.class);
+                            }else if(entry.getKey().equals("backlog")){
+                                acc_backlog = gson.fromJson(entry.getValue(), new TypeToken<ArrayList<Transaction>>(){}.getType());
                             }
-                            else if(entry.getKey().equals("backlog")){
-                                for(String s : entry.getValue()){
-                                    Transaction t = gson.fromJson(s, Transaction.class);
-                                    clientBacklog.add(t);
-                                }
-                            }
-                            else if(entry.getKey().equals("finalizedTransactions")){
-                                for(String s : entry.getValue()){
-                                    Block b = gson.fromJson(s, Block.class);
-                                    clientChain.addAll(b.getBlockTransactions());
-                                }
-                            }
-                            for(Transaction t : clientBacklog){
-                                if(!SecurityManager.VerifyMessage(t.getSourceAddress()+t.getDestinationAddress()+t.getValue(), t.getTSig(), t.getSourceAddress())){
-                                    //send back NO_ACK
-                                    Request errorAnswer = new Request(Opcode.NO_ACK);
-                                    errorAnswer.setWTS(req.getWTS());
-                                    sendResponseToClient(createWriteResponse(errorAnswer), out);
-                                }
-                            }
-
-                            //verify backlog and transactions
                         }
-                    break;
+
+                        for(Block b : acc_hi.getBlockChain()){
+                            for(Transaction t : b.getBlockTransactions()){
+                                if(t.getTSig() != null)
+                                    if(!SecurityManager.VerifyMessage(t.getSourceAddress()+t.getDestinationAddress()+t.getValue(), t.getTSig(), t.getSourceAddress())){
+                                        System.out.println("invalid state (Transaction TSig). NO_ACK");
+                                    }
+                                if(t.getRSig() != null) {
+                                    if (!SecurityManager.VerifyMessage(t.getDestinationAddress() + t.getSourceAddress() + t.getTransactionId(), t.getRSig(), t.getDestinationAddress())) {
+                                        System.out.println("Invalid RSig. NO_ACK");
+                                    }
+                                }
+
+                            }
+                        }
+                        if(!acc_hi.verifyChain()){
+                            System.out.println("Failed to verify chain integrity.");
+                        }
+                        for(Transaction t : acc_backlog){
+                            if(t.getTSig() != null) {
+                                if (!SecurityManager.VerifyMessage(t.getSourceAddress() + t.getDestinationAddress() + t.getValue(), t.getTSig(), t.getSourceAddress())) {
+                                    System.out.println("invalid state (Transaction TSig) on backlog. NO_ACK");
+                                }
+                            }
+                            if(t.getRSig() != null) {
+                                if (!SecurityManager.VerifyMessage(t.getDestinationAddress() + t.getSourceAddress() + t.getTransactionId(), t.getRSig(), t.getDestinationAddress())) {
+                                    System.out.println("Invalid RSig backlog. NO_ACK");
+                                }
+                            }
+                        }
+                        System.out.println("This state is gud.");
+                        sendResponseToClient(createWriteResponse(req),out);
+
+
+                        break;
                 case GET_CURRENT_STATE:
-                    HashMap<String, ArrayList<String>> currentInfo = new HashMap<>();
-                    ArrayList<String> accountInfo = new ArrayList<String>();
-                    accountInfo.add(gson.toJson(ledger.getAccount(publicKeyBase64), Account.class));
-                    currentInfo.put("account", accountInfo);
-                    ArrayList<String> accountBacklog = new ArrayList<>();
+                    HashMap<String, String> currentData = new HashMap<>();
+                    Account acc_state = ledger.getAccount(req.getParameter(0));
+                    System.out.println("Starting to gather info...");
+                    String accountInfo = gson.toJson(acc_state);
+                    ArrayList<Transaction> accountBacklog = new ArrayList<>();
                     for(Transaction t : ledger.backlog){
-                        if(t.getSourceAddress().equals(publicKeyBase64)){
-                            accountBacklog.add(gson.toJson(t, Transaction.class));
+                        if(t.getSourceAddress().equals(acc_state.getPublicKeyString())){
+                            accountBacklog.add(t);
                         }
                     }
-                    ArrayList<String> acceptedTransactions = new ArrayList<>();
-
-                    currentInfo.put("backlog", accountBacklog);
-                    currentInfo.put("finalizedTransactions", acceptedTransactions);
-                    String serializedMap = ledger.serializeMap(currentInfo);
-
-                    sendResponseToClient(createReadResponse(serializedMap, ledger.getAccount(publicKeyBase64)),out);
-
+                    String accountBack = gson.toJson(accountBacklog);
+                    currentData.put("account", accountInfo);
+                    currentData.put("backlog", accountBack);
+                    String map_string = gson.toJson(currentData);
+                    System.out.println("STATE SIZE : " + map_string.getBytes().length);
+                    sendResponseToClient(createReadResponse(map_string, acc_state),out);
+                    System.out.println("Sent ledger state to client.");
+                    break;
 
                 default:
                     sendResponseToClient(createResponse("Unrecognized command.", req.getRID()), out);

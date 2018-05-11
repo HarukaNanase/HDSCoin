@@ -144,15 +144,17 @@ public class Account {
     }
 
     public String getBlockChainLastHash(){
-        return this.blockchain.size()-1 > 0 ? this.blockchain.get(this.blockchain.size() - 1).hash : "0";
+        return (this.blockchain.size() > 0) ? this.blockchain.get(this.blockchain.size() - 1).hash : "0";
     }
     public void addTransactionToBlockChain(Transaction t){
         Block b = new Block("Received Transaction", this);
+        b.previousBlockHash = getBlockChainLastHash();
         b.addTransaction(t);
         b.mine();
         this.blockchain.add(b);
     }
     public void addBlockToBlockChain(Block b){
+        b.previousBlockHash = this.getBlockChainLastHash();
         b.mine();
         this.blockchain.add(b);
     }

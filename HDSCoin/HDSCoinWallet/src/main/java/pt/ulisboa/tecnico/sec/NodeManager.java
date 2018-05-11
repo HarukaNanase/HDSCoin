@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 public class NodeManager {
 
     private ArrayList<LedgerNode> nodes;
-    private int DEFAULT_TIMEOUT = 0;
+    private int DEFAULT_TIMEOUT = 5000;
     private int FAULT_VALUE = 1;
     private long WTS = 0;
     private long RID = 0;
@@ -118,7 +118,7 @@ public class NodeManager {
     }
 
     public Request decideRegularRegisterRead(ArrayList<Request> readlist){
-        readlist.removeIf(r->r.getOpcode() != Opcode.SERVER_ANSWER || r.getWTS() > this.WTS);
+        readlist.removeIf(r->r.getOpcode() != Opcode.SERVER_ANSWER || r.getWTS() > this.WTS || r.getRID() != this.RID);
         System.out.println("VALID ANSWERS SIZE: " + readlist.size());
         System.out.println("DECIDE REGULAR REGISTER READ:");
         if(readlist.size() > (((float)nodes.size() + FAULT_VALUE)/2)) {
@@ -134,10 +134,6 @@ public class NodeManager {
                 occurrenceMap.put(req, occurrences == null ? 1 : occurrences + 1);
             }
 
-            //TODO: To transform regular register into atomic do the following:
-            //instead of returning just highest val, check quorum for 2F+1 equal answers.
-            //if quorum of 2F+1 equal answers not found, initiate write-back phase
-            //esperar 2F+1 acks de volta.
 
             for(Entry<Request,Integer> entry : occurrenceMap.entrySet()) {
                 Request req = entry.getKey();
@@ -152,9 +148,13 @@ public class NodeManager {
                     if (highestval != null) {
                         LedgerNode node = this.getNodeByKey(highestval.getNodeID());
                         Request request = new Request(Opcode.GET_CURRENT_STATE);
+                        request.addParameter(Wallet.getPublicKeyString());
+                        request.setSequenceNumber(Wallet.getSequenceNumber() + 1);
+                        Wallet.setSequenceNumber(request.getSequenceNumber());
                         Request highestState = node.sendRequest(request);
                         String stateData = highestState.getParameter(0);
                         Request writeBack = new Request(Opcode.WRITE_BACK);
+                        writeBack.addParameter(Wallet.getPublicKeyString());
                         writeBack.addParameter(stateData);
                         if (broadcastWrite(writeBack)) {
                             return highestval;

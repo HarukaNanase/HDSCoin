@@ -8,7 +8,7 @@ import java.security.spec.X509EncodedKeySpec;
 
 public class SecurityManager {
     private static String algorithm = "RSA";
-    private static long MAX_MESSAGE_DELAY = 10000;
+    private static long MAX_MESSAGE_DELAY = 15000;
     private static String hashAlgorithm = "SHA256";
 
     public static boolean VerifyMessage(Request request, String sender){
@@ -47,6 +47,8 @@ public class SecurityManager {
         try {
             if(request.getdSig() != null)
                 request.setdSig(null);
+            if(request.getSequenceNumber() == 0)
+                request.setSequenceNumber(Wallet.getSequenceNumber());
             long currentTime = System.currentTimeMillis();
             request.setCreatedOn(currentTime);
             request.setExpiresOn(currentTime + MAX_MESSAGE_DELAY);

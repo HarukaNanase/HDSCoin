@@ -35,7 +35,6 @@ public class Block
     }
 
     public void mine(){
-        //String objective = new String(new char[dificulty]).replace('\0','0');
         for(Transaction t : this.blockTransactions){
             System.out.println("PROCESSING THIS TRANSACTION:\n" + t.getTransactionInfo());
             t.process();

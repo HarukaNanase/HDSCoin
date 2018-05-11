@@ -103,6 +103,11 @@ public class Wallet {
 
     }
 
+    public static String getPublicKeyString(){
+        return publicKeyString;
+    }
+
+    public static void setSequenceNumber(long sqr){ sequenceNumber = sqr;}
     public static long getSequenceNumber(){
         return sequenceNumber;
     }
