@@ -31,11 +31,17 @@ Special attention to the SecurityManagerTest class where attempts to tamper with
 
 ### How to run:
 
-- Open a terminal and run - "mvn clean install" at the root project /HDSCoin
-- On /HDSCoin/HDSCoinServer run "mvn exec:java"
-	-"mvn compile exec:java -Dexec.args="ledger1"
+- Open a terminal per ledger and run - "mvn clean install" at the root project /HDSCoin
+- On each terminal run:
+	- "mvn compile exec:java -Dexec.args="ledger1"
+	- "mvn compile exec:java -Dexec.args="ledger2"
+	- "mvn compile exec:java -Dexec.args="ledger3"
+	- "mvn compile exec:java -Dexec.args="ledger4"
+
+
 - On /HDSCoin/HDSCoinWallet run "mvn exec:java"
-  - To run client with predefined keys - On /HDSCoin/HDSCoinWallet run "mvn compile exec:java -Dexec.args="client1" where client1 is the folder where the keys are. The keys must be named client.priv and client.pub
+  - To run client with predefined keys - On /HDSCoin/HDSCoinWallet run "mvn compile exec:java -Dexec.args="client1" where client is the folder containing the keystore for the client.
+
 
   - Two pre-generated key pairs are presented in the client1 and client2 folders. Those can be used to test the system and run demos on the software
 

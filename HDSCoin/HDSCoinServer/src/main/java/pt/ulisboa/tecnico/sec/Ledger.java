@@ -319,6 +319,15 @@ public class Ledger{
         return req;
     }
 
+    private static Request createAuditReadResponse(String message, Account acc, Request request){
+        Request req = new Request(Opcode.SERVER_ANSWER);
+        req.addParameter(message);
+        req.setRID(request.getRID());
+        req.setWTS(acc.getWTS());
+        req.setNodeID(ledger.publicKeyString);
+        return req;
+    }
+
     private static Request createReadResponse(String message, Account acc){
         Request req = new Request(Opcode.SERVER_ANSWER);
         req.addParameter(message);
@@ -385,7 +394,7 @@ public class Ledger{
                         return;
                     }
                     if(!SecurityManager.VerifySequenceNumber(req, acc) && req.getOpcode() != Opcode.WRITE_BACK){
-                        System.out.println("Incorrect Sequence Number: " + req.getSequenceNumber() + " Should be: " + acc.getSequenceNumber());
+                        System.out.println("Incorrect Sequence Number: " + req.getSequenceNumber() + " Should be: " + (acc.getSequenceNumber()+1));
                         sendResponseToClient(createResponse("Incorrect Sequence Number.", req.getRID()), out);
                         return;
                     }
@@ -466,8 +475,8 @@ public class Ledger{
                     break;
                 case AUDIT:
                     Account acc1 = ledger.getAccount(publicKeyBase64);
-                    acc1.setRID(req.getRID());
-                    sendResponseToClient(createReadResponse(ledger.auditAccount(publicKeyBase64), acc1), out);
+                    //acc1.setRID(req.getRID());
+                    sendResponseToClient(createAuditReadResponse(ledger.auditAccount(publicKeyBase64), acc1, req), out);
                     break;
                 case REQUEST_SEQUENCE_NUMBER:
                     String sq = ""+ledger.getAccountSequenceNumber(publicKeyBase64);
@@ -491,6 +500,12 @@ public class Ledger{
                         }
                         if(acc_hi == null || acc_backlog == null) {
                             sendResponseToClient(createNOACKResponse(req), out);
+                            return;
+                        }
+                        Account this_account = ledger.getAccount(publicKeyBase64);
+                        if(acc_hi.getWTS() <= this_account.getWTS()){
+                            System.out.println("I already have a more recent write timestamp for this account.");
+                            sendResponseToClient(createWriteResponse(req),out);
                             return;
                         }
 
@@ -533,7 +548,7 @@ public class Ledger{
                             }
                         }
                         System.out.println("This state is gud.");
-                        Account this_account = ledger.getAccount(publicKeyBase64);
+
                         this_account.setTransactionId(acc_hi.getTransactionId());
                         this_account.setSequenceNumber(acc_hi.getSequenceNumber());
                         this_account.setWTS(acc_hi.getWTS());

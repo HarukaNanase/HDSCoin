@@ -90,7 +90,7 @@ public class NodeManager {
             Request req = entry.getKey();
             if(req.getOpcode() == Opcode.ACK && Long.parseLong(req.getParameter(0)) == this.WTS){
                 if(entry.getValue() >= (2*FAULT_VALUE + 1)) {
-                    System.out.println("Got 2F + 1 acks with correct WTS.");
+                    System.out.println("Number of acks: " + entry.getValue());
                     return true;
                 }
             }
@@ -109,11 +109,15 @@ public class NodeManager {
             readlist.add(node.sendRequest(request));
         }
 
-        return decideRegularRegisterRead(readlist);
+        return decideRegularRegisterRead(readlist, request);
     }
 
-    public Request decideRegularRegisterRead(ArrayList<Request> readlist){
-        readlist.removeIf(r->r.getOpcode() != Opcode.SERVER_ANSWER || r.getWTS() > this.WTS || r.getRID() != this.RID);
+    public Request decideRegularRegisterRead(ArrayList<Request> readlist, Request rekt){
+        if(rekt.getOpcode() == Opcode.AUDIT)
+            readlist.removeIf(r->r.getOpcode() != Opcode.SERVER_ANSWER || r.getRID() != this.RID);
+        else
+            readlist.removeIf(r->r.getOpcode() != Opcode.SERVER_ANSWER || r.getWTS() > this.WTS || r.getRID() != this.RID);
+
         System.out.println("VALID ANSWERS SIZE: " + readlist.size());
         System.out.println("DECIDE REGULAR REGISTER READ:");
         if(readlist.size() > (((float)nodes.size() + FAULT_VALUE)/2)) {
@@ -129,7 +133,6 @@ public class NodeManager {
                 occurrenceMap.put(req, occurrences == null ? 1 : occurrences + 1);
             }
 
-
             for(Entry<Request,Integer> entry : occurrenceMap.entrySet()) {
                 Request req = entry.getKey();
                 System.out.println("Values: " + entry.getValue());
@@ -144,7 +147,6 @@ public class NodeManager {
                                 return highestval;
                             }
                             Request request = new Request(Opcode.GET_CURRENT_STATE);
-
                             request.addParameter(Wallet.getPublicKeyString());
                             request.setSequenceNumber(Wallet.getSequenceNumber() + 1);
                             Wallet.setSequenceNumber(request.getSequenceNumber());

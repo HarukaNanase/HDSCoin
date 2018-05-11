@@ -105,6 +105,8 @@ public class Wallet {
 
     }
 
+    public static NodeManager getNodeManager(){return manager;}
+
     public static String getPublicKeyString(){
         return publicKeyString;
     }
@@ -183,7 +185,7 @@ public class Wallet {
             return;
         }
 
-        if(ureq.getOpcode() != Opcode.CREATE_ACCOUNT && ureq.getOpcode() != Opcode.REQUEST_CHAIN)
+        if(ureq.getOpcode() != Opcode.CREATE_ACCOUNT && ureq.getOpcode() != Opcode.REQUEST_CHAIN && ureq.getOpcode() != Opcode.AUDIT)
             ureq.setSequenceNumber(++sequenceNumber);
 
         ureq.addParameter(publicKeyString);
@@ -258,7 +260,7 @@ public class Wallet {
         }
     }
 
-    private static void GenerateKeys(){
+    public static void GenerateKeys(){
         try {
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
             keyGen.initialize(KEY_SIZE);
@@ -275,6 +277,7 @@ public class Wallet {
         privateKeyString = Base64.encode(privKeyBytes, KEY_SIZE);
         X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(
                 pKey.getEncoded());
+
         try {
             FileOutputStream fos = new FileOutputStream(System.getProperty("user.dir") + "/src/main/resources/" + "client.pub");
             fos.write(x509EncodedKeySpec.getEncoded());
@@ -289,8 +292,10 @@ public class Wallet {
             System.out.println("Failed to save key pair to file.");
             e.printStackTrace();
         }
-        System.out.println("Your key: " + publicKeyString);
-        System.out.println("Your private key: " + privateKeyString);
+        sequenceNumber=0;
+        isRegistered=false;
+        //System.out.println("Your key: " + publicKeyString);
+        //System.out.println("Your private key: " + privateKeyString);
     }
 
 
