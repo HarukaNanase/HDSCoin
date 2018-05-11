@@ -108,12 +108,7 @@ public class NodeManager {
             request.setNodeID(node.getPublicKeyString());
             readlist.add(node.sendRequest(request));
         }
-        System.out.println("THIS RID: " + this.RID);
-        System.out.println("THIS WTS: " + this.WTS);
-        System.out.println("ANSWERS RECEIVED:\n");
-        for(Request r : readlist){
-            System.out.println(r.requestAsJson());
-        }
+
         return decideRegularRegisterRead(readlist);
     }
 
@@ -142,34 +137,33 @@ public class NodeManager {
                     if (entry.getValue() >= (2 * FAULT_VALUE + 1)) {
                         System.out.println("Quorum sucessfull. 2F+1 equal highestvals.");
                         return req;
-                    }
-                } else if (req.getOpcode() == Opcode.SERVER_ANSWER && req.getWTS() < this.WTS) {
-                    //fall back to RR and write-back phase
-                    if (highestval != null) {
-                        LedgerNode node = this.getNodeByKey(highestval.getNodeID());
-                        Request request = new Request(Opcode.GET_CURRENT_STATE);
-                        request.addParameter(Wallet.getPublicKeyString());
-                        request.setSequenceNumber(Wallet.getSequenceNumber() + 1);
-                        Wallet.setSequenceNumber(request.getSequenceNumber());
-                        Request highestState = node.sendRequest(request);
-                        String stateData = highestState.getParameter(0);
-                        Request writeBack = new Request(Opcode.WRITE_BACK);
-                        writeBack.addParameter(Wallet.getPublicKeyString());
-                        writeBack.addParameter(stateData);
-                        if (broadcastWrite(writeBack)) {
-                            return highestval;
-                        } else {
-                            //?
-                            return highestval;
-                        }
+                    } else {
+                        if (highestval != null) {
+                            LedgerNode node = this.getNodeByKey(highestval.getNodeID());
+                            if(node != null && node.getDelivered().get(node.getDelivered().size()-1).getOpcode() == Opcode.REQUEST_SEQUENCE_NUMBER){
+                                return highestval;
+                            }
+                            Request request = new Request(Opcode.GET_CURRENT_STATE);
 
+                            request.addParameter(Wallet.getPublicKeyString());
+                            request.setSequenceNumber(Wallet.getSequenceNumber() + 1);
+                            Wallet.setSequenceNumber(request.getSequenceNumber());
+                            Request highestState = node.sendRequest(request);
+                            System.out.println("WTF");
+                            String stateData = highestState.getParameter(0);
+                            Request writeBack = new Request(Opcode.WRITE_BACK);
+                            writeBack.addParameter(Wallet.getPublicKeyString());
+                            writeBack.addParameter(stateData);
+                            if (broadcastWrite(writeBack)) {
+                                return highestval;
+                            } else {
+                                //?
+                                return highestval;
+                            }
+                        }
                     }
                 }
             }
-
-
-
-
             //System.out.println("Decision: ");
             //for(String s : highestval.getParameters())
              //   System.out.println(s);

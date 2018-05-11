@@ -315,6 +315,7 @@ public class Ledger{
         Request req = new Request(Opcode.SERVER_ANSWER);
         req.addParameter(message);
         req.setRID(RID);
+        req.setNodeID(ledger.publicKeyString);
         return req;
     }
 
@@ -348,6 +349,12 @@ public class Ledger{
         }
     }
 
+    private static Request createNOACKResponse(Request request){
+        Request no_ack = new Request(Opcode.NO_ACK);
+        no_ack.setWTS(request.getWTS());
+        request.setNodeID(ledger.publicKeyString);
+        return no_ack;
+    }
 
     public static void handleClientRequest(Socket client) throws SocketException, IOException{
             System.out.println("Awaiting client input");
@@ -474,6 +481,7 @@ public class Ledger{
                         HashMap<String, String> data = gson.fromJson(recent_data, new TypeToken<HashMap<String,String>>(){}.getType());
                         Account acc_hi = null;
                         ArrayList<Transaction> acc_backlog = null;
+
                         for(Map.Entry<String, String> entry : data.entrySet()){
                             if(entry.getKey().equals("account")){
                                 acc_hi = gson.fromJson(entry.getValue(), Account.class);
@@ -481,16 +489,24 @@ public class Ledger{
                                 acc_backlog = gson.fromJson(entry.getValue(), new TypeToken<ArrayList<Transaction>>(){}.getType());
                             }
                         }
+                        if(acc_hi == null || acc_backlog == null) {
+                            sendResponseToClient(createNOACKResponse(req), out);
+                            return;
+                        }
 
                         for(Block b : acc_hi.getBlockChain()){
                             for(Transaction t : b.getBlockTransactions()){
                                 if(t.getTSig() != null)
                                     if(!SecurityManager.VerifyMessage(t.getSourceAddress()+t.getDestinationAddress()+t.getValue(), t.getTSig(), t.getSourceAddress())){
                                         System.out.println("invalid state (Transaction TSig). NO_ACK");
+                                        sendResponseToClient(createNOACKResponse(req), out);
+                                        return;
                                     }
                                 if(t.getRSig() != null) {
                                     if (!SecurityManager.VerifyMessage(t.getDestinationAddress() + t.getSourceAddress() + t.getTransactionId(), t.getRSig(), t.getDestinationAddress())) {
                                         System.out.println("Invalid RSig. NO_ACK");
+                                        sendResponseToClient(createNOACKResponse(req), out);
+                                        return;
                                     }
                                 }
 
@@ -503,16 +519,37 @@ public class Ledger{
                             if(t.getTSig() != null) {
                                 if (!SecurityManager.VerifyMessage(t.getSourceAddress() + t.getDestinationAddress() + t.getValue(), t.getTSig(), t.getSourceAddress())) {
                                     System.out.println("invalid state (Transaction TSig) on backlog. NO_ACK");
+                                    sendResponseToClient(createNOACKResponse(req), out);
+                                    return;
+
                                 }
                             }
                             if(t.getRSig() != null) {
                                 if (!SecurityManager.VerifyMessage(t.getDestinationAddress() + t.getSourceAddress() + t.getTransactionId(), t.getRSig(), t.getDestinationAddress())) {
                                     System.out.println("Invalid RSig backlog. NO_ACK");
+                                    sendResponseToClient(createNOACKResponse(req), out);
+                                    return;
                                 }
                             }
                         }
                         System.out.println("This state is gud.");
+                        Account this_account = ledger.getAccount(publicKeyBase64);
+                        this_account.setTransactionId(acc_hi.getTransactionId());
+                        this_account.setSequenceNumber(acc_hi.getSequenceNumber());
+                        this_account.setWTS(acc_hi.getWTS());
+                        this_account.setRID(acc_hi.getRID());
+                        this_account.setQueue(acc_hi.getQueue());
+                        this_account.setBalance(acc_hi.getBalance());
+                        this_account.setBlockchain(acc_hi.getBlockChain());
+                        ledger.backlog.removeIf(t->t.getSourceAddress().equals(this_account.getPublicKeyString()));
+                        for(Transaction t : acc_backlog){
+                            if(!ledger.backlog.contains(t)){
+                                ledger.backlog.add(t);
+                            }
+                        }
+
                         sendResponseToClient(createWriteResponse(req),out);
+                        ledger.saveLedgerState(ledger.RESOURCES_PATH);
 
 
                         break;

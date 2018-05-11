@@ -80,6 +80,7 @@ public class Wallet {
                 sequenceNumber = sequenceNumber == -1 ? 0 : sequenceNumber;
                 manager.setWTS(wts == -1? 0 : wts);
                 manager.setRID(rid == -1? 0: rid);
+                if(sequenceNumber>0) isRegistered=true;
                 System.out.println("Manager : WTS: " + wts + " RID: " + rid);
             }
             if (sequenceNumber != -1)
@@ -189,8 +190,10 @@ public class Wallet {
         switch(ureq.getOpcode()) {
             case CREATE_ACCOUNT:
                 //signAndSendMessage(ureq);
-                isRegistered = manager.broadcastWrite(ureq);
-                sequenceNumber = 0;
+                if(!isRegistered) {
+                    isRegistered = manager.broadcastWrite(ureq);
+                    sequenceNumber = 0;
+                }
                 break;
             case CHECK_ACCOUNT:
                 //signAndSendMessage(ureq);

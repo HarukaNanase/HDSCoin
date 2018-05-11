@@ -59,5 +59,9 @@ public class Block
         return gson.toJson(this);
     }
 
+    public long getHeight(){
+        return this.height;
+    }
+
 
 }

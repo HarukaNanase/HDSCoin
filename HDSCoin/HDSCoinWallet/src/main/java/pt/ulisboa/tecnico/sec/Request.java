@@ -140,7 +140,6 @@ public class Request implements Comparable<Request>{
                 }
                 return true;
             }
-            System.out.println("SeqNr Now: " + this.getSequenceNumber());
             return false;
         }
         return false;

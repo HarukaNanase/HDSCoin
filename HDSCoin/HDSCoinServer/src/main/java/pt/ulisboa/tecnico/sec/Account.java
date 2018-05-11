@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.sec;
 import com.google.gson.Gson;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 
+import java.lang.reflect.Array;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
@@ -65,6 +66,10 @@ public class Account {
             delivered = new ArrayList<>();
             queue = new ArrayList<>();
             blockchain = new ArrayList<>();
+        }
+
+        public void setQueue(ArrayList<Request> q){
+            this.queue = q;
         }
 
         public void setTransactionId(long id){ this.transactionId = id;}
@@ -159,6 +164,10 @@ public class Account {
         this.blockchain.add(b);
     }
 
+    public void appendBlockToBlockChain(Block b){
+        this.blockchain.add(b);
+    }
+
     public synchronized boolean verifyChain(){
         Block current;
         Block previous;
@@ -177,4 +186,9 @@ public class Account {
         }
         return true;
     }
+
+    public void setBlockchain(ArrayList<Block> bc){
+        this.blockchain = bc;
+    }
+
 }
