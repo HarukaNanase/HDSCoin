@@ -33,16 +33,17 @@ Special attention to the SecurityManagerTest class where attempts to tamper with
 
 - Open a terminal and run - "mvn clean install" at the root project /HDSCoin
 - On /HDSCoin/HDSCoinServer run "mvn exec:java"
+	-"mvn compile exec:java -Dexec.args="ledger1"
 - On /HDSCoin/HDSCoinWallet run "mvn exec:java"
-  - To run client with predefined keys - On /HDSCoin/HDSCoinWallet run "mvn exec:java -Dexec.args="client1" where client1 is the folder where the keys are. The keys must be named client.priv and client.pub
+  - To run client with predefined keys - On /HDSCoin/HDSCoinWallet run "mvn compile exec:java -Dexec.args="client1" where client1 is the folder where the keys are. The keys must be named client.priv and client.pub
 
   - Two pre-generated key pairs are presented in the client1 and client2 folders. Those can be used to test the system and run demos on the software
 
 - After launching wallet, you can run the following commands:
  	- create_account - Creates an account on the server with the current keys loaded into the wallet
  	- check_account - Checks current wallet account in the server and prints account information
- 	- send_amount - Allows user to send a transaction of HDSCoins to another user by using the recipient's public key as the address and stipulating an ammount.
- 	- receive_amount - Allows recipient of a transaction to claim the coins previously sent into their balance.
+ 	- create_transaction - Allows user to send a transaction of HDSCoins to another user by using the recipient's public key as the address and stipulating an ammount.
+ 	- receive_transaction - Allows recipient of a transaction to claim the coins previously sent into their balance.
  	- audit - Allows an auditor to view any account information as long as they have the account's public key. This command can be run by any user, registered or not into the system.
 
  	Other commands:

@@ -24,6 +24,7 @@ public class Account {
         private transient PrivateKey privateKey;
         private String publicKeyString;
         private int balance;
+        private int INITIAL_VALUE = 50;
         private ArrayList<Transaction> backlog;
         private ArrayList<Block> blockchain;
         private long sequenceNumber;
@@ -97,8 +98,25 @@ public class Account {
             return this.balance;
         }
 
+        //BALANCE WITH CALCULATION (INITIAL_BALANCE + RECEIVING_DONE - SENDING_DONE)
+        public int getBalance2(){
+            int balance = INITIAL_VALUE;
+            for(Block b : this.getBlockChain()){
+                for(Transaction t : b.getBlockTransactions()){
+                    if(t.getSourceAddress().equals(this.publicKeyString))
+                        balance -= t.getValue();
 
-        public void makePayment(int value) throws Exception{
+                    else if(t.getDestinationAddress().equals(this.publicKeyString))
+                        balance += t.getValue();
+                }
+            }
+            return balance;
+        }
+
+
+
+
+    public void makePayment(int value) throws Exception{
             if((this.balance - value) < 0 || value <= 0){
                 //error out
                 throw new Exception("Not enough balance or negative value.");

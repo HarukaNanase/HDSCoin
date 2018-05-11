@@ -93,7 +93,8 @@ public class Wallet {
 
 
             while (true) {
-                System.out.println("What you wanna do?");
+                System.out.println("What you wanna do?\n");
+                System.out.println("1 - create_account\n2 - check_account\n3 - create_transaction\n4 - receive_transaction\n5 - audit\n");
                 String opcode = scanner.next();
                 handleUserInput(opcode);
             }
