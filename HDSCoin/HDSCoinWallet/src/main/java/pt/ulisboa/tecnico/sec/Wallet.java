@@ -277,7 +277,6 @@ public class Wallet {
         privateKeyString = Base64.encode(privKeyBytes, KEY_SIZE);
         X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(
                 pKey.getEncoded());
-
         try {
             FileOutputStream fos = new FileOutputStream(System.getProperty("user.dir") + "/src/main/resources/" + "client.pub");
             fos.write(x509EncodedKeySpec.getEncoded());
@@ -292,10 +291,8 @@ public class Wallet {
             System.out.println("Failed to save key pair to file.");
             e.printStackTrace();
         }
-        sequenceNumber=0;
-        isRegistered=false;
-        //System.out.println("Your key: " + publicKeyString);
-        //System.out.println("Your private key: " + privateKeyString);
+        System.out.println("Your key: " + publicKeyString);
+        System.out.println("Your private key: " + privateKeyString);
     }
 
 

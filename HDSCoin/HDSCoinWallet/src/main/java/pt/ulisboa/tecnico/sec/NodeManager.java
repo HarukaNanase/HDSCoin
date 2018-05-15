@@ -90,7 +90,7 @@ public class NodeManager {
             Request req = entry.getKey();
             if(req.getOpcode() == Opcode.ACK && Long.parseLong(req.getParameter(0)) == this.WTS){
                 if(entry.getValue() >= (2*FAULT_VALUE + 1)) {
-                    System.out.println("Number of acks: " + entry.getValue());
+                    System.out.println("Got 2F + 1 acks with correct WTS.");
                     return true;
                 }
             }

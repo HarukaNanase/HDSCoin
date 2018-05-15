@@ -394,7 +394,7 @@ public class Ledger{
                         return;
                     }
                     if(!SecurityManager.VerifySequenceNumber(req, acc) && req.getOpcode() != Opcode.WRITE_BACK){
-                        System.out.println("Incorrect Sequence Number: " + req.getSequenceNumber() + " Should be: " + (acc.getSequenceNumber()+1));
+                        System.out.println("Incorrect Sequence Number: " + req.getSequenceNumber() + " Should be: " + acc.getSequenceNumber());
                         sendResponseToClient(createResponse("Incorrect Sequence Number.", req.getRID()), out);
                         return;
                     }

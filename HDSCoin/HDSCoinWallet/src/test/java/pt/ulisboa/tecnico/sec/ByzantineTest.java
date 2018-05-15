@@ -43,6 +43,7 @@ public class ByzantineTest {
         assertEquals(true, manager.broadcastWrite(request));
     }
 
+/*
 
     @Test
     public void WriteAtomicRegisterTestCreateTransactionTest(){
@@ -57,7 +58,7 @@ public class ByzantineTest {
         transaction.addParameter(tSign);
         assertEquals(true, manager.broadcastWrite(transaction));
     }
-
+*/
     @Test
     public void ReadAtomicRegisterTestReadTransactionTest(){
         System.out.println("READ_ATOMIC_READ_TRANSACTION_TEST");
@@ -77,6 +78,7 @@ public class ByzantineTest {
         assertNotNull(manager.broadcastRead(read));
     }
 
+/*
     @Test
     public void WriteAtomicRegisterOneFaultTest(){
 
@@ -95,7 +97,7 @@ public class ByzantineTest {
         assertEquals(true, manager.broadcastWrite(transaction));
 
     }
-
+*/
     @Test
     public void ReadAtomicRegisterOneFaultTest(){
         System.out.println("READ_ATOMIC_REGISTER_ONE_FAULT_TEST");
