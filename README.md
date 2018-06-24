@@ -1,5 +1,5 @@
 # SEC - Sistemas de Elevada Confiabilidade (2017-2018)
-
+# Final Grade: 19,33
 ### Contributors
 - [@jtf16](https://github.com/jtf16) - João Freitas
 - [@HarukaNanase](https://github.com/HarukaNanase) - André Soares
